@@ -1,0 +1,19 @@
+\input{docs/preamble}
+\begin{document}
+\input{docs/coverpage}
+\clearpage
+\renewcommand*\contentsname{Table of Contents}
+\tableofcontents
+\clearpage
+\listoffigures
+\listoftables
+\clearpage
+\input{docs/report}
+\bibliographystyle{plainnat}
+\renewcommand{\bibfont}{\footnotesize}
+\clearpage\
+\bibliography{refs/references,refs/reading}
+\nocite{*}
+\clearpage
+\input{docs/appendices}
+\end{document}

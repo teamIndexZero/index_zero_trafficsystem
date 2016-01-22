@@ -1,0 +1,73 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+%Table of Content depth
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+%Page layout sizes
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm,a4paper]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+	\setlist{nosep}
+\usepackage{url}
+\usepackage[numbers]{natbib}
+\usepackage[nottoc,notlot,notlof,numbib]{tocbibind}
+%\usepackage[bottom]{footmisc}
+\usepackage[table,xcdraw,usenames,dvipsnames]{xcolor}
+\usepackage[font=scriptsize]{caption}
+	\captionsetup{labelfont=bf,textfont=bf}
+	\DeclareCaptionType{equCaption}[][List of equations]
+	\captionsetup[equCaption]{name=Equation}
+\usepackage{subfig}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{hyperref}
+	\hypersetup{colorlinks=false,pdfborder=0 0 0}
+\usepackage{cleveref}
+	\crefname{equation}{equation}{equations}
+	\crefname{figure}{figure}{figures}
+	\crefname{table}{table}{tables}	
+	\crefname{code}{code}{code}
+\usepackage{makeidx}
+\usepackage{graphicx}
+
+\usepackage{mathtools}
+	\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+
+\usepackage{tikz}
+	\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
+\usepackage{tikz-3dplot}
+\usetikzlibrary{arrows,shapes,positioning,shadows,trees,calc}
+
+\usepackage{lmodern}
+\usepackage{kpfonts}
+\usepackage{nth}
+\usepackage{verbatim}
+
+\definecolor{light-grey}{gray}{0.95}
+
+\usepackage[]{algorithm2e}
+\usepackage{listings} %for code
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\scriptsize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  commentstyle=\color{blue},   	   % comment style
+  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{Violet},       % keyword style
+  %numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  %numbersep=5pt,                   % how far the line-numbers are from the code
+  %numberstyle=\tiny\color{gray}, % the style that is used for the line-numbers
+  %rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  %stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  tabsize=2,                       % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\setlength{\parindent}{0pt}
+\hyphenchar\font=-1
+\sloppy
