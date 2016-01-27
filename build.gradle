@@ -20,5 +20,6 @@ subprojects {
     dependencies {
         testCompile 'junit:junit:4.11'
         testCompile 'org.mockito:mockito-all:1.8.4'
+        testCompile 'org.easytesting:fest-assert-core:2.0M10'
     }
 }

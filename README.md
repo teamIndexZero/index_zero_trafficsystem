@@ -32,3 +32,14 @@ Created by KCL students as a part of group project 2016
  1. simulator - actual simulator with all the logic embedded in there
  2. gui - graphical user interface capable of drawing the animated simulation, getting input either from the simulator
  directly via pipe, or from a file.
+ 
+ ## Tests 
+ 
+ There are a couple of easy things in use for testing, namely: 
+ 
+ 1. JUnit - 'default' test runner for java. Basically, you create a class in Test source root (`src/test/java`), make up 
+ a method which is going to be the test and annotate it with `@Test` annotation. 
+ 2. Mockito - mock framework. When we have no dependency ready, or when we want to test dependency in isolation, it comes handy. http://www.vogella.com/tutorials/Mockito/article.html nice tutorial
+ 3. Fest-assert - fluent assertion library. https://github.com/alexruiz/fest-assert-2.x/wiki/One-minute-starting-guide one minute starting guide. It saves time on tests. 
+ 
+ Obviously we not need use 2) and 3), but they come handy as we get into the longer run.
