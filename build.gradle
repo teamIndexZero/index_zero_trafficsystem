@@ -1,0 +1,24 @@
+group 'team_index_zero'
+version '1.0-SNAPSHOT'
+
+
+allprojects {
+    apply plugin: 'java'
+
+    sourceCompatibility = 1.7
+    group = 'org.team_index_zero.traffic_simulation'
+    version = '1.0'
+}
+
+subprojects {
+    apply plugin: 'application'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testCompile 'junit:junit:4.11'
+        testCompile 'org.mockito:mockito-all:1.8.4'
+    }
+}

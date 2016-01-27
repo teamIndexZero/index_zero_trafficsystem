@@ -1,0 +1,5 @@
+rootProject.name = 'traffic_simulation'
+include 'gui'
+include 'simulator'
+
+
