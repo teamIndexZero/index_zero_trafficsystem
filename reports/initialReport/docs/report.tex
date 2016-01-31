@@ -120,3 +120,14 @@ team that may arise.
 	\end{itemize}
 
 \end{itemize}
+
+\section{Project Description - engine} 
+
+We decided to program our project in Java, as this programing language is known by everyone and it gives possibility to create powerful projects. The simulation engine would be based on Nagel–Schreckenberg model of simulation traffic. In this model the street is divided into cellular automaton. Each cell, in the Nagel–Schrecken model stands for 7.5 m. It could be occupied (but only by 1 car) or be free. Cars and other participants can:
+	\begin{itemize}
+		\item accelerate - increase their velocity, only if the next cell is not occupied.
+		\item brake - decrease their  velocity if other traffic participants are too close. 
+		\item take part in a random action, i.e. decrease speed because of the child that ran at the road (random actions would occur with a set probability). 
+		\item move from one cell to the another, with the respect to the set traffic arrangements. 
+	\end{itemize}
+
