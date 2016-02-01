@@ -24,7 +24,7 @@ public class Log_Config {
         //TODO if invalid/empty load defaults
 
         //DEFAULTS
-        Log_TimeStamp time_stamp = new Log_TimeStamp(); //TODO catch exception
+        Log_TimeStamp time_stamp = new Log_TimeStamp();
         global_file_name += time_stamp.getCustomStamp( "yyyyMMdd'-'HHmmss" );
         outputs.add( new Output_TERM( "Console" ) ); //Change to Output_TXT when implemented
     }

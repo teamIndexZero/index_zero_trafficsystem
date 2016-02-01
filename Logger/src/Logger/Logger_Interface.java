@@ -23,7 +23,7 @@ public interface Logger_Interface {
     void log_Error( Object... objects );
 
     /**
-     * Logs a warnign message
+     * Logs a warning message
      * @param objects description
      */
     void log_Warning( Object... objects );
