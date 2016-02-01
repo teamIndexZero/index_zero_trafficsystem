@@ -1,0 +1,101 @@
+@startuml
+
+'skinparam monochrome true
+skinparam classAttributeIconSize 0
+
+interface SimulationAware {
++tick(time:Time)
+}
+
+class Simulator {
++Simulator(Map, Evnrionment, MapObjectCollection, DrivingRules, SimParams)
++start()
++stop()
++getStatus():SimulatorStatus
+-status:StatusEnum
+-simulationStep
+-simulationTimeElapsed
+-realTimeElapsed
+-tick()
+}
+
+Simulator --> Map: Controls, sends ticks\nand events
+
+note left of Map: 'see' is the vision \n of the moving objects (vehicles)
+class Map {
++tick(time:Time)
++addObject(MapObject, Position)
++removeObject(MapObject)
++moveObject(MapObject, Position)
++isMovePossible(MapObject, Position)
++isRegionFree(Position)
++see(MapObject, VisibilityFactor): Map
++dumpRawMapState(): byte[]
+-rawMapData: byte[]
+-env:Evnrionment
+-mapObjectCollection:Collection<MapObject>
+}
+
+Map --|> SimulationAware
+
+interface MapObject {
++tick(time:Time)
++getPosition():Position
++setMap(Map)
+}
+
+MapObject --|> SimulationAware
+Map "1" o--> "*" MapObject
+
+class Vehicle {
++tick(time:Time)
++getPosition():Position
++setMap(Map)
+-weightKilos: float
+-position: Position
+-map
+-speed
+-acceleration
+-direction
+-driverSpec:DriverStrategy
+-route:MapRoute
+}
+
+Vehicle --|> MapObject
+
+class Obstacle {
++tick(time:Time) //noop for now!
++getPosition():Position
++setMap(Map)
+-map:Map
+-position:Position
+}
+
+Obstacle --|> MapObject
+
+class MapFactory {
++createDefaultMap():Map
++createSimpleMap(int widht, int height):Map
++createMapFromSpec(MapSpec):Map
++creatMapFromFile(File):Map
+}
+
+MapFactory --> Map: "creates"
+
+class Evnrionment {
++getVisibilityCells(): int
++getNextPos(Map, Position, Vehicle):
++getTractionCoefficient(): float
+}
+
+Map "1" o-> "1" Evnrionment
+
+class DriverStrategy {
++getNextPossibleMoves(current: Position,\n visibleMap: Map, Route): VehicleMove[]
+-strategyState
+}
+
+Vehicle "1" o-> "1" DriverStrategy
+
+
+@enduml
