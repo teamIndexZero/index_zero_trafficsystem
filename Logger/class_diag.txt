@@ -1,14 +1,12 @@
-size="4,7.5"
-
 @startuml
 
 package "Logger" #FFFFFF {
 
-	Logger_Interface <|-- Logger
+	Logger --|> Logger_Interface
+	Log_Levels <-- Logger
 	Log_TimeStamp <-- Logger
 	Log_Engine <-- Logger
 	Log_Config <-- Log_Engine
-	
 	
 	interface Logger_Interface <<interface>> {
 		{abstract} log( objects : Object... )
@@ -34,6 +32,12 @@ package "Logger" #FFFFFF {
 	}
 
 	class Log_Engine {
+		-{static} Log_Engine INSTANCE
+		-Log_Config global_log_config
+		-Long session_msg_number
+		-Log_Engine()
+		+{static} getInstance() : Log_Engine
+		#processLogMsg( time_stamp : Log_TimeStamp, level : int, class_origin : String, objects : Object... )
 	}
 
 	class Log_Config {
@@ -131,20 +135,21 @@ package "Logger" #FFFFFF {
 			CSV
 		}
 
-		Formatter_Interface <-- Formatter_TERM
-		Formatter_Interface <-- Formatter_TXT
-		Formatter_Interface <-- Formatter_CSV
+		Formatter_TERM --|> Formatter_Interface
+		Formatter_TXT --|> Formatter_Interface
+		Formatter_CSV --|> Formatter_Interface
 		Log_TimeStamp <-- Formatter_TERM
 		Log_TimeStamp <-- Formatter_TXT
 		Log_TimeStamp <-- Formatter_CSV
 		GlobalOutputTypes <-- Output
+		Output <-- Log_Engine
 		Output <|-- Output_TERM
 		Output <|-- Output_TXT
 		Output <|-- Output_CSV
 		Output <-- Log_Levels
-		Output_TERM <-- Formatter_TERM
-		Output_TXT <-- Formatter_TXT
-		Output_CSV <-- Formatter_CSV
+		Output_TERM --> Formatter_TERM
+		Output_TXT --> Formatter_TXT
+		Output_CSV --> Formatter_CSV
 	}
 }
 
