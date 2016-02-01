@@ -4,14 +4,15 @@ version '1.0-SNAPSHOT'
 allprojects {
     apply plugin: 'java'
 
-    sourceCompatibility = 1.8
+    compileJava {
+        sourceCompatibility = '1.8'
+    }
+
     group = 'org.team_index_zero.traffic_simulation'
     version = '1.0'
 }
 
 subprojects {
-    apply plugin: 'application'
-
     repositories {
         mavenCentral()
     }
