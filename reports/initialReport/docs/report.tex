@@ -32,8 +32,8 @@ achieving those aims. A rough timetable may be appropriate and you may wish to b
 		\item technology choice: Java. Why?:
 		\begin{itemize}
 		    \item maximum intersection set of what team knows
-		    \item many libraries and tools, incl. spatial, modeling, parallelism, etc.
-		    \item it is crossplatform, and can run on all 3 major OSs (we have Windows and Mac in team)
+		    \item many libraries and tools, incl. spatial, modelling, parallelism, etc.
+		    \item it is cross-platform, and can run on all 3 major OSs (we have Windows and Mac in team)
 		    \item Has GUI capabilities
 		\end{itemize}
 
@@ -65,7 +65,7 @@ achieving those aims. A rough timetable may be appropriate and you may wish to b
 	        \item Something else here gentlemen?
 	    \end{itemize}
 
-	    \item by 1st of Apirl - documentation and report
+	    \item by 1st of April - documentation and report
 	    \begin{itemize}
 	        \item Code prepared and ensured for correctness and visibility
 	        \item Report ready and submitted.
@@ -82,6 +82,18 @@ achieving those aims. A rough timetable may be appropriate and you may wish to b
 	\end{itemize}
 
 \end{itemize}
+
+\subsection{Simulation Engine} 
+
+We decided to program our project in Java, as this programming language is known by everyone and it gives possibility to create powerful projects. The simulation engine would be based on Nagel–Schreckenberg model of simulation traffic. In this model the street is divided into cellular automaton. Each cell, in the Nagel–Schrecken model stands for 7.5 m. It could be occupied (but only by 1 car) or be free. Cars and other participants can:
+	\begin{itemize}
+		\item accelerate - increase their velocity, only if the next cell is not occupied.
+		\item brake - decrease their  velocity if other traffic participants are too close. 
+		\item take part in a random action, i.e. decrease speed because of the child that ran at the road (random actions would occur with a set probability). 
+		\item move from one cell to the another, with the respect to the set traffic arrangements. 
+	\end{itemize}
+	
+	
 
 \section{Project Organisation} %~40% of the report
 Describe how you will work together as a team. You should set out the roles you expect team members to play and what
@@ -115,19 +127,12 @@ team that may arise.
 	\item Tools
 	\begin{itemize}
 		\item Trello
-		\item HipChat (inc. Git commit plugin)
+		\item HipChat (inc. Git commit & trello plugin)
 	    \item JetBrain's IntelliJ Idea IDE for everyone
+	    \item PlantUML for UML diagrams?
 	\end{itemize}
 
 \end{itemize}
 
-\section{Project Description - engine} 
 
-We decided to program our project in Java, as this programing language is known by everyone and it gives possibility to create powerful projects. The simulation engine would be based on Nagel–Schreckenberg model of simulation traffic. In this model the street is divided into cellular automaton. Each cell, in the Nagel–Schrecken model stands for 7.5 m. It could be occupied (but only by 1 car) or be free. Cars and other participants can:
-	\begin{itemize}
-		\item accelerate - increase their velocity, only if the next cell is not occupied.
-		\item brake - decrease their  velocity if other traffic participants are too close. 
-		\item take part in a random action, i.e. decrease speed because of the child that ran at the road (random actions would occur with a set probability). 
-		\item move from one cell to the another, with the respect to the set traffic arrangements. 
-	\end{itemize}
 
