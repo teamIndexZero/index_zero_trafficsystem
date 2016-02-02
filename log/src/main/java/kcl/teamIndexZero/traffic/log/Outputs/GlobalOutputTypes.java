@@ -1,4 +1,4 @@
-package Logger.Outputs;
+package kcl.teamIndexZero.traffic.log.Outputs;
 
 /**
  * Created by Es on 27/01/2016.

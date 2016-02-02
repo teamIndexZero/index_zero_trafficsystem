@@ -1,7 +1,7 @@
-package Logger;
+package kcl.teamIndexZero.traffic.log;
 
-import Logger.Outputs.Output;
-import Logger.Outputs.Output_TERM;
+import kcl.teamIndexZero.traffic.log.Outputs.Output;
+import kcl.teamIndexZero.traffic.log.Outputs.Output_TERM;
 
 import java.util.Vector;
 
@@ -25,12 +25,13 @@ public class Log_Config {
 
         //DEFAULTS
         Log_TimeStamp time_stamp = new Log_TimeStamp();
-        global_file_name += time_stamp.getCustomStamp( "yyyyMMdd'-'HHmmss" );
-        outputs.add( new Output_TERM( "Console" ) ); //Change to Output_TXT when implemented
+        global_file_name += time_stamp.getCustomStamp("yyyyMMdd'-'HHmmss");
+        outputs.add(new Output_TERM("Console")); //Change to Output_TXT when implemented
     }
 
     /**
      * Gets the current global file output name
+     *
      * @return Global file output name
      */
     public String getFileName() {
@@ -39,6 +40,7 @@ public class Log_Config {
 
     /**
      * Gets the log level
+     *
      * @return Log level
      */
     public int getGlobalLogLevel() {
@@ -47,6 +49,7 @@ public class Log_Config {
 
     /**
      * Gets the output pipes of the log
+     *
      * @return Outputs
      */
     protected Vector<Output> getOutputs() {
@@ -55,10 +58,11 @@ public class Log_Config {
 
     /**
      * Sets the global log level
+     *
      * @param level Minimum level
      */
-    private void setGlobalLogLevel( int level ) {
-        if( level < Log_Levels.OFF ) level = Log_Levels.OFF;
+    private void setGlobalLogLevel(int level) {
+        if (level < Log_Levels.OFF) level = Log_Levels.OFF;
         this.global_log_level = level;
     }
 }

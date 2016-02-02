@@ -152,7 +152,7 @@ package "Logger" #FFFFFF {
 		Output_CSV --> Formatter_CSV
 	}
 	
-	package "Logger.FileIO" #DDDDDD {
+	package "kcl.teamIndexZero.traffic.log.FileIO" #DDDDDD {
 		class FileIO {
 			+FileIO( file_name : String )
 		}

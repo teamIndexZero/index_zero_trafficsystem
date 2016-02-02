@@ -1,13 +1,11 @@
 package kcl.teamIndexZero.traffic.simulator;
 
-import kcl.teamIndexZero.traffic.simulator.SomeNiceClass;
 import org.junit.Assert;
 import org.junit.Test;
-import static org.fest.assertions.api.Assertions.*;
-
 
 import java.util.List;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 

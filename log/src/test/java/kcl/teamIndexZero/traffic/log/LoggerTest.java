@@ -1,4 +1,4 @@
-package Logger;
+package kcl.teamIndexZero.traffic.log;
 
 import org.junit.Test;
 
@@ -9,8 +9,8 @@ public class LoggerTest {
 
     @Test
     public void testGetLoggerInstance() throws Exception {
-        Logger log = Logger.getLoggerInstance( "Logger_test" );
-        log.log( "Testing ", 1, ", " , 2, ", ", 3, ", and some more..." );
+        Logger log = Logger.getLoggerInstance("Logger_test");
+        log.log("Testing ", 1, ", ", 2, ", ", 3, ", and some more...");
     }
 
     @Test

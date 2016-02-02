@@ -1,4 +1,4 @@
-package Logger;
+package kcl.teamIndexZero.traffic.log;
 
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -11,7 +11,7 @@ public class Log_ConfigTest extends TestCase {
     @Test
     public void testGetFileName() throws Exception {
         Log_Config config = new Log_Config();
-        System.out.println( config.getFileName() );
+        System.out.println(config.getFileName());
     }
 
     @Test
