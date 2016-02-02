@@ -1,26 +1,48 @@
 %Max 1500w or 4 pages
 %Deadline 17:00 on Tuesday 09-02-2016
 
+\section{Introduction}
+
+The project aims to create a micro-modelled road traffic simulation engine enabling inspection of various effects of changing key rules within the model. For team members, this project is centered around teamwork and also, as a less prominent addition, the learning and application of software engineering skills.
+
 \section{Project Description} %~60% of the report
 Describe your team’s aims for the projects. Outline what aims your team have set for the project and your strategy for
 achieving those aims. A rough timetable may be appropriate and you may wish to break your aims into levels
  (e.g. mandatory / optional or we will first work on level 1 aims before moving to level 2 aims) to allow for
  unexpected issues that may arise. You must also describe how your initial progress developing your piece of software
  has gone and where you currently are relative to your aims.
+ 
 
-\begin{itemize}
-	\item Outline of the project
+\subsection{Project Outline}
+
+
+research micro/macro
+architecture
+division into artifact (gui,simulator,log)
+
+
+
+
+\subsubsection{Model}
+
+As the micro-model implementation focuses on individual representation of cars as physical objects and individual tuning of their parameters the starting point chosen is based on the Nagel–Schreckenberg model. The roads in this model are represented as cellular automata\cite{Schreckenberg}. In this, each cell can either be occupied by an object or be empty. Cars can have different properties such as acceleration, speed, direction and can move to other free neighbouring cells. The model can be expanded through the use of graphs to connect roads.
+
+In the early stages streets will be arranged to model simple road networks and, in time, more realistic ones.
+Rules in the simulation will include driving rules such as crossings, lane changes, etc.., and laws of physics. That can be further expanded to include weather factors and engine emissions.
+
+The simulation system will be used to gather relevant data for analysis that can include road network throughput, congestion effects, pollution and more generally reaction of the model to changing rules.
+
+\subsubsection{Technical considerations} %%??
+
+
+\subsubsection{}
+
 	\begin{itemize}
 		\item approach (conceptual and technical)
 		\begin{itemize}
 		    \item Base: build, test, IDE, rough architecture set up.
-		    \item Micro model: focusing on individual representation of cars as physical objects and individual tuning of their parameters
-		    \item Starting with simple model, adding obstacles on road, lane changing, varying speeds/acceleration
-		    \item Adding crossings with rules
-		    \item Adding traffic lights
-		    \item Estimating model throughput, etc.
-		    \item Estimating weather factors, or rules (external) factors on model key parameters - throughput and latency
-		    \item Estimating 2nd level effects (like pollution effect) from traffic regulation change
+		    
+
 		\end{itemize}
 
 		\item rough architecture
@@ -38,6 +60,11 @@ achieving those aims. A rough timetable may be appropriate and you may wish to b
 		\end{itemize}
 
 	\end{itemize}
+\subsection{Timetable}
+ 
+
+\begin{itemize}
+
 
 	\item Rough plan (estimate). Splitting all 2 months into 4 rough periods:
 	\begin{itemize}
@@ -83,22 +110,6 @@ achieving those aims. A rough timetable may be appropriate and you may wish to b
 
 \end{itemize}
 
-\subsection{Simulation Engine} 
-
-We decided to program our project in Java, as this programming language is known by everyone and it gives possibility to create powerful projects. The simulation engine would be based on Nagel–Schreckenberg model of simulation traffic. In this model the street is divided into cellular automaton[1]. Each cell, in the Nagel–Schrecken model stands for 7.5 m. It could be occupied (but only by 1 car) or be free [1]. Cars and other participants can:
-	\begin{itemize}
-		\item accelerate - increase their velocity, only if the next cell is not occupied.
-		\item brake - decrease their  velocity if other traffic participants are too close. 
-		\item take part in a random action, i.e. decrease speed because of the child that ran at the road (random actions would occur with a set probability). 
-		\item move from one cell to the another, with the respect to the set traffic arrangements [1]. 
-	\end{itemize}
-	
-The different parts of the street would be (i.e. straight streets or crossroads etc.) would be a different nodes of a graph. All structure would be mapping the scheme of streets that represents the traffic vision. Cars would be moving within each node. Then, when they reach the border of the node's automaton, they  would continue moving in the automaton that are in the neighbourhood nodes. Cars would vanish if they reach and go through the whole the border node.  New cars would randomly occurs at a borders nodes and continue their way into the "interior" of the graph. 
-
-%% bibliography for this paragraph 
-1. Nagel, K.; Schreckenberg, M. (December 1992).  
-"A cellular automaton model for freeway traffic" . Journal de Physique I 2 , pages : 2221-2229
-%%%%%%	
 
 \section{Project Organisation} %~40% of the report
 Describe how you will work together as a team. You should set out the roles you expect team members to play and what
@@ -132,7 +143,7 @@ team that may arise.
 	\item Tools
 	\begin{itemize}
 		\item Trello
-		\item HipChat (inc. Git commit & trello plugin)
+		\item HipChat (inc. Git commit \& trello plugin)
 	    \item JetBrain's IntelliJ Idea IDE for everyone
 	    \item PlantUML for UML diagrams?
 	\end{itemize}
