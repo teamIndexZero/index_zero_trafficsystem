@@ -1,0 +1,3 @@
+apply plugin: 'application'
+mainClassName = 'kcl.teamIndexZero.traffic.simulator.SomeNiceClass'
+

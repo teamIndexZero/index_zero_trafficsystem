@@ -1,5 +1,143 @@
+%Max 1500w or 4 pages
+%Deadline 17:00 on Tuesday 09-02-2016
+
+\section{Project Description} %~60% of the report
+Describe your team’s aims for the projects. Outline what aims your team have set for the project and your strategy for
+achieving those aims. A rough timetable may be appropriate and you may wish to break your aims into levels
+ (e.g. mandatory / optional or we will first work on level 1 aims before moving to level 2 aims) to allow for
+ unexpected issues that may arise. You must also describe how your initial progress developing your piece of software
+ has gone and where you currently are relative to your aims.
+
+\begin{itemize}
+	\item Outline of the project
+	\begin{itemize}
+		\item approach (conceptual and technical)
+		\begin{itemize}
+		    \item Base: build, test, IDE, rough architecture set up.
+		    \item Micro model: focusing on individual representation of cars as physical objects and individual tuning of their parameters
+		    \item Starting with simple model, adding obstacles on road, lane changing, varying speeds/acceleration
+		    \item Adding crossings with rules
+		    \item Adding traffic lights
+		    \item Estimating model throughput, etc.
+		    \item Estimating weather factors, or rules (external) factors on model key parameters - throughput and latency
+		    \item Estimating 2nd level effects (like pollution effect) from traffic regulation change
+		\end{itemize}
+
+		\item rough architecture
+		\begin{itemize}
+		    \item Component 1 - simulator
+		    \item Component 2 - GUI/animation engine
+		\end{itemize}
+
+		\item technology choice: Java. Why?:
+		\begin{itemize}
+		    \item maximum intersection set of what team knows
+		    \item many libraries and tools, incl. spatial, modelling, parallelism, etc.
+		    \item it is cross-platform, and can run on all 3 major OSs (we have Windows and Mac in team)
+		    \item Has GUI capabilities
+		\end{itemize}
+
+	\end{itemize}
+
+	\item Rough plan (estimate). Splitting all 2 months into 4 rough periods:
+	\begin{itemize}
+
+	    \item By 9th of Feb - initial report submission time:
+	    \begin{itemize}
+	        \item Team structure ready
+	        \item Team process setup (communication, teamwork, knowledge sharing, visibility)
+	        \item Rough architecture outlined, some basics set for modelling
+	    \end{itemize}
+
+	    \item by March 1st - less than 1 month iteration
+	    \begin{itemize}
+	        \item Basic modelling ready: simple roads (multi-lane) with different physical (and mental) properties of objects
+	        \item Basic tooling support: setting up testbed parameters, map, parameters of active objects
+	        \item Basic measurements ready: log output, throughput measurements, ability to save sim runs for future inspection
+	        \item Basic GUI ready: able to display animations either from live simulation or saved as a file
+	    \end{itemize}
+
+	    \item by March 25th - end of project development (+buffer). Could go in one or some of the directions:
+	    \begin{itemize}
+	        \item Larger size of the model: graph with many connections
+	        \item Loading map data from actual OpenStreetMap sources (filtering highways, counting lanes, etc.)
+	        \item Attempting in-model traffic lights and model parameters optimization with different algorithms
+	        \item Something else here gentlemen?
+	    \end{itemize}
+
+	    \item by 1st of April - documentation and report
+	    \begin{itemize}
+	        \item Code prepared and ensured for correctness and visibility
+	        \item Report ready and submitted.
+	        \item Presentation ready, rehearsed
+	    \end{itemize}
+
+	\end{itemize}
+
+	\item Things done to date
+	\begin{itemize}
+		\item (Should be by that moment) Basic simulation skeleton and architecture
+		\item Graple deployment harness
+		\item Basic log system
+	\end{itemize}
+
+\end{itemize}
+
+\subsection{Simulation Engine} 
+
+We decided to program our project in Java, as this programming language is known by everyone and it gives possibility to create powerful projects. The simulation engine would be based on Nagel–Schreckenberg model of simulation traffic. In this model the street is divided into cellular automaton[1]. Each cell, in the Nagel–Schrecken model stands for 7.5 m. It could be occupied (but only by 1 car) or be free [1]. Cars and other participants can:
+	\begin{itemize}
+		\item accelerate - increase their velocity, only if the next cell is not occupied.
+		\item brake - decrease their  velocity if other traffic participants are too close. 
+		\item take part in a random action, i.e. decrease speed because of the child that ran at the road (random actions would occur with a set probability). 
+		\item move from one cell to the another, with the respect to the set traffic arrangements [1]. 
+	\end{itemize}
+	
+The different parts of the street would be (i.e. straight streets or crossroads etc.) would be a different nodes of a graph. All structure would be mapping the scheme of streets that represents the traffic vision. Cars would be moving within each node. Then, when they reach the border of the node's automaton, they  would continue moving in the automaton that are in the neighbourhood nodes. Cars would vanish if they reach and go through the whole the border node.  New cars would randomly occurs at a borders nodes and continue their way into the "interior" of the graph. 
+
+%% bibliography for this paragraph 
+1. Nagel, K.; Schreckenberg, M. (December 1992).  
+"A cellular automaton model for freeway traffic" . Journal de Physique I 2 , pages : 2221-2229
+%%%%%%	
+
+\section{Project Organisation} %~40% of the report
+Describe how you will work together as a team. You should set out the roles you expect team members to play and what
+processes and tools you will use to collaborate together as a team. You should also explain the process you expect to
+use for handling peer assessment as well as the mechanisms you have agreed upon for handling any conflicts within the
+team that may arise.
+
+\begin{itemize}
+	\item Teamwork
+	\begin{itemize}
+		\item Distribution of tasks
+    	\item Conflict resolution
+    	\item Efforts planned from each member
+    	\item Meetings (could tie in the tools in this section?)
+        \begin{enumerate}
+            \item Organisation of matters to discuss
+            \item Organisation of meeting time
+        \end{enumerate}
+        \item peer assesment (marks)
+
+        \item Process
+        \begin{itemize}
+            \item Kanban-like process with board and no strict iterations defined
+            \item Minimum viable product set out rather early (half-time) so should have features to add on later
+            \item Git: for now master-only, will switch to features branches as everyone is comfy with git
+            \item Test: obligatory automated unit-testing for components and features
+            \item Peer review: post-commit review of features (peer). At least 1 person should have looked at code after commit.
+        \end{itemize}
+	\end{itemize}
+
+	\item Tools
+	\begin{itemize}
+		\item Trello
+		\item HipChat (inc. Git commit & trello plugin)
+	    \item JetBrain's IntelliJ Idea IDE for everyone
+	    \item PlantUML for UML diagrams?
+	\end{itemize}
+
+\end{itemize}
 
 
-
-        \item Using cellular automata for traffic modelling
 
