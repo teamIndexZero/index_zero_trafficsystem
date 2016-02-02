@@ -25,7 +25,18 @@ Created by KCL students as a part of group project 2016
  ## Developing with IntelliJ IDEA
 
  In order to import project, from the IntelliJ IDEA start screen, select Import -> From existing model -> Choose Gradle
- and then choose our build.gradle top-level file.
+ and then choose our build.gradle top-level file:
+ 
+ 1. Start up IDEA
+ 2. If any project is open, click File -> Close project
+ 3. From IDEA New project screen, select Import project
+ 4. Select Traffic System project folder
+ 5. When asked what to do: Import project from external model -> Gradle
+ 6. Next screen: settings: tick Use auto-import, tick create dirs for empty content roots. Use gradle wrapper.
+ 7. Import all projects (tick all boxes) 
+ 8. In IDEA (top-right): Unregistered VCS root detected -> Add root
+ 9. Try building it - in Gradle sidebar, invoke: gradlew.bat build in top level terminal.
+ 
 
  ## Project structure
 
