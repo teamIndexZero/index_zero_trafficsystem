@@ -151,6 +151,12 @@ package "Logger" #FFFFFF {
 		Output_TXT --> Formatter_TXT
 		Output_CSV --> Formatter_CSV
 	}
+	
+	package "Logger.FileIO" #DDDDDD {
+		class FileIO {
+			+FileIO( file_name : String )
+		}
+	}	
 }
 
 @enduml
