@@ -85,16 +85,20 @@ achieving those aims. A rough timetable may be appropriate and you may wish to b
 
 \subsection{Simulation Engine} 
 
-We decided to program our project in Java, as this programming language is known by everyone and it gives possibility to create powerful projects. The simulation engine would be based on Nagel–Schreckenberg model of simulation traffic. In this model the street is divided into cellular automaton. Each cell, in the Nagel–Schrecken model stands for 7.5 m. It could be occupied (but only by 1 car) or be free. Cars and other participants can:
+We decided to program our project in Java, as this programming language is known by everyone and it gives possibility to create powerful projects. The simulation engine would be based on Nagel–Schreckenberg model of simulation traffic. In this model the street is divided into cellular automaton[1]. Each cell, in the Nagel–Schrecken model stands for 7.5 m. It could be occupied (but only by 1 car) or be free [1]. Cars and other participants can:
 	\begin{itemize}
 		\item accelerate - increase their velocity, only if the next cell is not occupied.
 		\item brake - decrease their  velocity if other traffic participants are too close. 
 		\item take part in a random action, i.e. decrease speed because of the child that ran at the road (random actions would occur with a set probability). 
-		\item move from one cell to the another, with the respect to the set traffic arrangements. 
+		\item move from one cell to the another, with the respect to the set traffic arrangements [1]. 
 	\end{itemize}
 	
 The different parts of the street would be (i.e. straight streets or crossroads etc.) would be a different nodes of a graph. All structure would be mapping the scheme of streets that represents the traffic vision. Cars would be moving within each node. Then, when they reach the border of the node's automaton, they  would continue moving in the automaton that are in the neighbourhood nodes. Cars would vanish if they reach and go through the whole the border node.  New cars would randomly occurs at a borders nodes and continue their way into the "interior" of the graph. 
-	
+
+%% bibliography for this paragraph 
+1. Nagel, K.; Schreckenberg, M. (December 1992).  
+"A cellular automaton model for freeway traffic" . Journal de Physique I 2 , pages : 2221-2229
+%%%%%%	
 
 \section{Project Organisation} %~40% of the report
 Describe how you will work together as a team. You should set out the roles you expect team members to play and what
