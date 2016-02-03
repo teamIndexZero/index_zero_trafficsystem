@@ -1,0 +1,38 @@
+@startuml
+
+'initial version - this diagram has no additional features to emerge later yet.
+'later should add: map import/export, etc.
+
+package "Simulator" {
+[CLIControlInterface]
+[SimulationEngine]
+[IOSubsystem]
+[Map]
+[RulesLawsPhysics]
+[Vehicles]
+
+CLIControlInterface-->SimulationEngine
+SimulationEngine-->Map
+SimulationEngine-->IOSubsystem
+Map-->RulesLawsPhysics
+Map->Vehicles
+}
+
+package "Graphical UI" {
+[ControlUI]
+[RenderingEngine]
+ControlUI-->RenderingEngine
+}
+[LogSystem]
+
+package "Common" {
+[DataFormat]
+[DataSerialization]
+IOSubsystem-->DataFormat
+SimulationEngine-->LogSystem
+ControlUI-->DataFormat
+ControlUI-->LogSystem
+DataFormat-left->DataSerialization
+}
+
+@enduml
