@@ -9,7 +9,7 @@ import java.util.Map;
 public class Logger implements Logger_Interface {
     private String calling_instance_name;
     private Log_Engine log_engine = Log_Engine.getInstance();
-    private static Map<String, Logger> loggers = new HashMap<>();
+    private static Map<String, Logger> loggers = new HashMap<String, Logger>();
 
     /**
      * Constructor

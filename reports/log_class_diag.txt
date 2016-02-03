@@ -154,7 +154,15 @@ package "Logger" #FFFFFF {
 	
 	package "kcl.teamIndexZero.traffic.log.FileIO" #DDDDDD {
 		class FileIO {
-			+FileIO( file_name : String )
+			-{static} Charset charset
+			-String directory
+			-String file_name		
+			+FileIO( directory_name : String, file_name : String )
+			+read() : List<String>
+			+append( s : String )
+			+appendLine( s : String )
+			+deleteFile() : bool
+			-getFilePath() : Path
 		}
 	}
 }

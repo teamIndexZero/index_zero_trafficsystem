@@ -1,5 +1,6 @@
 package kcl.teamIndexZero.traffic.log;
 
+import kcl.teamIndexZero.traffic.log.fileIO.FileIO;
 import kcl.teamIndexZero.traffic.log.outputs.Output;
 import kcl.teamIndexZero.traffic.log.outputs.Output_TERM;
 
@@ -11,7 +12,7 @@ import java.util.Vector;
 public class Log_Config {
     private String global_file_name = "log_"; //Default
     private int global_log_level = Log_Levels.DEBUG; //Default
-    private Vector<Output> outputs = new Vector<>();
+    private Vector<Output> outputs = new Vector<Output>();
 
     //TODO Create file loader class for getting options from outside
     //TODO if file not found or empty then load defaults (txt)
@@ -20,13 +21,17 @@ public class Log_Config {
      * Constructor (default)
      */
     protected Log_Config() {
+
+            FileIO config_io = new FileIO("", "log_config.txt");
+            //DEFAULTS
+            Log_TimeStamp time_stamp = new Log_TimeStamp();
+            global_file_name += time_stamp.getCustomStamp("yyyyMMdd'-'HHmmss");
+            outputs.add(new Output_TERM("Console")); //Change to Output_TXT when implemented
+
         //TODO load from file
         //TODO if invalid/empty load defaults
 
-        //DEFAULTS
-        Log_TimeStamp time_stamp = new Log_TimeStamp();
-        global_file_name += time_stamp.getCustomStamp("yyyyMMdd'-'HHmmss");
-        outputs.add(new Output_TERM("Console")); //Change to Output_TXT when implemented
+
     }
 
     /**
