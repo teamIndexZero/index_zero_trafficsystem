@@ -6,12 +6,12 @@
 The project aims to create a micro-modelled road traffic simulation engine enabling inspection of various effects of changing key rules within the model. For team members, this project is centered around teamwork and also, as a less prominent addition, the learning and application of software engineering skills.
 
 \section{Project Description} %~60% of the report
-Describe your team’s aims for the projects. Outline what aims your team have set for the project and your strategy for
+Describe your team aims for the projects. Outline what aims your team have set for the project and your strategy for
 achieving those aims. A rough timetable may be appropriate and you may wish to break your aims into levels
  (e.g. mandatory / optional or we will first work on level 1 aims before moving to level 2 aims) to allow for
  unexpected issues that may arise. You must also describe how your initial progress developing your piece of software
  has gone and where you currently are relative to your aims.
- 
+
 
 \subsection{Project Outline}
 
@@ -41,7 +41,7 @@ The simulation system will be used to gather relevant data for analysis that can
 		\item approach (conceptual and technical)
 		\begin{itemize}
 		    \item Base: build, test, IDE, rough architecture set up.
-		    
+
 
 		\end{itemize}
 
@@ -61,7 +61,7 @@ The simulation system will be used to gather relevant data for analysis that can
 
 	\end{itemize}
 \subsection{Timetable}
- 
+
 
 \begin{itemize}
 
@@ -112,43 +112,82 @@ The simulation system will be used to gather relevant data for analysis that can
 
 
 \section{Project Organisation} %~40% of the report
-Describe how you will work together as a team. You should set out the roles you expect team members to play and what
-processes and tools you will use to collaborate together as a team. You should also explain the process you expect to
-use for handling peer assessment as well as the mechanisms you have agreed upon for handling any conflicts within the
-team that may arise.
+The project is organized around the skills team member have, and tools which can be used to achieve best results. Main
+principles are flat team organization (no management relations), peer interaction (reviews, help) and agile overall
+approach to the development. The concept of project advancement is built on the notion of Minimal Viable Product and
+iterative improvements with team-wide backlog prioretization.
+
+Each team member bears equal rights and responsibilities, in addition to that project coordinator has an extra responsibility
+of ensuring that the artifacts are delivered on time. Peer assesment is set as equal participation/equal assesment.
+
+\subsection{Process and Teamwork}
+\subsubsection{Cooperation}
+%This is probably already covered in section 1 - the task%
+The development process approach is revolving around main aims of the project - that being not only building the product
+satisfying specification, but also learning form each other and attempting the agile and responsible teamwork model.
+
+Tasks are distributed according to personal preferences and skills. Existing team member experience is used to the most
+possible extent. Actual breakdown of the system to individual task happens in face-to-face meetings, where team members
+can discuss actual tasks, their separation, interfaces, ask and provide aid if needed etc.
+
+As soon as there are multiple opinions on any decision to be made, following procedure might be applied:
+
+\begin{enumerate}
+    \item Two conflicting parties try to persuade each other using logic
+    \item In case consensus not found, all the team is invovled to the mutual persuasion
+    \item In case consensus not yet found, voting is attempted (public, majority rule). Team size of 5 guarantees decision.
+        Everyone should follow this decision even if they were opposing party.
+\end{enumerate}
+
+As each team member is anticipated to invests similar effort into the project, votes are always equal.
+\subsubsection {Meetings}
+There is a planned weekly iterated meeting on Tuesdays. Meeting agenda is created in advance, everyone can
+contribute. Meeting minutes are added as comments to the appropriate Trello\footnote{Trello is an agile process and information organisation tool having card and board notion, moving the concept of sticky notes and board to software world https://trello.com/tour} card
+. Meeting time is to be used mostly for synchronisation, mutual help and discussion of
+ complex matters. Daily interaction should happen in on-line process using various tools.
+
+\subsubsection{Development Process}
+%Add a section task/module breakdown%
+The team has decided to follow simplistic Kanban-like\cite{Ahmed} agile development process, with individual work items piled into backlog,
+which is prioritised by all team members. Team members pick up the tasks from the top of the stack which match their skill set
+and module specialisation. The team will adopt new techniques and elements of the process as project course demands.
+The same agile continuous refinement and improvement process is applied to the architecture.
+
+The selected process is development-centric, it defines rules of how features are specified, implemented, tested and eventually
+merged into the main git repository, and how visibility is achieved. The card system allows for clear classification of an activity by specific team member, component, status, priority, and activity progress. Commenting is then used for information exchange on that specific activity. Activities can be features, bugs, non-code items, research items, etc. The board as a whole gives snapshot of the current project status, as well as providing full change history.
+
+Unit testing has a dedicated place within the process. Every commit should be accompanied by appropriate unit tests, and code should have
+inline documentation supplied. Obligatory post-commit peer code review aims at improving code quality as well as ensuring the rules are abided.
+
+\subsubsection{Tools}
+
+Due to distributed and asynchronous project nature, software tools play an important role in ensuring the overall success. Following are description of \emph{development tools} chosen for the project:
 
 \begin{itemize}
-	\item Teamwork
-	\begin{itemize}
-		\item Distribution of tasks
-    	\item Conflict resolution
-    	\item Efforts planned from each member
-    	\item Meetings (could tie in the tools in this section?)
-        \begin{enumerate}
-            \item Organisation of matters to discuss
-            \item Organisation of meeting time
-        \end{enumerate}
-        \item peer assesment (marks)
-
-        \item Process
-        \begin{itemize}
-            \item Kanban-like process with board and no strict iterations defined
-            \item Minimum viable product set out rather early (half-time) so should have features to add on later
-            \item Git: for now master-only, will switch to features branches as everyone is comfy with git
-            \item Test: obligatory automated unit-testing for components and features
-            \item Peer review: post-commit review of features (peer). At least 1 person should have looked at code after commit.
-        \end{itemize}
-	\end{itemize}
-
-	\item Tools
-	\begin{itemize}
-		\item Trello
-		\item HipChat (inc. Git commit \& trello plugin)
-	    \item JetBrain's IntelliJ Idea IDE for everyone
-	    \item PlantUML for UML diagrams?
-	\end{itemize}
-
+	\item Git and GitHub. Git is used as a primary code exchange point, communication tool by using appropriate commit messages. Frequent updates are an
+	important project practice. At the time of writing this report, team does not use forked feature branches and pull requests approach. It is anticipated that team will
+	switch to this approach of using Git after delivery of Milestone~1:~Minimal Viable Product. \\GitHub is a primary tool for code review, as it allows for
+	code commenting.
+	\item Build System to ensure build portability and easy project model exchange.
+	 Gradle\footnote{Gradle is a task-based sophisticated build automation tool for Java and more. http://gradle.org} has been chosen as a primary build tool for the project, since it allows for easy plugin architecture, is quick and easy to setup and IntelliJ IDEA has
+	 great Gradle integration features. Gradle is used to automate routine jobs of build, test, assembly  and documentation generation,
+	as well as provide more in-depths analysis tools such as providing test coverage metrics.\\Gradle wrapper is also committed to the main code repository, so the build
+	is configuration-agnostic and requires Java Development Kit only in minimal setup.
+	\item IntelliJ IDEA\footnote{We decided to use IntelliJ IDEA Community Edition, https://www.jetbrains.com/idea/download/}. Selected as an IDE of choice as it may greatly improve productivity and has means for extensive refactoring functionality. IDEA has an outstanding
+	integration with Gradle builds, allowing to run the tasks from within.
+	\item Unit Testing. jUnit 4, Mockito and Fest-assert\footnote{Following article has been used as a base for testing environment setup http://blog.codeleak.pl/2013/07/test-code-readability-improved-junit.html} libraries are used to provide reliability and regression-resistant code base. Unit testing is one of the key development
+	activities in project scope.
 \end{itemize}
 
+In addition to development tools, following communication and documentation tools are of utter importance for the project to succeed:
 
+\begin{itemize}
+	\item Trello is a web- and mobile-based collaboration tool organising projects into the boards. With this distinctive feature, it is extremely easy to use Trello as a
+	Kanban board with tasks represented with Trello cards, and a full visibility of the scope and current progress. In addition to storing tasks as cards on board, same cards
+	may be used for convenient information storage and exchange, forming essentially the loosely coupled knowledge base of links, ideas and preliminary research
+	results which may be easily searched upon by any team member.
+	\item HipChat\footnote{Atlassian web chat product, based on open Jabber protocol, https://www.hipchat.com} is used as a primary communication tool. Being a webchat with separate rooms and offering web, mobile and desktop clients, it offers myriad of different integrations. For now, only the simple GitHub and Trello integrations are used. GitHub issues messages into development chat room when there is an activity (commits, pull requests) happening in the main code repository, while Trello notifies of card changes and comments. 
+	\item PlantUML for diagrams. Since PlantUML allows to create diagrams using text files, they are extremely easy to version under same source code control as the main code. Approach of non-WYSIWYG editor for diagram also saves time on object arrangement greatly, forcing user to spend more time on semantics rather than positioning.
+	\item LaTeX is used for generating project preliminary and final reports.
+\end{itemize}
 
