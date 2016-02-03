@@ -1,4 +1,4 @@
-package kcl.teamIndexZero.traffic.log.FileIO;
+package kcl.teamIndexZero.traffic.log.fileIO;
 
 import java.io.IOException;
 import java.nio.file.Files;

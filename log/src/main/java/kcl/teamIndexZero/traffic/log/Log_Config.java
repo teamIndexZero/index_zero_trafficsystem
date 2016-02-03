@@ -1,7 +1,7 @@
 package kcl.teamIndexZero.traffic.log;
 
-import kcl.teamIndexZero.traffic.log.Outputs.Output;
-import kcl.teamIndexZero.traffic.log.Outputs.Output_TERM;
+import kcl.teamIndexZero.traffic.log.outputs.Output;
+import kcl.teamIndexZero.traffic.log.outputs.Output_TERM;
 
 import java.util.Vector;
 

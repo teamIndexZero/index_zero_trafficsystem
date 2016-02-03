@@ -1,4 +1,4 @@
-package kcl.teamIndexZero.traffic.log.Outputs;
+package kcl.teamIndexZero.traffic.log.outputs;
 
 import kcl.teamIndexZero.traffic.log.Log_TimeStamp;
 

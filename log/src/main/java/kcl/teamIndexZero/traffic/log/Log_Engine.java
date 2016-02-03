@@ -1,6 +1,6 @@
 package kcl.teamIndexZero.traffic.log;
 
-import kcl.teamIndexZero.traffic.log.Outputs.Output;
+import kcl.teamIndexZero.traffic.log.outputs.Output;
 
 /**
  * Created by Es on 27/01/2016.
