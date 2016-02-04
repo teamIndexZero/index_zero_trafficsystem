@@ -1,6 +1,6 @@
 @startuml
 
-package "Logger" #FFFFFF {
+package "kcl.teamIndexZero.traffic.log" #FFFFFF {
 
 	Logger --|> Logger_Interface
 	Log_Levels <-- Logger
@@ -31,7 +31,7 @@ package "Logger" #FFFFFF {
 		+log_Trace( objects : Object... )
 	}
 
-	class Log_Engine {
+	Class Log_Engine <<singleton>> {
 		-{static} Log_Engine INSTANCE
 		-Log_Config global_log_config
 		-Long session_msg_number
@@ -72,7 +72,7 @@ package "Logger" #FFFFFF {
 		+getCustomStamp( formatter : String ) : String
 	}
 
-	package "Logger.Ouputs" #DDDDDD {
+	package "kcl.teamIndexZero.traffic.log.outputs" #DDDDDD {
 		interface Formatter_Interface <<interface>> {
 			format( origin_name : String, log_level : int, log_number : Long, time_stamp : Log_TimeStamp, objects : Object... ) : String
 		}
@@ -152,19 +152,41 @@ package "Logger" #FFFFFF {
 		Output_CSV --> Formatter_CSV
 	}
 	
-	package "kcl.teamIndexZero.traffic.log.FileIO" #DDDDDD {
+	package "kcl.teamIndexZero.traffic.log.fileIO" #DDDDDD {
 		class FileIO {
 			-{static} Charset charset
 			-String directory
-			-String file_name		
-			+FileIO( directory_name : String, file_name : String )
-			+read() : List<String>
-			+append( s : String )
-			+appendLine( s : String )
+			-String file_name
 			+deleteFile() : bool
-			-getFilePath() : Path
+			#getFilePath() : Path
 		}
+		
+		class FileOutput {
+			-BufferedWriter writer
+			+FileOutput( directory_name : String, file_name : String )
+			+reOpenBufferedWriter() : bool
+			+closeBufferedWriter() : bool
+			+appendString( s : String )
+			+appendLine( line : String )
+			+deleteFile() : bool
+		}
+		
+		class FileInput {
+			-BufferedReader reader
+			+FileInput( directory_name : String, file_name : String )
+			+reOpenBufferedReader() : bool
+			+closeBufferedReader() : bool
+			+readFile() : List<String>
+			+readLine() : String
+			+deleteFile() : bool
+		}
+		
+		FileIO <|-- FileInput
+		FileIO <|-- FileOutput
 	}
+	
+	FileOutput <-- Output
+	FileInput <-- Log_Config
 }
 
 @enduml
