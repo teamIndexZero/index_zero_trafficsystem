@@ -7,9 +7,9 @@ import java.util.Map;
  * Created by Es on 27/01/2016.
  */
 public class Logger implements Logger_Interface {
+    private static Map<String, Logger> loggers;
+    private static Log_Engine log_engine;
     private String calling_instance_name;
-    private Log_Engine log_engine = Log_Engine.getInstance();
-    private static Map<String, Logger> loggers = new HashMap<String, Logger>();
 
     /**
      * Constructor
@@ -27,6 +27,8 @@ public class Logger implements Logger_Interface {
      * @return Logger
      */
     public static Logger getLoggerInstance(String instance_name) {
+        if( loggers == null ) loggers = new HashMap<String, Logger>();
+        if( log_engine == null ) log_engine = Log_Engine.getInstance();
         Logger logger_instance = loggers.get(instance_name);
         if (logger_instance == null) {
             logger_instance = new Logger(instance_name);
@@ -82,6 +84,7 @@ public class Logger implements Logger_Interface {
      */
     @Override
     public void log_Debug(Object... objects) {
+        System.out.println( "WTF" );
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.DEBUG, calling_instance_name, objects);
     }
 

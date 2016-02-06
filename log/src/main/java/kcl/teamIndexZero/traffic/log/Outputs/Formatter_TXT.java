@@ -29,6 +29,6 @@ public class Formatter_TXT implements Formatter_Interface {
         for (Object o : objects) {
             s += o.toString();
         }
-        return s;
+        return s + System.lineSeparator();
     }
 }

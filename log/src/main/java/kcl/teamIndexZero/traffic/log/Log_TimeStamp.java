@@ -57,7 +57,12 @@ public class Log_TimeStamp {
             return now.format(DateTimeFormatter.ofPattern(formatter));
         } catch (IllegalArgumentException e) {
             System.err.println("Caught IllegalArgumentException in Log_TimeStamp.getCustomStamp(..): " + e.getMessage());
-            return now.format(DateTimeFormatter.ofPattern("yyyyMMddhhmmss"));
+            try {
+                return now.format(DateTimeFormatter.ofPattern("yyyyMMddhhmmss"));
+            } catch ( IllegalArgumentException ee ) {
+                ee.printStackTrace();
+                return "";
+            }
         }
     }
 }

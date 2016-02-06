@@ -42,6 +42,6 @@ public class Output_TERM extends Output {
 
     @Override
     public void output(String origin_name, int log_level, Long log_number, Log_TimeStamp time_stamp, Object... objects) {
-        System.out.print(formatter.format(origin_name, log_level, log_number, time_stamp, objects));
+        System.out.println(formatter.format(origin_name, log_level, log_number, time_stamp, objects));
     }
 }

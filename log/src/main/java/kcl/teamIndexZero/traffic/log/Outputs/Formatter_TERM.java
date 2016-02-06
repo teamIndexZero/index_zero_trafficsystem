@@ -28,6 +28,6 @@ public class Formatter_TERM implements Formatter_Interface {
         for (Object o : objects) {
             s += o.toString();
         }
-        return s + "\n";
+        return s;
     }
 }

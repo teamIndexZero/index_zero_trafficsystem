@@ -1,9 +1,10 @@
 package kcl.teamIndexZero.traffic.log;
 
-import kcl.teamIndexZero.traffic.log.fileIO.FileIO;
 import kcl.teamIndexZero.traffic.log.outputs.Output;
 import kcl.teamIndexZero.traffic.log.outputs.Output_TERM;
+import kcl.teamIndexZero.traffic.log.outputs.Output_TXT;
 
+import java.io.IOException;
 import java.util.Vector;
 
 /**
@@ -20,16 +21,24 @@ public class Log_Config {
     /**
      * Constructor (default)
      */
-    protected Log_Config() {
+    public Log_Config() {
+            try {
+                //FileInput config_file = new FileInput("", "log_config.txt");
 
-            FileIO config_io = new FileIO("", "log_config.txt");
-            //DEFAULTS
-            Log_TimeStamp time_stamp = new Log_TimeStamp();
-            global_file_name += time_stamp.getCustomStamp("yyyyMMdd'-'HHmmss");
-            outputs.add(new Output_TERM("Console")); //Change to Output_TXT when implemented
+                Log_TimeStamp time_stamp = new Log_TimeStamp();
+                global_file_name += time_stamp.getCustomStamp("yyyyMMdd'-'HHmmss");
+                //TODO load from file
+                //TODO if invalid/empty load defaults
+                //DEFAULTS
+                outputs.add(new Output_TERM("Console")); //Change to Output_TXT when implemented
+                outputs.add(new Output_TXT( global_file_name ) );
+            } catch ( IOException e ) {
+                //TODO config file cannot be accessed to default to terminal and txt(if that's doable)
+                System.err.println("Caught IOException in Log_Config.Log_Config(): " + e.getMessage());
+                e.printStackTrace();
+            }
 
-        //TODO load from file
-        //TODO if invalid/empty load defaults
+
 
 
     }

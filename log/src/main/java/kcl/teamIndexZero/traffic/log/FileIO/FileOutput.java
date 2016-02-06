@@ -10,56 +10,68 @@ import java.nio.file.StandardOpenOption;
  * Created by Es on 04/02/2016.
  */
 public class FileOutput extends FileIO {
-    BufferedWriter writer = null;
+    private BufferedWriter writer = null;
 
     /**
      * Constructor
-     * @param directory Directory path
+     * @param folder_path Directory path
      * @param file_name File name
      * @exception IOException when file cannot be accessed
      * @exception InvalidPathException when the path description is invalid
      */
-    public FileOutput( String directory, String file_name ) throws IOException {
-        super( directory, file_name );
+    public FileOutput( String folder_path, String file_name ) throws IOException {
+        super( folder_path, file_name );
         try {
-            this.writer = Files.newBufferedWriter(super.getFilePath(), super.getCharset(), StandardOpenOption.APPEND);
+            if( super.createFile() ) {
+                this.writer = Files.newBufferedWriter(super.getFilePath(), super.getCharset(), StandardOpenOption.APPEND);
+            } else {
+                //TODO log error
+                throw new IOException( "Failed to create/access the file " + getFilePath().toString() );
+            }
         } catch (IOException e) {
+            //TODO log error
             System.err.println("Caught IOException in FileOutput(): " + e.getMessage());
             throw e;
         } catch (InvalidPathException e ) {
+            //TODO log error
             System.err.println("Caught InvalidPathException in FileOutput(): " + e.getMessage());
             throw e;
         }
     }
 
     /**
-     * Re-Opens the BufferedWriter to the same path/file
+     * Re-Opens the Writer to the same path/file
      * @return Success
      */
-    public boolean reOpenBufferedWriter() {
+    public boolean reOpenWriter() {
         try {
-            this.writer = Files.newBufferedWriter(super.getFilePath(), super.getCharset(), StandardOpenOption.APPEND);
-            return true;
+            if( super.createFile() ) {
+                this.writer = Files.newBufferedWriter(super.getFilePath(), super.getCharset(), StandardOpenOption.APPEND);
+                return true;
+            } else {
+                return false;
+            }
         } catch (IOException e) {
-            System.err.println("Caught IOException in FileOutput.reOpenBufferedWriter(): " + e.getMessage());
+            System.err.println("Caught IOException in FileOutput.reOpenWriter(): " + e.getMessage());
             return false;
         } catch (InvalidPathException e ) {
-            System.err.println("Caught InvalidPathException in FileOutput.reOpenBufferedWriter(): " + e.getMessage());
+            System.err.println("Caught InvalidPathException in FileOutput.reOpenWriter(): " + e.getMessage());
             return false;
         }
     }
 
     /**
-     * Closes the BufferedWriter
+     * Closes the Writer
      * @return Success (
      */
-    public boolean closeBufferedWriter() {
+    public boolean closeWriter() {
         if( this.writer != null ) {
             try {
                 writer.close();
                 return true;
             } catch ( IOException e ) {
-                System.err.println( "Caught IOException in FileOutput.closeBufferedWriter(): "+ e.getMessage());
+                //TODO log error
+                System.err.println( "Caught IOException in FileOutput.closeWriter(): " + e.getMessage());
                 return false;
             }
         }
@@ -73,30 +85,11 @@ public class FileOutput extends FileIO {
      */
     public void appendString( String string ) throws InvalidPathException, IOException {
         try {
-            if( !Files.exists( getFilePath() ) ) {
-                Files.createFile( getFilePath() );
-            }
             this.writer.write(string, 0, string.length());
+            this.writer.flush();
         } catch ( IOException e ) {
+            //TODO log error
             System.err.println("Caught IOException in FileOutput.appendString(): " + e.getMessage());
-            throw e;
-        }
-    }
-
-    /**
-     * Writes a string to the end of the file on a new line
-     * @param string String to append to file on new line
-     * @exception IOException when the file cannot be accessed
-     */
-    public void appendLine( String string ) throws InvalidPathException, IOException {
-        try {
-            if( !Files.exists( getFilePath() ) ) {
-                Files.createFile( getFilePath() );
-            }
-            writer.newLine();
-            writer.write(string, 0, string.length());
-        } catch ( IOException e ) {
-            System.err.println("Caught IOException in FileOutput.appendLine(): " + e.getMessage());
             throw e;
         }
     }
@@ -109,9 +102,11 @@ public class FileOutput extends FileIO {
         try {
             return super.deleteFile();
         } catch ( InvalidPathException e ) {
+            //TODO log error
             System.err.println("Caught InvalidPathException in FileOutput.deleteFile(): " + e.getMessage());
             return false;
         } catch ( IOException e ) {
+            //TODO log error
             System.err.println("Caught IOException in FileOutput.deleteFile(): " + e.getMessage());
             return false;
         }

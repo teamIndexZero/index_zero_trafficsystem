@@ -23,7 +23,7 @@ public class FileInput extends FileIO {
     public FileInput(  String directory, String file_name ) throws InvalidPathException, IOException {
         super( directory, file_name );
         try {
-            this.reader = Files.newBufferedReader( super.getFilePath(), super.getCharset() );
+            this.reader = Files.newBufferedReader( super.getFilePath() );
         } catch ( InvalidPathException e ) {
             System.err.println("Caught IOException in FileInput(): " + e.getMessage());
             throw e;
@@ -40,7 +40,6 @@ public class FileInput extends FileIO {
      * @exception IOException when the file cannot be accessed
      */
     public List<String> read() throws InvalidPathException, IOException {
-        BufferedReader reader = null;
         try {
             List<String> file_content = new ArrayList<String>();
             String line = null;
@@ -65,7 +64,20 @@ public class FileInput extends FileIO {
         }
     }
 
-
-
+    /**
+     * Deletes the file
+     * @return Success
+     */
+    public boolean deleteFile() {
+        try {
+            return super.deleteFile();
+        } catch ( IOException e ) {
+            System.err.println("Caught IOException in FileInput.deleteFile(): " + e.getMessage());
+            return false;
+        } catch ( InvalidPathException e ) {
+            System.err.println("Caught IOException in FileInput.deleteFile(): " + e.getMessage());
+            return false;
+        }
+    }
 
 }

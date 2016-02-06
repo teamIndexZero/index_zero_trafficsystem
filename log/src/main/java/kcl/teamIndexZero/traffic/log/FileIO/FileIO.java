@@ -2,10 +2,7 @@ package kcl.teamIndexZero.traffic.log.fileIO;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
+import java.nio.file.*;
 
 /**
  * Created by Es on 02/02/2016.
@@ -14,7 +11,7 @@ public class FileIO {
     private String file_name;
     private String directory;
     private static final Charset charset = Charset.forName( "UTF-8" );
-    //TODO inject buffered reader from Output so that it can remain opened during the life of the output whilst it is used then closed at the end
+
     /**
      * Constructor
      * @param directory Directory relative to running instance
@@ -25,6 +22,29 @@ public class FileIO {
         this.directory = directory;
     }
 
+    /**
+     * Creates file if it doesn't exist
+     * @return Creation success
+     */
+    public boolean createFile() {
+        try {
+            if (!Files.exists(getFilePath())) {
+                Files.createDirectories( getDirectoryPath() );
+                Files.createFile(getFilePath());
+            }
+            return true;
+        } catch ( SecurityException e ) {
+            System.err.println("Caught SecurityException in FileIO.createFile(): " + e.getMessage());
+            return false;
+        } catch ( FileAlreadyExistsException e ) {
+            System.err.println("Caught FileAlreadyExistsException in FileIO.createFile(): " + e.getMessage());
+            return true;
+        } catch ( IOException e ) {
+            System.err.println("Caught IOException in FileIO.createFile(): " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     /**
      * Deletes the file if it exists
@@ -51,8 +71,21 @@ public class FileIO {
     }
 
     /**
-     * Gets the Path from the file_name and directory properties
-     * @return Path Path of the file
+     * Gets the complete Path from the directory properties
+     * @return Path of the directory
+     * @throws InvalidPathException when the path described is invalid
+     */
+    protected Path getDirectoryPath() throws InvalidPathException {
+        try {
+            return FileSystems.getDefault().getPath( this.directory );
+        } catch (InvalidPathException e ) {
+            throw e;
+        }
+    }
+
+    /**
+     * Gets the complete Path from the file_name and directory properties
+     * @return Path of the file
      * @throws InvalidPathException when the path described is invalid
      */
     protected Path getFilePath() throws InvalidPathException {
@@ -70,4 +103,6 @@ public class FileIO {
     protected Charset getCharset() {
         return charset;
     }
+
+
 }

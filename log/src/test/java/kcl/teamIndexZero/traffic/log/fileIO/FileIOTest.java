@@ -8,17 +8,12 @@ import org.junit.Test;
 public class FileIOTest {
 
     @Test
-    public void testRead() throws Exception {
+    public void testDeleteFile() throws Exception {
 
     }
 
     @Test
-    public void testAppend() throws Exception {
-
-    }
-
-    @Test
-    public void testClearFile() throws Exception {
+    public void testGetFilePath() throws Exception {
 
     }
 }

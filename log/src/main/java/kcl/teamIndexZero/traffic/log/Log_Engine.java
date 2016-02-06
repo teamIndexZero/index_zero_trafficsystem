@@ -7,14 +7,16 @@ import kcl.teamIndexZero.traffic.log.outputs.Output;
  * Log engine
  */
 public class Log_Engine {
-    private static Log_Engine INSTANCE = new Log_Engine();
-    private Log_Config global_config = new Log_Config();
-    private Long session_msg_number = new Long(0);
+    private Log_Config global_config;
+    private Long session_msg_number;
+    private static Log_Engine INSTANCE;
 
     /**
      * Constructor
      */
     private Log_Engine() {
+        global_config = new Log_Config();
+        session_msg_number = new Long(0);
     }
 
     /**
@@ -23,14 +25,17 @@ public class Log_Engine {
      * @return Log_Engine instance
      */
     public static Log_Engine getInstance() {
+        if( INSTANCE == null ) {
+            INSTANCE = new Log_Engine();
+        }
         return INSTANCE;
     }
 
     /**
      * Queues the log messages
-     *
-     * @param class_origin Name of the message's origin
      * @param time_stamp   Time stamp of the message
+     * @param level Log level
+     * @param class_origin Name of the message's origin
      * @param objects      Log message details
      */
     protected void processLogMsg(Log_TimeStamp time_stamp, int level, String class_origin, Object... objects) {
