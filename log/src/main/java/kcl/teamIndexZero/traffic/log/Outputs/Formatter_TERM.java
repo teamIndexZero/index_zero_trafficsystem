@@ -41,12 +41,13 @@ public class Formatter_TERM implements Formatter_Interface {
      *
      * @param origin_name Name of the message's origin
      * @param time_stamp  Time stamp of the message
+     * @param log_number  Message number in log session
      * @param e           Exception raised
      * @return Formatted String
      */
     @Override
-    public String format(String origin_name, Log_TimeStamp time_stamp, Exception e) {
-        String s = "\t===Exception raised in [" + origin_name + "]===";
+    public String format(String origin_name, Log_TimeStamp time_stamp, Long log_number, Exception e) {
+        String s = "[" + log_number.toString() + "]\t===Exception raised in [" + origin_name + "]===";
         s += System.lineSeparator() + "\t";
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

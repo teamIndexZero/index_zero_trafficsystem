@@ -1,5 +1,7 @@
 package kcl.teamIndexZero.traffic.log.fileIO;
 
+import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,49 +17,55 @@ public class FileInput extends FileIO {
 
     /**
      * Constructor
-     * @param directory Directory path
-     * @param file_name File name
+     *
+     * @param folder_path Directory path
+     * @param file_name   File name
      * @throws InvalidPathException
      * @throws IOException
      */
-    public FileInput(  String directory, String file_name ) throws InvalidPathException, IOException {
-        super( directory, file_name );
+    public FileInput(String folder_path, String file_name) throws InvalidPathException, IOException {
+        super(folder_path, file_name);
         try {
-            this.reader = Files.newBufferedReader( super.getFilePath() );
-        } catch ( InvalidPathException e ) {
-            System.err.println("Caught IOException in FileInput(): " + e.getMessage());
+            this.reader = Files.newBufferedReader(super.getFilePath());
+        } catch (InvalidPathException e) {
+            MicroLogger.INSTANCE.log_Error("InvalidPathException raised in [FileInput.FileInput( ", folder_path, ", ", file_name, " )]");
+            MicroLogger.INSTANCE.log_ExceptionMsg(e);
             throw e;
-        } catch ( IOException e ) {
-            System.err.println("Caught IOException in FileInput(): " + e.getMessage());
+        } catch (IOException e) {
+            MicroLogger.INSTANCE.log_Error("IOException raised in [FileInput.FileInput( ", folder_path, ", ", file_name, " )]");
+            MicroLogger.INSTANCE.log_ExceptionMsg(e);
             throw e;
         }
     }
 
     /**
      * Reads the file into a list of Strings
+     *
      * @return List of lines from file
-     * @exception InvalidPathException when the path description is invalid
-     * @exception IOException when the file cannot be accessed
+     * @throws InvalidPathException when the path description is invalid
+     * @throws IOException          when the file cannot be accessed
      */
     public List<String> read() throws InvalidPathException, IOException {
         try {
             List<String> file_content = new ArrayList<String>();
             String line = null;
             while ((line = reader.readLine()) != null) {
-                file_content.add( line );
+                file_content.add(line);
             }
             return file_content;
-        } catch ( InvalidPathException e ) {
-            System.err.println("Caught InvalidPathException in FileIO.read(): " + e.getMessage());
+        } catch (InvalidPathException e) {
+            MicroLogger.INSTANCE.log_Error("InvalidPathException raised in [FileInput.read()] for , ", super.getFilePath());
+            MicroLogger.INSTANCE.log_ExceptionMsg(e);
             throw e;
-        } catch ( IOException e ) {
-            System.err.println("Caught IOException in FileIO.read(): " + e.getMessage());
+        } catch (IOException e) {
+            MicroLogger.INSTANCE.log_Error("IOException raised in [FileInput.read()] for , ", super.getFilePath());
+            MicroLogger.INSTANCE.log_ExceptionMsg(e);
             throw e;
         } finally {
-            if( reader != null ) {
+            if (reader != null) {
                 try {
                     reader.close();
-                } catch ( IOException e ) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -66,16 +74,19 @@ public class FileInput extends FileIO {
 
     /**
      * Deletes the file
+     *
      * @return Success
      */
     public boolean deleteFile() {
         try {
             return super.deleteFile();
-        } catch ( IOException e ) {
-            System.err.println("Caught IOException in FileInput.deleteFile(): " + e.getMessage());
+        } catch (IOException e) {
+            MicroLogger.INSTANCE.log_Error("InvalidPathException raised in [FileInput.deleteFile()] for , ", super.getFilePath());
+            MicroLogger.INSTANCE.log_ExceptionMsg(e);
             return false;
-        } catch ( InvalidPathException e ) {
-            System.err.println("Caught IOException in FileInput.deleteFile(): " + e.getMessage());
+        } catch (InvalidPathException e) {
+            MicroLogger.INSTANCE.log_Error("IOException raised in [FileInput.deleteFile()] for , ", super.getFilePath());
+            MicroLogger.INSTANCE.log_ExceptionMsg(e);
             return false;
         }
     }

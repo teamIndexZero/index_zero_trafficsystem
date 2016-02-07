@@ -71,10 +71,10 @@ public class Output {
      * @param time_stamp  Time stamp of the message
      * @param e           Exception raised
      */
-    public void output(String origin_name, Log_TimeStamp time_stamp, Exception e) {
+    public void output(String origin_name, Log_TimeStamp time_stamp, Long log_number, Exception e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        System.out.println("\t===Exception raised in [" + origin_name + "] at " + time_stamp.getDate() + " - " + time_stamp.getTime() + "===" + System.lineSeparator() + sw.toString() + System.lineSeparator());
+        System.out.println("[" + log_number.toString() + "]\t===Exception raised in [" + origin_name + "] at " + time_stamp.getDate() + " - " + time_stamp.getTime() + "===" + System.lineSeparator() + sw.toString() + System.lineSeparator());
     }
 }

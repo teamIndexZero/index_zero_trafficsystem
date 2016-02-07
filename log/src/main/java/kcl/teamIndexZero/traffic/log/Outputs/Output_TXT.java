@@ -87,13 +87,14 @@ public class Output_TXT extends Output {
      *
      * @param origin_name Name of the message's origin
      * @param time_stamp  Time stamp of the message
+     * @param log_number  Message number in session
      * @param e           Exception raised
      */
-    public void output(String origin_name, Log_TimeStamp time_stamp, Exception e) {
+    public void output(String origin_name, Log_TimeStamp time_stamp, Long log_number, Exception e) {
         try {
-            out.appendString(formatter.format(origin_name,time_stamp, e));
+            out.appendString(formatter.format(origin_name, time_stamp, log_number, e));
         } catch (IOException exception) {
-            MicroLogger.INSTANCE.log_Error("IOException raised in [Output_TXT.output( ", origin_name, ", ", time_stamp, " )] <-Output Exception version." );
+            MicroLogger.INSTANCE.log_Error("IOException raised in [Output_TXT.output( ", origin_name, ", ", time_stamp, " )] <-Output Exception version.");
             MicroLogger.INSTANCE.log_ExceptionMsg(exception);
         }
     }

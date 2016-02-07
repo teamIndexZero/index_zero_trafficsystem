@@ -58,7 +58,7 @@ public class Log_Engine {
     protected void processException(Log_TimeStamp time_stamp, String class_origin, Exception e ) {
         if (global_config.getGlobalLogLevel() > 0 && global_config.getLogExceptionFlag() ) {
             for (Output out : global_config.getOutputs()) {
-                out.output(class_origin, time_stamp, e );
+                out.output(class_origin, time_stamp, this.session_msg_number, e );
             }
         }
         session_msg_number++;

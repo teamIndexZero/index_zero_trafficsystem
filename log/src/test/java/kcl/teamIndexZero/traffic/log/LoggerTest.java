@@ -13,6 +13,7 @@ public class LoggerTest {
         Logger log = Logger.getLoggerInstance("Logger_test");
         log.log_Error("Testing ", 1, ", ", 2, ", ", 3, ", and some more std text...");
         log.log_Exception( new IOException("bad stuff happened") );
+        log.log_Warning( "Maybe check something?");
     }
 
     @Test

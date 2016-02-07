@@ -31,11 +31,11 @@ public class FileOutput extends FileIO {
                 throw new IOException( "Failed to create/access the file " + getFilePath().toString() );
             }
         } catch (IOException e) {
-            MicroLogger.INSTANCE.log_Error( "IOException raised in [FileOutput.FileOutput( \", folder_path, \", \", file_name, \" )]");
+            MicroLogger.INSTANCE.log_Error( "IOException raised in [FileOutput.FileOutput( ", folder_path, ", ", file_name, " )]");
             MicroLogger.INSTANCE.log_ExceptionMsg( e );
             throw e;
         } catch (InvalidPathException e ) {
-            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileOutput.FileOutput( \", folder_path, \", \", file_name, \" )]");
+            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileOutput.FileOutput( ", folder_path, ", ", file_name, " )]");
             MicroLogger.INSTANCE.log_ExceptionMsg( e );
             throw e;
         }

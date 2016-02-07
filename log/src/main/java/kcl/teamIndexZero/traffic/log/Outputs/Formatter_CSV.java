@@ -41,15 +41,16 @@ public class Formatter_CSV implements Formatter_Interface {
      *
      * @param origin_name Name of the message's origin
      * @param time_stamp  Time stamp for the message
+     * @param log_number  Message number in session
      * @param e           Exception raised
      * @return Formatted String
      */
     @Override
-    public String format(String origin_name, Log_TimeStamp time_stamp, Exception e) {
+    public String format(String origin_name, Log_TimeStamp time_stamp, Long log_number, Exception e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        String s = ";" + time_stamp.getDate() + ";" + time_stamp.getTime() + ";EXCEPTION;" + origin_name + "; " + sw.toString(); //TODO check format
+        String s = log_number.toString() + ";" + time_stamp.getDate() + ";" + time_stamp.getTime() + ";EXCEPTION;" + origin_name + "; " + sw.toString(); //TODO check format
         return s;
     }
 }

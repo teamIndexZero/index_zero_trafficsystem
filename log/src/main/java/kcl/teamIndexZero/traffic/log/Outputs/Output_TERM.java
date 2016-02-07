@@ -65,9 +65,10 @@ public class Output_TERM extends Output {
      *
      * @param origin_name Origin name of the call
      * @param time_stamp  Time stamp of the message
+     * @param log_number  Message number in session
      * @param e           Exception raised
      */
-    public void output(String origin_name, Log_TimeStamp time_stamp, Exception e) {
-        System.out.println(formatter.format(origin_name, time_stamp, e));
+    public void output(String origin_name, Log_TimeStamp time_stamp, Long log_number, Exception e) {
+        System.out.println(formatter.format(origin_name, time_stamp, log_number, e));
     }
 }
