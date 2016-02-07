@@ -1,5 +1,7 @@
 package kcl.teamIndexZero.traffic.log.fileIO;
 
+import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.*;
@@ -34,14 +36,15 @@ public class FileIO {
             }
             return true;
         } catch ( SecurityException e ) {
-            System.err.println("Caught SecurityException in FileIO.createFile(): " + e.getMessage());
+            MicroLogger.INSTANCE.log_Error( "SecurityException raised in [FileIO.createFile()] in regards to ", getFilePath(), ".");
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             return false;
         } catch ( FileAlreadyExistsException e ) {
-            System.err.println("Caught FileAlreadyExistsException in FileIO.createFile(): " + e.getMessage());
+            MicroLogger.INSTANCE.log( "FileAlreadyExistsException raised in [FileIO.createFile()] in regards to ", getFilePath(), ".");
             return true;
         } catch ( IOException e ) {
-            System.err.println("Caught IOException in FileIO.createFile(): " + e.getMessage());
-            e.printStackTrace();
+            MicroLogger.INSTANCE.log_Error( "IOException raised in [FileIO.createFile()] in regards to ", getFilePath(), ".");
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             return false;
         }
     }
@@ -61,11 +64,16 @@ public class FileIO {
                 return false;
             }
         } catch ( SecurityException e ) {
-            System.err.println("Caught SecurityException in FileIO.deleteFile(): " + e.getMessage());
+            MicroLogger.INSTANCE.log_Error( "SecurityException raised in [FileIO.deleteFile()] for , ", this.getFilePath() );
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             return false;
         } catch ( InvalidPathException e) {
+            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileIO.deleteFile()] for , ", this.getFilePath() );
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             throw e;
         } catch ( IOException e ) {
+            MicroLogger.INSTANCE.log_Error( "IOException raised in [FileIO.deleteFile()] for , ", this.getFilePath() );
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             throw e;
         }
     }
@@ -79,6 +87,8 @@ public class FileIO {
         try {
             return FileSystems.getDefault().getPath( this.directory );
         } catch (InvalidPathException e ) {
+            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileIO.getDirectoryPath()] for , ", this.directory );
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             throw e;
         }
     }
@@ -92,6 +102,8 @@ public class FileIO {
         try {
             return FileSystems.getDefault().getPath( this.directory, this.file_name );
         } catch ( InvalidPathException e ) {
+            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileIO.getFilePath()] for , ", this.directory, ", and ", this.file_name, "." );
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             throw e;
         }
     }

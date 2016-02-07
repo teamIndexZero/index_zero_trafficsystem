@@ -3,6 +3,9 @@ package kcl.teamIndexZero.traffic.log.outputs;
 import kcl.teamIndexZero.traffic.log.Log_Levels;
 import kcl.teamIndexZero.traffic.log.Log_TimeStamp;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * Created by Es on 29/01/2016.
  */
@@ -30,5 +33,24 @@ public class Formatter_TXT implements Formatter_Interface {
             s += o.toString();
         }
         return s + System.lineSeparator();
+    }
+
+    /**
+     * Formats message information for Text File output
+     *
+     * @param origin_name Name of the message's origin
+     * @param time_stamp  Time stamp for the message
+     * @param e           Exception raised
+     * @return Formatted String
+     */
+    @Override
+    public String format(String origin_name, Log_TimeStamp time_stamp, Exception e) {
+        String s = "\t===Exception raised in [" + origin_name + "] at " + time_stamp.getDate() + " - " + time_stamp.getTime() + "===";
+        s += System.lineSeparator() + "\t";
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        s += sw.toString() + System.lineSeparator();
+        return s;
     }
 }

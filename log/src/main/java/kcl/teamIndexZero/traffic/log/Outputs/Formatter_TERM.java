@@ -3,14 +3,18 @@ package kcl.teamIndexZero.traffic.log.outputs;
 import kcl.teamIndexZero.traffic.log.Log_Levels;
 import kcl.teamIndexZero.traffic.log.Log_TimeStamp;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * Created by Es on 29/01/2016.
  */
 public class Formatter_TERM implements Formatter_Interface {
+    /**
+     * Constructor
+     */
     protected Formatter_TERM() {
     }
-
-    ;
 
     /**
      * Formats message information for console output
@@ -28,6 +32,25 @@ public class Formatter_TERM implements Formatter_Interface {
         for (Object o : objects) {
             s += o.toString();
         }
+        return s;
+    }
+
+    /**
+     * Formats Exception information for console output
+     *
+     * @param origin_name Name of the message's origin
+     * @param time_stamp  Time stamp of the message
+     * @param e           Exception raised
+     * @return Formatted String
+     */
+    @Override
+    public String format(String origin_name, Log_TimeStamp time_stamp, Exception e) {
+        String s = "\t===Exception raised in [" + origin_name + "]===";
+        s += System.lineSeparator() + "\t";
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        s += sw.toString() + System.lineSeparator();
         return s;
     }
 }

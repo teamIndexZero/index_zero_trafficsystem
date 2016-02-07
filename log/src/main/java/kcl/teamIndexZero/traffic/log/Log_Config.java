@@ -1,5 +1,6 @@
 package kcl.teamIndexZero.traffic.log;
 
+import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
 import kcl.teamIndexZero.traffic.log.outputs.Output;
 import kcl.teamIndexZero.traffic.log.outputs.Output_TERM;
 import kcl.teamIndexZero.traffic.log.outputs.Output_TXT;
@@ -13,6 +14,7 @@ import java.util.Vector;
 public class Log_Config {
     private String global_file_name = "log_"; //Default
     private int global_log_level = Log_Levels.DEBUG; //Default
+    private boolean log_exception_flag = true; //Default
     private Vector<Output> outputs = new Vector<Output>();
 
     //TODO Create file loader class for getting options from outside
@@ -34,7 +36,8 @@ public class Log_Config {
                 outputs.add(new Output_TXT( global_file_name ) );
             } catch ( IOException e ) {
                 //TODO config file cannot be accessed to default to terminal and txt(if that's doable)
-                System.err.println("Caught IOException in Log_Config.Log_Config(): " + e.getMessage());
+                MicroLogger.INSTANCE.log_Error( "IOException raised in [Log_Config.Log_Config()]" );
+                MicroLogger.INSTANCE.log_ExceptionMsg( e );
                 e.printStackTrace();
             }
 
@@ -60,6 +63,13 @@ public class Log_Config {
     public int getGlobalLogLevel() {
         return this.global_log_level;
     }
+
+
+    /**
+     * Gets the "log exceptions" flag
+     * @return Flag state
+     */
+    public boolean getLogExceptionFlag() { return this.log_exception_flag; }
 
     /**
      * Gets the output pipes of the log

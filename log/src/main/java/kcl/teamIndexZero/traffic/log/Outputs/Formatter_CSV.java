@@ -31,4 +31,17 @@ public class Formatter_CSV implements Formatter_Interface {
         }
         return s + System.lineSeparator();
     }
+
+    /**
+     * Formats message information for CSV File output
+     *
+     * @param origin_name Name of the message's origin
+     * @param time_stamp  Time stamp for the message
+     * @param e           Exception raised
+     * @return Formatted String
+     */
+    @Override
+    public String format(String origin_name, Log_TimeStamp time_stamp, Exception e) {
+        return ""; //TODO
+    }
 }

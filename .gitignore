@@ -4,3 +4,4 @@
 *.iml
 build
 *.class
+log/logs/

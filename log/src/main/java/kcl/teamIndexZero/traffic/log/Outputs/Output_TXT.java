@@ -15,42 +15,85 @@ public class Output_TXT extends Output {
 
     /**
      * Constructor
+     *
      * @param output_name
-     * @exception IOException
+     * @throws IOException
      */
     public Output_TXT(String output_name) throws IOException {
         super(output_name, GlobalOutputTypes.TXT);
         try {
-            MicroLogger.INSTANCE.log( "[Output_TXT.Output_TXT( ", output_name, " )] New Text output created.");
+            MicroLogger.INSTANCE.log_Debug("[Output_TXT.Output_TXT( ", output_name, " )] New Text output created.");
             out = new FileOutput("logs", output_name + ".txt");
-            MicroLogger.INSTANCE.log_Debug( "[Output_TXT.Output_TXT( ", output_name, " )] All done." );
-        } catch ( IOException e ) {
+        } catch (IOException e) {
+            MicroLogger.INSTANCE.log_Error("IOException raised in [Output_TXT.Output_TXT( ", output_name, " )]");
+            MicroLogger.INSTANCE.log_ExceptionMsg(e);
             throw e;
         }
 
     }
 
+    /**
+     * Sets the name of the output
+     *
+     * @param output_name Output name
+     */
     @Override
     public void setName(String output_name) {
         super.setName(output_name);
     }
 
+    /**
+     * Gets the name of the output
+     *
+     * @return Output name
+     */
     @Override
     public String getOutputName() {
         return super.getOutputName();
     }
 
+    /**
+     * Get the type of the output
+     *
+     * @return Output type
+     */
     @Override
     public GlobalOutputTypes getOutputType() {
         return super.getOutputType();
     }
 
+    /**
+     * Outputs message to a text file
+     *
+     * @param origin_name Origin name of the call
+     * @param log_level   Log level
+     * @param log_number  Message number in session
+     * @param time_stamp  Time stamp of the message
+     * @param objects     Message description (not used in "Output" parent class)
+     */
     @Override
     public void output(String origin_name, int log_level, Long log_number, Log_TimeStamp time_stamp, Object... objects) {
         try {
             out.appendString(formatter.format(origin_name, log_level, log_number, time_stamp, objects));
-        } catch ( IOException e ) {
-            System.err.println("Caught IOException in Output_TXT.output(): " + e.getMessage());
+        } catch (IOException e) {
+            MicroLogger.INSTANCE.log_Error("IOException raised in [Output_TXT.output( ", origin_name, ", ", log_level, ", ", log_number, ", ", time_stamp, ", ", objects, " )]");
+            MicroLogger.INSTANCE.log_ExceptionMsg(e);
+        }
+    }
+
+    /**
+     * Outputs message to a text file
+     *
+     * @param origin_name Name of the message's origin
+     * @param time_stamp  Time stamp of the message
+     * @param e           Exception raised
+     */
+    public void output(String origin_name, Log_TimeStamp time_stamp, Exception e) {
+        try {
+            out.appendString(formatter.format(origin_name,time_stamp, e));
+        } catch (IOException exception) {
+            MicroLogger.INSTANCE.log_Error("IOException raised in [Output_TXT.output( ", origin_name, ", ", time_stamp, " )] <-Output Exception version." );
+            MicroLogger.INSTANCE.log_ExceptionMsg(exception);
         }
     }
 }

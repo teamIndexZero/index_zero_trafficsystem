@@ -1,5 +1,7 @@
 package kcl.teamIndexZero.traffic.log.fileIO;
 
+import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,16 +27,16 @@ public class FileOutput extends FileIO {
             if( super.createFile() ) {
                 this.writer = Files.newBufferedWriter(super.getFilePath(), super.getCharset(), StandardOpenOption.APPEND);
             } else {
-                //TODO log error
+                MicroLogger.INSTANCE.log_Error( "[FileOutput.FileOutput( ", folder_path, ", ", file_name, " )] Couldn't create/access the file.");
                 throw new IOException( "Failed to create/access the file " + getFilePath().toString() );
             }
         } catch (IOException e) {
-            //TODO log error
-            System.err.println("Caught IOException in FileOutput(): " + e.getMessage());
+            MicroLogger.INSTANCE.log_Error( "IOException raised in [FileOutput.FileOutput( \", folder_path, \", \", file_name, \" )]");
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             throw e;
         } catch (InvalidPathException e ) {
-            //TODO log error
-            System.err.println("Caught InvalidPathException in FileOutput(): " + e.getMessage());
+            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileOutput.FileOutput( \", folder_path, \", \", file_name, \" )]");
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             throw e;
         }
     }
@@ -52,10 +54,12 @@ public class FileOutput extends FileIO {
                 return false;
             }
         } catch (IOException e) {
-            System.err.println("Caught IOException in FileOutput.reOpenWriter(): " + e.getMessage());
+            MicroLogger.INSTANCE.log_Error( "IOException raised in [FileOutput.reOpenWriter()] for , ", super.getFilePath());
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             return false;
         } catch (InvalidPathException e ) {
-            System.err.println("Caught InvalidPathException in FileOutput.reOpenWriter(): " + e.getMessage());
+            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileOutput.reOpenWriter()] for , ", super.getFilePath() );
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             return false;
         }
     }
@@ -70,8 +74,8 @@ public class FileOutput extends FileIO {
                 writer.close();
                 return true;
             } catch ( IOException e ) {
-                //TODO log error
-                System.err.println( "Caught IOException in FileOutput.closeWriter(): " + e.getMessage());
+                MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileOutput.closeWriter()] for , ", super.getFilePath() );
+                MicroLogger.INSTANCE.log_ExceptionMsg( e );
                 return false;
             }
         }
@@ -88,8 +92,8 @@ public class FileOutput extends FileIO {
             this.writer.write(string, 0, string.length());
             this.writer.flush();
         } catch ( IOException e ) {
-            //TODO log error
-            System.err.println("Caught IOException in FileOutput.appendString(): " + e.getMessage());
+            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileOutput.appendString()] for , ", super.getFilePath(), " with <", string, ">");
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             throw e;
         }
     }
@@ -102,12 +106,12 @@ public class FileOutput extends FileIO {
         try {
             return super.deleteFile();
         } catch ( InvalidPathException e ) {
-            //TODO log error
-            System.err.println("Caught InvalidPathException in FileOutput.deleteFile(): " + e.getMessage());
+            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileOutput.deleteFile()] for , ", super.getFilePath() );
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             return false;
         } catch ( IOException e ) {
-            //TODO log error
-            System.err.println("Caught IOException in FileOutput.deleteFile(): " + e.getMessage());
+            MicroLogger.INSTANCE.log_Error( "IOException raised in [FileOutput.deleteFile()] for , ", super.getFilePath() );
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
             return false;
         }
     }

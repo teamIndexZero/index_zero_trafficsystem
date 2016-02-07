@@ -2,6 +2,8 @@ package kcl.teamIndexZero.traffic.log.microLogger;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * Created by Es on 06/02/2016.
@@ -13,8 +15,13 @@ public enum MicroLogger {
     private String file_name = "micrologger.log";
     MicroLogger() {
         writeToFile( "==================================[ NEW SESSION ]==================================" + System.lineSeparator());
-    };
-    MicroLogger( String name ) {
+    }
+
+    /**
+     * Sets a new output file name for the rest of the session
+     * @param name File name
+     */
+    public void setFileName( String name ) {
         file_name = name;
         writeToFile( "==================================[ NEW SESSION ]==================================" + System.lineSeparator());
     }
@@ -77,6 +84,18 @@ public enum MicroLogger {
             s += o;
         }
         writeToFile( s + System.lineSeparator() );
+    }
+
+    /**
+     * Logs an Exception's stacktrace
+     * @param e Exception
+     */
+    public void log_ExceptionMsg( Exception e ) {
+        String s = "\t==Exception trace==" + System.lineSeparator() + "\t";
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace( pw );
+        writeToFile( s + sw.toString() + System.lineSeparator() );
     }
 
     /**

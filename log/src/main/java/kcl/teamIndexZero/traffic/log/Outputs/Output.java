@@ -3,6 +3,9 @@ package kcl.teamIndexZero.traffic.log.outputs;
 import kcl.teamIndexZero.traffic.log.Log_Levels;
 import kcl.teamIndexZero.traffic.log.Log_TimeStamp;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * Created by Es on 29/01/2016.
  */
@@ -58,6 +61,20 @@ public class Output {
      * @param objects     Message description (not used in "Output" parent class)
      */
     public void output(String origin_name, int log_level, Long log_number, Log_TimeStamp time_stamp, Object... objects) {
-        System.out.print("[" + log_number.toString() + "] " + time_stamp.getDate() + " - " + time_stamp.getTime() + " " + Log_Levels.txtLevels[log_level] + " [" + origin_name + "] Please use specific output child class to see the message...");
+        System.out.println("[" + log_number.toString() + "] " + time_stamp.getDate() + " - " + time_stamp.getTime() + " " + Log_Levels.txtLevels[log_level] + " [" + origin_name + "] Please use specific output child class to see the message...");
+    }
+
+    /**
+     * Outputs an exception's details
+     *
+     * @param origin_name Origin name of the call
+     * @param time_stamp  Time stamp of the message
+     * @param e           Exception raised
+     */
+    public void output(String origin_name, Log_TimeStamp time_stamp, Exception e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        System.out.println("\t===Exception raised in [" + origin_name + "] at " + time_stamp.getDate() + " - " + time_stamp.getTime() + "===" + System.lineSeparator() + sw.toString() + System.lineSeparator());
     }
 }

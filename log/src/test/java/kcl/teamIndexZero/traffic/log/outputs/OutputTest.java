@@ -2,10 +2,8 @@ package kcl.teamIndexZero.traffic.log.outputs;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
- * Created by Alwlyan on 07/02/2016.
+ * Created by Es on 07/02/2016.
  */
 public class OutputTest {
 
