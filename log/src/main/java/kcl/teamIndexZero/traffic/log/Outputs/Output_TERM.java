@@ -4,6 +4,7 @@ import kcl.teamIndexZero.traffic.log.Log_TimeStamp;
 
 /**
  * Created by Es on 29/01/2016.
+ * Output to the console
  */
 public class Output_TERM extends Output {
     private Formatter_TERM formatter = new Formatter_TERM();

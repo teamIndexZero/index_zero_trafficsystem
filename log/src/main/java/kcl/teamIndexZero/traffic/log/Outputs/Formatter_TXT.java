@@ -8,6 +8,7 @@ import java.io.StringWriter;
 
 /**
  * Created by Es on 29/01/2016.
+ * Formatter for '.txt' file export
  */
 public class Formatter_TXT implements Formatter_Interface {
     /**
