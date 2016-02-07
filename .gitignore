@@ -5,3 +5,5 @@
 build
 *.class
 log/logs/
+*.log
+log_*.txt
