@@ -9,10 +9,6 @@ public class Log_EngineTest {
 
     @Test
     public void testGetInstance() throws Exception {
-        Log_Engine log_engine = Log_Engine.getInstance();
-        org.junit.Assert.assertFalse( log_engine != null );
-        org.junit.Assert.assertEquals( log_engine.getClass(), Log_Engine.class );
-
 
     }
 

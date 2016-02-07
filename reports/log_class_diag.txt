@@ -161,16 +161,6 @@ package "kcl.teamIndexZero.traffic.log" #FFFFFF {
 			#getFilePath() : Path
 		}
 		
-		class FileOutput {
-			-BufferedWriter writer
-			+FileOutput( directory_name : String, file_name : String )
-			+reOpenBufferedWriter() : bool
-			+closeBufferedWriter() : bool
-			+appendString( s : String )
-			+appendLine( line : String )
-			+deleteFile() : bool
-		}
-		
 		class FileInput {
 			-BufferedReader reader
 			+FileInput( directory_name : String, file_name : String )
@@ -181,8 +171,18 @@ package "kcl.teamIndexZero.traffic.log" #FFFFFF {
 			+deleteFile() : bool
 		}
 		
-		FileIO <|-- FileInput
+		class FileOutput {
+			-BufferedWriter writer
+			+FileOutput( directory_name : String, file_name : String )
+			+reOpenBufferedWriter() : bool
+			+closeBufferedWriter() : bool
+			+appendString( s : String )
+			+appendLine( line : String )
+			+deleteFile() : bool
+		}
+		
 		FileIO <|-- FileOutput
+		FileIO <|-- FileInput
 	}
 	
 	FileOutput <-- Output
