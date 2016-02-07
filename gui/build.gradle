@@ -1,6 +1,7 @@
 apply plugin: 'application'
-mainClassName = 'kcl.teamIndexZero.traffic.gui.Main'
+mainClassName = 'kcl.teamIndexZero.traffic.gui.SimulatorGui'
 
 dependencies {
     compile project(':log')
+    compile project(':simulator')
 }

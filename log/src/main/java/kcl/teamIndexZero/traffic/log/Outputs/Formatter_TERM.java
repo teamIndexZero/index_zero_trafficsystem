@@ -29,7 +29,13 @@ public class Formatter_TERM implements Formatter_Interface {
      */
     @Override
     public String format(String origin_name, int log_level, Long log_number, Log_TimeStamp time_stamp, Object... objects) {
-        String s = "[" + log_number.toString() + "] " + time_stamp.getDate() + " - " + time_stamp.getTime() + " " + Log_Levels.txtLevels[log_level] + " [" + origin_name + "] ";
+        String s = String.format("%4d %s - %s %s + [%s]",
+                log_number,
+                time_stamp.getDate(),
+                time_stamp.getTime(),
+                Log_Levels.txtLevels[log_level],
+                origin_name
+        );
         for (Object o : objects) {
             s += o.toString();
         }
