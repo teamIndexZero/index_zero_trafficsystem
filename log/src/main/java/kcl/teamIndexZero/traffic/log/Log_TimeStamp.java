@@ -65,4 +65,12 @@ public class Log_TimeStamp {
             }
         }
     }
+
+    /**
+     * Gets the string representation of the object
+     * @return String time stamp
+     */
+    public String toString() {
+        return this.now.toString();
+    }
 }
