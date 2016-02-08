@@ -50,7 +50,8 @@ public class Formatter_CSV implements Formatter_Interface {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        String s = log_number.toString() + ";" + time_stamp.getDate() + ";" + time_stamp.getTime() + ";EXCEPTION;" + origin_name + "; " + sw.toString(); //TODO check format
+        String s = log_number.toString() + ";" + time_stamp.getDate() + ";" + time_stamp.getTime() + ";EXCEPTION;" + origin_name + "; " + sw.toString();
+        //TODO check exception details format
         return s;
     }
 }
