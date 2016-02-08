@@ -7,9 +7,9 @@ import java.util.Map;
  * Created by Es on 27/01/2016.
  */
 public class Logger implements Logger_Interface {
+    private static Map<String, Logger> loggers;
+    private static Log_Engine log_engine;
     private String calling_instance_name;
-    private Log_Engine log_engine = Log_Engine.getInstance();
-    private static Map<String, Logger> loggers = new HashMap<>();
 
     /**
      * Constructor
@@ -27,6 +27,8 @@ public class Logger implements Logger_Interface {
      * @return Logger
      */
     public static Logger getLoggerInstance(String instance_name) {
+        if (loggers == null) loggers = new HashMap<String, Logger>();
+        if (log_engine == null) log_engine = Log_Engine.getInstance();
         Logger logger_instance = loggers.get(instance_name);
         if (logger_instance == null) {
             logger_instance = new Logger(instance_name);
@@ -45,6 +47,7 @@ public class Logger implements Logger_Interface {
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.MSG, calling_instance_name, objects);
     }
 
+
     /**
      * Logs a fatal log message
      *
@@ -54,6 +57,7 @@ public class Logger implements Logger_Interface {
     public void log_Fatal(Object... objects) {
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.FATAL, calling_instance_name, objects);
     }
+
 
     /**
      * Logs an error log message
@@ -75,6 +79,7 @@ public class Logger implements Logger_Interface {
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.WARNING, calling_instance_name, objects);
     }
 
+
     /**
      * Logs a debug log message
      *
@@ -93,5 +98,15 @@ public class Logger implements Logger_Interface {
     @Override
     public void log_Trace(Object... objects) {
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.TRACE, calling_instance_name, objects);
+    }
+
+    /**
+     * Logs an Exception
+     *
+     * @param e Exception
+     */
+    @Override
+    public void log_Exception(Exception e) {
+        log_engine.processException( new Log_TimeStamp(), calling_instance_name, e);
     }
 }

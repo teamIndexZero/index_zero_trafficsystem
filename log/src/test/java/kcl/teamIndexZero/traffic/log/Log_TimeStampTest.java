@@ -34,6 +34,7 @@ public class Log_TimeStampTest extends TestCase {
         secs = String.format("%02d", date_time.getSecond());
         nano = Integer.toString(date_time.getNano() / 1).substring(0, 1);
         String time = hours + ":" + mns + ":" + secs + "." + nano;
+        System.out.println("Expected: " + time);
         assertEquals(timeStamp_test.getTime(), time);
     }
 
@@ -47,16 +48,16 @@ public class Log_TimeStampTest extends TestCase {
         hours = String.format("%02d", date_time.getHour());
         mns = String.format("%02d", date_time.getMinute());
         secs = String.format("%02d", date_time.getSecond());
-        nano = Integer.toString(date_time.getNano()).substring(0, 1);
+        nano = Integer.toString(date_time.getNano() / 1).substring(0, 1);
         Log_TimeStamp timeStamp_test = new Log_TimeStamp(date_time);
         //Valid formatter
-        String valid_formatter = "yyyy MM dd hh mm ss S";
+        String valid_formatter = "yyyy MM dd HH mm ss S";
         String time_stamp = timeStamp_test.getCustomStamp(valid_formatter);
         String comparator = year + " " + month + " " + day + " " + hours + " " + mns + " " + secs + " " + nano;
         assertEquals(time_stamp, comparator);
         //Invalid formatter
         String invalid_formatter = "YyJkjhkjf87y53kj";
-        String default_time_stamp = timeStamp_test.getCustomStamp(invalid_formatter); //yyyyMMddhhmmss
+        String default_time_stamp = timeStamp_test.getCustomStamp(invalid_formatter); //yyyyMMddHHmmss
         String default_comparator = year + month + day + hours + mns + secs;
         assertEquals(default_time_stamp, default_comparator);
     }

@@ -1,5 +1,7 @@
 package kcl.teamIndexZero.traffic.log;
 
+import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -41,7 +43,7 @@ public class Log_TimeStamp {
      * @return time of time stamp
      */
     public String getTime() {
-        return now.format(DateTimeFormatter.ofPattern("hh:mm:ss.S"));
+        return now.format(DateTimeFormatter.ofPattern("HH:mm:ss.S"));
     }
 
     /**
@@ -49,15 +51,30 @@ public class Log_TimeStamp {
      *
      * @param formatter Formatter for the stamp
      *                  If stamp is invalid raises an error msg to System.err and
-     *                  returns date/time formatted as "yyyyMMddhhmmss"
+     *                  returns date/time formatted as "yyyyMMddHHmmss"
      * @return Formatted stamp
      */
     public String getCustomStamp(String formatter) {
         try {
             return now.format(DateTimeFormatter.ofPattern(formatter));
         } catch (IllegalArgumentException e) {
-            System.err.println("Caught IllegalArgumentException in Log_TimeStamp.getCustomStamp(..): " + e.getMessage());
-            return now.format(DateTimeFormatter.ofPattern("yyyyMMddhhmmss"));
+            MicroLogger.INSTANCE.log_Error( "IllegalArgumentException raised in [Log_TimeStamp.getCustomStamp( ", formatter, " )]");
+            MicroLogger.INSTANCE.log_ExceptionMsg( e );
+            try {
+                return now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+            } catch ( IllegalArgumentException ee ) {
+                MicroLogger.INSTANCE.log_Error( "IllegalArgumentException raised in [Log_TimeStamp.getCustomStamp( \'yyyyMMddHHmmss\' )] <-Default fallback value has failed.");
+                MicroLogger.INSTANCE.log_ExceptionMsg( e );
+                return "";
+            }
         }
+    }
+
+    /**
+     * Gets the string representation of the object
+     * @return String time stamp
+     */
+    public String toString() {
+        return this.now.toString();
     }
 }

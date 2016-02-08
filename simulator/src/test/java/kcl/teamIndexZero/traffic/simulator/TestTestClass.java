@@ -1,6 +1,5 @@
 package kcl.teamIndexZero.traffic.simulator;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
@@ -11,11 +10,6 @@ import static org.mockito.Mockito.verify;
 
 @SuppressWarnings("unchecked")
 public class TestTestClass {
-
-    @Test
-    public void testShouldBeTrue() {
-        Assert.assertTrue((new SomeNiceClass().hi));
-    }
 
     @Test
     public void testWithMockitoAndFest() {

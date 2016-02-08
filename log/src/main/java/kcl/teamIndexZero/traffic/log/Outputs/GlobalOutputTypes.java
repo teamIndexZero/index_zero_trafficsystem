@@ -1,4 +1,4 @@
-package kcl.teamIndexZero.traffic.log.Outputs;
+package kcl.teamIndexZero.traffic.log.outputs;
 
 /**
  * Created by Es on 27/01/2016.

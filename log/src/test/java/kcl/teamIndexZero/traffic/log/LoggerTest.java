@@ -2,15 +2,18 @@ package kcl.teamIndexZero.traffic.log;
 
 import org.junit.Test;
 
+import java.io.IOException;
+
 /**
  * Created by Es on 01/02/2016.
  */
 public class LoggerTest {
-
     @Test
     public void testGetLoggerInstance() throws Exception {
         Logger log = Logger.getLoggerInstance("Logger_test");
-        log.log("Testing ", 1, ", ", 2, ", ", 3, ", and some more...");
+        log.log_Error("Testing ", 1, ", ", 2, ", ", 3, ", and some more std text...");
+        log.log_Exception( new IOException("bad stuff happened") );
+        log.log_Warning( "Maybe check something?");
     }
 
     @Test
