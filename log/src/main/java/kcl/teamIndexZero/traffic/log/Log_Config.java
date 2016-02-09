@@ -25,14 +25,15 @@ public class Log_Config {
     private boolean log_exception_flag = true; //Default
     private Vector<Output> outputs = new Vector<Output>();
     private String config_file_name = "log_config.cfg";
+    private Log_TimeStamp ts = null;
 
     /**
      * Constructor (default)
      */
     public Log_Config() {
+        this.ts = new Log_TimeStamp();
+        this.global_file_name += "_" + this.ts.getCustomStamp("yyyyMMdd'-'HHmmss");
         try {
-            Log_TimeStamp time_stamp = new Log_TimeStamp();
-            global_file_name += "_" + time_stamp.getCustomStamp("yyyyMMdd'-'HHmmss");
             if (!this.configurationLoader(config_file_name)) {
                 applyDefaultConfiguration();
             }
@@ -121,7 +122,7 @@ public class Log_Config {
                     return false;
                 }
             }
-            return false;
+            return true;
         } catch (IOException e) {
             MicroLogger.INSTANCE.log_Error("IOException raised in [Log_Config.configurationLoader( ", file_name, " )] Cannot read/load the config file. Reverting to defaults.. ");
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
@@ -159,13 +160,13 @@ public class Log_Config {
                 if (line.matches("^OUTPUT=<TXT,\\w+>$")) {
                     Matcher matcher = pattern.matcher(line);
                     matcher.find();
-                    this.outputs.add(new Output_TXT(matcher.group(1)));
+                    this.outputs.add(new Output_TXT(matcher.group(1) + "_" + this.ts.getCustomStamp("yyyyMMdd'-'HHmmss")));
                     return 1;
                 }
                 if (line.matches("^OUTPUT=<CSV,\\w+>$")) {
                     Matcher matcher = pattern.matcher(line);
                     matcher.find();
-                    this.outputs.add(new Output_CSV(matcher.group(1)));
+                    this.outputs.add(new Output_CSV(matcher.group(1) + "_" + this.ts.getCustomStamp("yyyyMMdd'-'HHmmss")));
                     return 1;
                 }
                 if (line.matches("^OUTPUT=<TERMINAL,\\w+>$")) {
@@ -262,8 +263,10 @@ public class Log_Config {
                         "// \t> syntax: NAME_OF_FLAG=1 for On or NAME_OF_FLAG=0 for Off" + System.lineSeparator() +
                         "// Variable types available: LEVEL" + System.lineSeparator() +
                         "// \t> level types: OFF, FATAL, ERROR, WARNING, MESSAGE, DEBUG, TRACE" + System.lineSeparator() +
-                        "//======================================================================================" + System.lineSeparator() +
-                        "// Syntax example: OUTPUT=<TERMINAL,my_name>" + System.lineSeparator() +
+                        "//=======================================EXAMPLES=======================================" + System.lineSeparator() +
+                        "// OUTPUT=<TERMINAL,my_name>" + System.lineSeparator() +
+                        "// VARIABLE<LEVEL,OFF>" + System.lineSeparator() +
+                        "// FLAG=<EXCEPTION,0>" + System.lineSeparator() +
                         "//======================================================================================" + System.lineSeparator() +
                         "VARIABLE=<LEVEL,DEBUG>" + System.lineSeparator() +
                         "FLAG=<EXCEPTIONS,1>" + System.lineSeparator() +
