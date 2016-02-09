@@ -105,6 +105,7 @@ public class FileOutput extends FileIO {
         try {
             PrintWriter pw = new PrintWriter( writer );
             pw.close();
+            reOpenWriter();
             return true;
         } catch ( SecurityException e ) {
             MicroLogger.INSTANCE.log_Error( "SecurityException raised in [FileOutput.clearFileContent()] for ", super.getFilePath());

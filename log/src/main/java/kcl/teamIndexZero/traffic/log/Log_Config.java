@@ -4,14 +4,16 @@ import kcl.teamIndexZero.traffic.log.fileIO.FileInput;
 import kcl.teamIndexZero.traffic.log.fileIO.FileOutput;
 import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
 import kcl.teamIndexZero.traffic.log.outputs.Output;
+import kcl.teamIndexZero.traffic.log.outputs.Output_CSV;
 import kcl.teamIndexZero.traffic.log.outputs.Output_TERM;
 import kcl.teamIndexZero.traffic.log.outputs.Output_TXT;
 
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Es on 27/01/2016.
@@ -31,12 +33,9 @@ public class Log_Config {
         try {
             Log_TimeStamp time_stamp = new Log_TimeStamp();
             global_file_name += "_" + time_stamp.getCustomStamp("yyyyMMdd'-'HHmmss");
-            applyDefaultConfiguration(); //TODO uncomment below and remove this line once all the other TODOs are implemented
-            /*
             if (!this.configurationLoader(config_file_name)) {
                 applyDefaultConfiguration();
             }
-            */
         } catch (IOException e) {
             MicroLogger.INSTANCE.log_Error("IOException raised in [Log_Config.Log_Config()]");
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
@@ -108,25 +107,21 @@ public class Log_Config {
                 }
                 return false;
             } else {
-                int line_counter = 1;
+                int line_counter = 0;
                 int invalid_counter = 0;
-                Iterator<String> it = lines.iterator();
-                while (it.hasNext()) {
-                    int check_value = configurationChecker(it.next());
-                    if (check_value < 0) { //Invalid
+                for (String line : lines) {
+                    line_counter++;
+                    if (configurationCheckerApplier(line) < 0) { //Invalid
                         MicroLogger.INSTANCE.log_Error("[Log_Config.configurationLoader( ", file_name, " )] Line ", line_counter, " is invalid. Please check syntax.");
                         invalid_counter++;
-                    } else if (check_value == 0) { //Ignored (comment)
-                        it.remove();
                     }
-                    line_counter++;
                 }
                 if (invalid_counter > 0) {
                     MicroLogger.INSTANCE.log_Error("[Log_Config.configurationLoader( ", file_name, " )] Configuration file has ", invalid_counter, " invalid lines.");
                     return false;
                 }
-                return applyConfiguration(lines);
             }
+            return false;
         } catch (IOException e) {
             MicroLogger.INSTANCE.log_Error("IOException raised in [Log_Config.configurationLoader( ", file_name, " )] Cannot read/load the config file. Reverting to defaults.. ");
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
@@ -140,6 +135,10 @@ public class Log_Config {
             MicroLogger.INSTANCE.log_Error("InvalidPathException raised in [Log_Config.configurationLoader( ", file_name, " )] Cannot read/load the config file. Reverting to defaults.. ");
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
             return false;
+        } catch (RuntimeException e) {
+            MicroLogger.INSTANCE.log_Error("RuntimeException raised in [Log_Config.configurationLoader( ", file_name, " )] Couldn't create a valid file output from the configuration file.");
+            MicroLogger.INSTANCE.log_ExceptionMsg(e);
+            return false;
         }
     }
 
@@ -148,43 +147,82 @@ public class Log_Config {
      *
      * @param line Line to check
      * @return Validity (-1:Invalid, 0:Ignore, 1:Valid)
+     * @throws RuntimeException when an output couldn't be created
      */
-    private int configurationChecker(String line) {
-        if (line.matches("^OUTPUT=<[A-Z]+,\\w+>$")) { //Output
-            //TODO check specifics
-
-
-            return 1;
+    private int configurationCheckerApplier(String line) throws RuntimeException {
+        try {
+            if (line.matches("^//(?s:.)*$")) { //Comment ('//...')
+                return 0;
+            }
+            if (line.matches("^OUTPUT=<[A-Z]+,\\w+>$")) { //Output
+                final Pattern pattern = Pattern.compile(",(.+?)>");
+                if (line.matches("^OUTPUT=<TXT,\\w+>$")) {
+                    Matcher matcher = pattern.matcher(line);
+                    matcher.find();
+                    this.outputs.add(new Output_TXT(matcher.group(1)));
+                    return 1;
+                }
+                if (line.matches("^OUTPUT=<CSV,\\w+>$")) {
+                    Matcher matcher = pattern.matcher(line);
+                    matcher.find();
+                    this.outputs.add(new Output_CSV(matcher.group(1)));
+                    return 1;
+                }
+                if (line.matches("^OUTPUT=<TERMINAL,\\w+>$")) {
+                    Matcher matcher = pattern.matcher(line);
+                    matcher.find();
+                    this.outputs.add(new Output_TERM(matcher.group(1)));
+                    return 1;
+                }
+                return -1;
+            }
+            if (line.matches("^FLAG=<[A-Z]+,[01]?>$")) { //Flag
+                if (line.matches("^FLAG=<EXCEPTIONS,0>$")) {
+                    this.log_exception_flag = false;
+                    return 1;
+                }
+                if (line.matches("^FLAG=<EXCEPTIONS,1>$")) {
+                    this.log_exception_flag = true;
+                    return 1;
+                }
+                return -1;
+            }
+            if (line.matches("^VARIABLE=<[A-Z]+,[A-Z]+>$")) { //Variable
+                if (line.matches("^VARIABLE=<LEVEL,OFF>$")) {
+                    this.global_log_level = Log_Levels.OFF;
+                    return 1;
+                }
+                if (line.matches("^VARIABLE=<LEVEL,FATAL>$")) {
+                    this.global_log_level = Log_Levels.FATAL;
+                    return 1;
+                }
+                if (line.matches("^VARIABLE=<LEVEL,ERROR>$")) {
+                    this.global_log_level = Log_Levels.ERROR;
+                    return 1;
+                }
+                if (line.matches("^VARIABLE=<LEVEL,WARNING>$")) {
+                    this.global_log_level = Log_Levels.WARNING;
+                    return 1;
+                }
+                if (line.matches("^VARIABLE=<LEVEL,MESSAGE>$")) {
+                    this.global_log_level = Log_Levels.MSG;
+                    return 1;
+                }
+                if (line.matches("^VARIABLE=<LEVEL,DEBUG>$")) {
+                    this.global_log_level = Log_Levels.DEBUG;
+                    return 1;
+                }
+                if (line.matches("^VARIABLE=<LEVEL,TRACE>$")) {
+                    this.global_log_level = Log_Levels.TRACE;
+                    return 1;
+                }
+                return -1;
+            }
+            return -1;
+        } catch (IOException e) {
+            MicroLogger.INSTANCE.log_Error("IOException raised in [Log_Config.configurationCheckerApplier()] Couldn't create file output.");
+            throw new RuntimeException("configurationCheckerApplier(..) couldn't apply an output.");
         }
-        if (line.matches("^FLAG=<[A-Z]+,[01]?")) { //Flag
-            //TODO check specifics
-
-            return 1;
-        }
-        if( line.matches("^VARIABLE=<[A-Z]+,[A-Z]+")) { //Variable
-            //TODO check specifics
-            
-            return 1;
-        }
-        if (line.matches("^//(?s:.)*$")) return 0; //Comment ('//...')
-        return -1;
-    }
-
-    /**
-     * Checks & applies configuration lines to the log system
-     *
-     * @param config_lines Configuration lines from file
-     * @return Success
-     */
-    private boolean applyConfiguration(List<String> config_lines) {
-        //TODO apply lines of configuration
-        //if flag
-
-
-        //if OUTPUT, extract output type and name
-        //switch/case for output types
-        //case default: unknown
-        return true; //if all is good
     }
 
     /**
@@ -221,18 +259,14 @@ public class Log_Config {
                         "//======================================================================================" + System.lineSeparator() +
                         "// Output types available: TERMINAL, TXT, CSV" + System.lineSeparator() +
                         "// Flag types available: EXCEPTIONS," + System.lineSeparator() +
-                        "// \t>syntax: NAME_OF_FLAG=1 for On or NAME_OF_FLAG=0 for Off" + System.lineSeparator() +
+                        "// \t> syntax: NAME_OF_FLAG=1 for On or NAME_OF_FLAG=0 for Off" + System.lineSeparator() +
                         "// Variable types available: LEVEL" + System.lineSeparator() +
-                        "// \t>level types: OFF, FATAL, ERROR, WARNING, MESSAGE, DEBUG, TRACE" + System.lineSeparator() +
+                        "// \t> level types: OFF, FATAL, ERROR, WARNING, MESSAGE, DEBUG, TRACE" + System.lineSeparator() +
                         "//======================================================================================" + System.lineSeparator() +
                         "// Syntax example: OUTPUT=<TERMINAL,my_name>" + System.lineSeparator() +
                         "//======================================================================================" + System.lineSeparator() +
-                        "//-------------------------------------Logging Level-----------------------------------" + System.lineSeparator() +
                         "VARIABLE=<LEVEL,DEBUG>" + System.lineSeparator() +
-                        "//--------------------------------------Global Flags-----------------------------------" + System.lineSeparator() +
-                        "FLAG=<EXCEPTIONS,1>;" + System.lineSeparator() +
-                        "//----------------------------------------Outputs--------------------------------------" + System.lineSeparator() +
-                        "//" + System.lineSeparator() +
+                        "FLAG=<EXCEPTIONS,1>" + System.lineSeparator() +
                         "OUTPUT=<TERMINAL,Console>" + System.lineSeparator() +
                         "OUTPUT=<TXT,log>";
                 out.appendString(s);
