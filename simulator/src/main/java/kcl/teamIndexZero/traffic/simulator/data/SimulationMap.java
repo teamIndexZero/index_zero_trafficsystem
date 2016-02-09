@@ -70,7 +70,13 @@ public class SimulationMap implements ISimulationAware {
         int maxX = Math.min(pos.x + pos.width, getH() - 1);
         int maxY = Math.min(pos.y + pos.height, getW() - 1);
         for (int x = pos.x; x <= maxX; x++) {
-            Arrays.fill(map[x], pos.y, maxY, value);
+            int xPos = Math.max(0, x);
+            int yPos = Math.max(0, pos.y);
+            Arrays.fill(map[xPos], yPos, maxY, value);
         }
+    }
+
+    public List<MapObject> getObjectsOnMap() {
+        return objectsOnMap;
     }
 }

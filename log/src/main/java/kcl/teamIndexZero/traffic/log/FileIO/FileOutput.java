@@ -2,8 +2,7 @@ package kcl.teamIndexZero.traffic.log.fileIO;
 
 import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.StandardOpenOption;
@@ -92,10 +91,27 @@ public class FileOutput extends FileIO {
             this.writer.write(string, 0, string.length());
             this.writer.flush();
         } catch ( IOException e ) {
-            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileOutput.appendString()] for , ", super.getFilePath(), " with <", string, ">");
+            MicroLogger.INSTANCE.log_Error( "InvalidPathException raised in [FileOutput.appendString()] for ", super.getFilePath(), " with <", string, ">");
             MicroLogger.INSTANCE.log_ExceptionMsg( e );
             throw e;
         }
+    }
+
+    /**
+     * Clears the content of the file
+     * @return Success
+     */
+    public boolean clearFileContent() {
+        try {
+            PrintWriter pw = new PrintWriter( writer );
+            pw.close();
+            reOpenWriter();
+            return true;
+        } catch ( SecurityException e ) {
+            MicroLogger.INSTANCE.log_Error( "SecurityException raised in [FileOutput.clearFileContent()] for ", super.getFilePath());
+            return false;
+        }
+
     }
 
     /**

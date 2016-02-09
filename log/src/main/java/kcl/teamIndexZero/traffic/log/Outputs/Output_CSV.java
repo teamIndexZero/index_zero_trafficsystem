@@ -19,10 +19,9 @@ public class Output_CSV extends Output {
      *
      * @param output_name Name of output
      */
-    protected Output_CSV(String output_name) throws IOException {
+    public Output_CSV(String output_name) throws IOException {
         super(output_name, GlobalOutputTypes.CSV);
         try {
-            MicroLogger.INSTANCE.log_Debug("[Output_CSV.Output_CSV( ", output_name, " )] New CSV output created.");
             out = new FileOutput("logs", output_name + ".csv");
         } catch (IOException e) {
             MicroLogger.INSTANCE.log_Error("IOException raised in [Output_CSV.Output_CSV( ", output_name, " )]");

@@ -23,7 +23,6 @@ public class Output_TXT extends Output {
     public Output_TXT(String output_name) throws IOException {
         super(output_name, GlobalOutputTypes.TXT);
         try {
-            MicroLogger.INSTANCE.log_Debug("[Output_TXT.Output_TXT( ", output_name, " )] New Text output created.");
             out = new FileOutput("logs", output_name + ".txt");
         } catch (IOException e) {
             MicroLogger.INSTANCE.log_Error("IOException raised in [Output_TXT.Output_TXT( ", output_name, " )]");

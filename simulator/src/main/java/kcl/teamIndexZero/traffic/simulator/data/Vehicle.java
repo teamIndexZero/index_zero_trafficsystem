@@ -27,7 +27,7 @@ public class Vehicle extends MapObject {
 
     @Override
     public String toString() {
-        return String.format("Vehicle \"%s\" is now at position %s with speed %.1f m/s and acceleration of %.2f m/s^2 ",
+        return String.format("Vehicle \"%s\" is now at position %s with speed %.1f m/s and acceleration of %.5f m/s^2 ",
                 name,
                 position.toString(),
                 speedMetersPerSecond,
