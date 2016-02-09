@@ -161,6 +161,11 @@ public class Log_Config {
 
             return 1;
         }
+        if( line.matches("^VARIABLE=<[A-Z]+,[A-Z]+")) { //Variable
+            //TODO check specifics
+            
+            return 1;
+        }
         if (line.matches("^//(?s:.)*$")) return 0; //Comment ('//...')
         return -1;
     }
@@ -188,6 +193,7 @@ public class Log_Config {
      * @throws IOException when there was a problem creating the default TXT output
      */
     private void applyDefaultConfiguration() throws IOException {
+        this.global_log_level = Log_Levels.DEBUG;
         this.log_exception_flag = true;
         this.outputs.clear();
         this.outputs.add(new Output_TERM("Console"));
@@ -210,17 +216,22 @@ public class Log_Config {
         try {
             FileOutput out = new FileOutput("", this.config_file_name);
             if (out.clearFileContent()) {
-                String s = "//================================================================" + System.lineSeparator() +
+                String s = "//======================================================================================" + System.lineSeparator() +
                         "// - Log configuration file - " + System.lineSeparator() +
-                        "//===============================================================" + System.lineSeparator() +
+                        "//======================================================================================" + System.lineSeparator() +
                         "// Output types available: TERMINAL, TXT, CSV" + System.lineSeparator() +
-                        "// Flag types available: EXCEPTIONS" + System.lineSeparator() +
-                        "// Flag syntax: NAME_OF_FLAG=1 for On or NAME_OF_FLAG=0 for Off" + System.lineSeparator() +
+                        "// Flag types available: EXCEPTIONS," + System.lineSeparator() +
+                        "// \t>syntax: NAME_OF_FLAG=1 for On or NAME_OF_FLAG=0 for Off" + System.lineSeparator() +
+                        "// Variable types available: LEVEL" + System.lineSeparator() +
+                        "// \t>level types: OFF, FATAL, ERROR, WARNING, MESSAGE, DEBUG, TRACE" + System.lineSeparator() +
+                        "//======================================================================================" + System.lineSeparator() +
                         "// Syntax example: OUTPUT=<TERMINAL,my_name>" + System.lineSeparator() +
-                        "//===============================================================" + System.lineSeparator() +
-                        "//--------------------------Global Flags-------------------------" + System.lineSeparator() +
+                        "//======================================================================================" + System.lineSeparator() +
+                        "//-------------------------------------Logging Level-----------------------------------" + System.lineSeparator() +
+                        "VARIABLE=<LEVEL,DEBUG>" + System.lineSeparator() +
+                        "//--------------------------------------Global Flags-----------------------------------" + System.lineSeparator() +
                         "FLAG=<EXCEPTIONS,1>;" + System.lineSeparator() +
-                        "//----------------------------Outputs----------------------------" + System.lineSeparator() +
+                        "//----------------------------------------Outputs--------------------------------------" + System.lineSeparator() +
                         "//" + System.lineSeparator() +
                         "OUTPUT=<TERMINAL,Console>" + System.lineSeparator() +
                         "OUTPUT=<TXT,log>";
