@@ -3,6 +3,7 @@ package kcl.teamIndexZero.traffic.gui;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
+import kcl.teamIndexZero.traffic.simulator.data.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
@@ -19,24 +20,39 @@ public class SimulationObserver implements ISimulationAware {
     private SimulationMap map;
 
     private Consumer<BufferedImage> imageConsumer;
+    private final BufferedImage image;
 
     public SimulationObserver(SimulationMap map, Consumer<BufferedImage> imageConsumer) {
         this.map = map;
         this.imageConsumer = imageConsumer;
+        image = new BufferedImage(map.getW(), map.getH(), BufferedImage.TYPE_INT_RGB);
+
     }
 
     @Override
     public void tick(SimulationTick tick) {
-        boolean[][] currentState = map.getMap();
-        BufferedImage image = new BufferedImage(map.getW(), map.getH(), BufferedImage.TYPE_BYTE_GRAY);
-        for (int x = 0; x < map.getW(); x++) {
-            for (int y = 0; y < map.getH(); y++) {
-                image.setRGB(x, y, (currentState[y][x] ? 0xFFFF0000 : 0xFFFFFFFF));
-            }
-        }
+        Graphics2D graphics = (Graphics2D) image.getGraphics();
+
+        graphics.setBackground(Color.WHITE);
+        graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
+
+        map.getObjectsOnMap().forEach(object -> {
+            graphics.setColor(object.getColor());
+            MapPosition pos = object.getPosition();
+            graphics.fillRect(
+                    pos.y,
+                    pos.x,
+                    pos.height,
+                    pos.width
+            );
+        });
+
+        graphics.dispose();
+
         imageConsumer.accept(image);
+
         try {
-            Thread.sleep(100);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
