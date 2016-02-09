@@ -6,8 +6,6 @@ package kcl.teamIndexZero.traffic.log;
 public final class Log_Levels {
     private Log_Levels() {
     }
-
-    ;
     public static final int OFF = 0;
     public static final int FATAL = 1;
     public static final int ERROR = 2;
