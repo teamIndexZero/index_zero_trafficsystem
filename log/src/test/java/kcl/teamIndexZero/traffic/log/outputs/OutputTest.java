@@ -30,7 +30,7 @@ public class OutputTest {
     @Test
     public void testSetName() throws Exception {
         Output out = new Output("Output_Name", GlobalOutputTypes.TERMINAL);
-        out.setName("New_Ouptut_Name");
+        out.setName("New_Output_Name");
         assertEquals("New_Output_Name", out.getOutputName());
     }
 
