@@ -5,15 +5,26 @@ Created by KCL students as a part of group project 2016
 
 ## Building and running
 
-**Prerequisites** you need to have JDK > 1.7 prior to running and building, and `JAVA_HOME` environment variable set.
+**Prerequisites and Building** you need to have JDK >= 1.8 prior to running and building, and `JAVA_HOME` environment variable set.
 
- In order to build the software, just execute for Mac/linux: ./gradlew clean assemble
+In order to build the software, just execute from the project root (here):
 
- For windows machines: gradlew.bat clean assemble
+ * for Mac/linux: `./gradlew clean assemble`
+ * For windows machines: `gradlew.bat clean assemble`
 
- It will compile, go through the tests (if any fail, will fail the build) and prepare distributions in relevant build
- folders of submodules. Alternatively, you can install gradle system-wide and use it.
+It will compile, go through the tests (if any fail, will fail the build) and prepare distributions in relevant build
+folders of submodules. Alternatively, you can install gradle system-wide and use it.
 
+**Running**
+
+In order to run the software with minimal hassle, just execute:
+ * Mac/linux `./gradlew :gui:run`
+ * Windows: `gradlew.bat :gui:run`
+
+The GUI part of software will be first built and then ran for you by gradle builder. At the time being, it automatically
+starts demonstration
+
+Be sure to close the window to release gradle process.
 
 ## Developing with IntelliJ IDEA
 
