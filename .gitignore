@@ -7,3 +7,4 @@ build
 log/logs/
 *.log
 log_*.txt
+log_config.cfg

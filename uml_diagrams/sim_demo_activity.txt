@@ -1,0 +1,32 @@
+@startuml
+start
+partition Init {
+	:create new SimulationMap;
+	:add map objects to SimulationMap at coordinates;
+	:create new Simulator;
+	:start Simulator;
+}
+
+partition Simulator {
+	while( tick duration ) is (not reached)
+	note left
+		for loop counting to the set tick 
+		duration for the simulation.
+	end note
+		:add 1 to for loop counter;
+		:create nextTick;
+		:run the tick over the map;
+		note right
+			if the object in map is not static then the object's tick
+			calculates the object's new position based on its speed
+			and acceleration during the time of the tick.
+		end note
+	endwhile( reached )
+}
+
+
+partition Init {
+	:stop Simulator;
+}
+stop
+@enduml
