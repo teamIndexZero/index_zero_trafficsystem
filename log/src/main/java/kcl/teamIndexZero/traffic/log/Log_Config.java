@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 //TODO make diagram for the logic steps in there
 public class Log_Config {
     private String global_file_name = "log"; //Default
-    private int global_log_level = Log_Levels.DEBUG; //Default
+    private int global_log_level = Log_Levels.WARNING; //Default
     private boolean log_exception_flag = true; //Default
     private Vector<Output> outputs = new Vector<Output>();
     private String config_file_name = "log_config.cfg";
@@ -232,7 +232,7 @@ public class Log_Config {
      * @throws IOException when there was a problem creating the default TXT output
      */
     private void applyDefaultConfiguration() throws IOException {
-        this.global_log_level = Log_Levels.DEBUG;
+        this.global_log_level = Log_Levels.WARNING;
         this.log_exception_flag = true;
         this.outputs.clear();
         this.outputs.add(new Output_TERM("Console"));
@@ -268,7 +268,7 @@ public class Log_Config {
                         "// VARIABLE<LEVEL,OFF>" + System.lineSeparator() +
                         "// FLAG=<EXCEPTION,0>" + System.lineSeparator() +
                         "//======================================================================================" + System.lineSeparator() +
-                        "VARIABLE=<LEVEL,DEBUG>" + System.lineSeparator() +
+                        "VARIABLE=<LEVEL,WARNING>" + System.lineSeparator() +
                         "FLAG=<EXCEPTIONS,1>" + System.lineSeparator() +
                         "OUTPUT=<TERMINAL,Console>" + System.lineSeparator() +
                         "OUTPUT=<TXT,log>";
