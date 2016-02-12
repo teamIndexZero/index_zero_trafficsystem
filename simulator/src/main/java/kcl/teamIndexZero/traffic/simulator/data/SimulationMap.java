@@ -3,7 +3,6 @@ package kcl.teamIndexZero.traffic.simulator.data;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,15 +23,24 @@ import java.util.List;
  */
 public class SimulationMap implements ISimulationAware {
 
-    private final int w;
-    private final int h;
+    private final int width;
+    private final int height;
     private List<MapObject> objectsOnMap = new ArrayList<>();
 
+    /**
+     * Constructor.
+     *
+     * @param width  map width
+     * @param height map height
+     */
     public SimulationMap(int width, int height) {
-        this.w = width;
-        this.h = height;
+        this.width = width;
+        this.height = height;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void tick(SimulationTick timeStep) {
         objectsOnMap.forEach(
@@ -42,21 +50,39 @@ public class SimulationMap implements ISimulationAware {
         );
     }
 
-    public int getW() {
-        return w;
+    /**
+     * @return width of the map
+     */
+    public int getWidth() {
+        return width;
 
     }
 
-    public int getH() {
-        return h;
+    /**
+     * @return height of the map
+     */
+    public int getHeight() {
+        return height;
     }
 
+    /**
+     * Add an object to the map. Object will be added at its current position.
+     *
+     * @param mapObject map object to add.
+     */
     public void addMapObject(MapObject mapObject) {
         //todo check if this really does not occupy some other object's space on map
         objectsOnMap.add(mapObject);
         mapObject.setMap(this);
     }
 
+    /**
+     * Try moving object from one position to another (it may be impossible - i.e. occupied). Old position will be freed
+     * while the new one will be occupied if it goes successfully.
+     *
+     * @param object an object to add
+     * @param pos    position to move to.
+     */
     public void moveObject(MapObject object, MapPosition pos) {
         // TODO check rules of physics
         // TODO  check that we don't have overlaps
@@ -64,6 +90,11 @@ public class SimulationMap implements ISimulationAware {
         object.setPosition(pos);
     }
 
+    /**
+     * TODO - bad example, we're exposing the objects from map. It should be encapsulated.
+     *
+     * @return objects on map.
+     */
     public List<MapObject> getObjectsOnMap() {
         return objectsOnMap;
     }
