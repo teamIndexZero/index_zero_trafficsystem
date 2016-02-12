@@ -3,40 +3,39 @@
 'skinparam monochrome true
 skinparam classAttributeIconSize 0
 
-interface SimulationAware {
+interface ISimulationAware {
 +tick(time:Time)
 }
 
 class Simulator {
-+Simulator(Map, Evnrionment, MapObjectCollection, DrivingRules, SimParams)
++Simulator(Map, MapObjectCollection, SimParams)
 +start()
 +stop()
-+getStatus():SimulatorStatus
--status:StatusEnum
--simulationStep
--simulationTimeElapsed
--realTimeElapsed
--tick()
++pause()
+-tick(): Uses Tick object
 }
 
-Simulator --> Map: Controls, sends ticks\nand events
+Simulator "1" o-left-> "*" ISimulationAware: Contains list of \nISimAware objects\n and runs ticks to it
 
-note left of Map: 'see' is the vision \n of the moving objects (vehicles)
+class SimulationTick {
++number: int
++simulatedTimeStamp: LocalDateTime
++tickDurationSeconds: int
+}
+
+SimulationTick <-- Simulator:creates and sends to \nall 'Tick Aware' objects
+
+
+note right of Map: 'see' is the vision \n of the moving objects (vehicles)
 class Map {
 +tick(time:Time)
 +addObject(MapObject, Position)
 +removeObject(MapObject)
 +moveObject(MapObject, Position)
-+isMovePossible(MapObject, Position)
-+isRegionFree(Position)
-+see(MapObject, VisibilityFactor): Map
-+dumpRawMapState(): byte[]
--rawMapData: byte[]
--env:Evnrionment
 -mapObjectCollection:Collection<MapObject>
 }
 
-Map --|> SimulationAware
+Map --|> ISimulationAware
 
 interface MapObject {
 +tick(time:Time)
@@ -44,7 +43,7 @@ interface MapObject {
 +setMap(Map)
 }
 
-MapObject --|> SimulationAware
+MapObject --|> ISimulationAware
 Map "1" o--> "*" MapObject
 
 class Vehicle {
@@ -61,7 +60,7 @@ class Vehicle {
 -route:MapRoute
 }
 
-Vehicle --|> MapObject
+MapObject <|-- Vehicle
 
 class Obstacle {
 +tick(time:Time) //noop for now!
@@ -71,31 +70,24 @@ class Obstacle {
 -position:Position
 }
 
-Obstacle --|> MapObject
+MapObject <|-- Obstacle
 
-class MapFactory {
-+createDefaultMap():Map
-+createSimpleMap(int widht, int height):Map
-+createMapFromSpec(MapSpec):Map
-+creatMapFromFile(File):Map
+class CarAdder {
 }
 
-MapFactory --> Map: "creates"
-
-class Evnrionment {
-+getVisibilityCells(): int
-+getNextPos(Map, Position, Vehicle):
-+getTractionCoefficient(): float
+class CarRemover {
 }
 
-Map "1" o-> "1" Evnrionment
-
-class DriverStrategy {
-+getNextPossibleMoves(current: Position,\n visibleMap: Map, Route): VehicleMove[]
--strategyState
+class ImageProducer {
 }
 
-Vehicle "1" o-> "1" DriverStrategy
+class SimulationDelay {
+ }
+
+ISimulationAware <|-left-CarAdder
+ISimulationAware <|--CarRemover
+ISimulationAware <|--SimulationDelay
+ISimulationAware <|--ImageProducer
 
 
 @enduml
