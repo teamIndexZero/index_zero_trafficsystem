@@ -10,7 +10,9 @@ import java.awt.*;
  * Created by lexaux on 07/02/2016.
  */
 public abstract class MapObject implements ISimulationAware {
+
     protected static Logger_Interface LOG = Logger.getLoggerInstance(MapObject.class.getSimpleName());
+
     protected static final Color[] COLORS = {
             Color.RED,
             Color.GREEN,
@@ -22,7 +24,6 @@ public abstract class MapObject implements ISimulationAware {
     };
 
     private final Color color;
-
     protected String name;
     protected MapPosition position;
     protected SimulationMap map;

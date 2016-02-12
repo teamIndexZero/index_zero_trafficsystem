@@ -34,7 +34,7 @@ public class SimulatorGui implements Consumer<BufferedImage> {
     private void startSimulation() {
         SimulationMap map = new SimulationMap(6, 300);
         SimulationObserver observer = new SimulationObserver(map, this);
-
+        SimulationDelay delay = new SimulationDelay(50);
 
         class CarAdder implements ISimulationAware {
             int counter = 1;
@@ -60,7 +60,7 @@ public class SimulatorGui implements Consumer<BufferedImage> {
             public void tick(SimulationTick tick) {
                 if (Math.random() < 0.2 && !addedCarOnPrevStep) {
                     addedCarOnPrevStep = true;
-                    if (tick.tickNumber % 2 == 1) {
+                    if (tick.getTickNumber() % 2 == 1) {
                         addForwardCar();
                     } else {
                         addBackwardCar();
@@ -79,19 +79,21 @@ public class SimulatorGui implements Consumer<BufferedImage> {
             }
         }
 
-
         map.addMapObject(new Vehicle("Ferrari ES3 4FF", new MapPosition(0, 0, 2, 1), 0.05f, 0));
         map.addMapObject(new Vehicle("Taxi TT1", new MapPosition(400, 5, 2, 1), -0.1f, 0));
 
         Simulator simulator = new Simulator(
                 new SimulationParams(LocalDateTime.now(), 10, 1000),
-                Arrays.asList(map, observer, new CarAdder(), new CarRemover())
+                Arrays.asList(
+                        map,
+                        observer,
+                        new CarAdder(),
+                        new CarRemover(),
+                        delay)
         );
-
 
         simulator.start();
         simulator.stop();
-
     }
 
     @Override

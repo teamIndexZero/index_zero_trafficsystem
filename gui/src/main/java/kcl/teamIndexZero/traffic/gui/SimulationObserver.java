@@ -50,11 +50,5 @@ public class SimulationObserver implements ISimulationAware {
         graphics.dispose();
 
         imageConsumer.accept(image);
-
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }
