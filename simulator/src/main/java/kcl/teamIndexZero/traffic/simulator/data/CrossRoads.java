@@ -8,10 +8,10 @@ public class CrossRoads
 {
     public CrossRoads crossRoads = null;
     public int[] cellsLength = null;
-    public int[][] cells = int[];
+    public int[][] cells;// = int[];
     public Vehicle vehicle = null;
 
-    cells = null;
+//    cells = null;
 
     public CrossRoads(CrossRoads crossRoads)
     {
@@ -71,37 +71,37 @@ public class CrossRoads
                 //I Horizontal cars creating
                 if ((this.cells[5][0] == 0) && (this.cells[5][1] == 0) && (Random(0, 75) % 3 == 1)) {
 
-                    Vehicle vehicle = new Vehicle(...); //change constructor
-                    this.cells[5][0] = vehicle.position;
-                    vehicle.positionOpt = "H";
+//                    Vehicle vehicle = new Vehicle(...); //change constructor
+//                    this.cells[5][0] = vehicle.position;
+//                    vehicle.positionOpt = "H";
                 }
                 //movement for vehicles inside the class vehicles
 
                 if ((this.cells[6][31] == 0) && (this.cells[6][30] == 0) && (Random(0, 75) % 3 == 1)) {
 
-                    Vehicle vehicle = new Vehicle(...);
-                    this.cells[6][31] = vehicle.position;
-                    vehicle.positionOpt = "H";
+//                    Vehicle vehicle = new Vehicle(...);
+//                    this.cells[6][31] = vehicle.position;
+//                    vehicle.positionOpt = "H";
                 }
 
                 //II Vertical cars creating
                 if ((this.cells[0][16] == 0) && (this.cells[1][16] == 0) && (Random(0, 75) % 3 == 1)) {
 
-                    Vehicle vehicle = new Vehicle(...);
-                    this.cells[0][16] = vehicle.position;
-                    vehicle.positionOpt = "V";
+//                    Vehicle vehicle = new Vehicle(...);
+//                    this.cells[0][16] = vehicle.position;
+//                    vehicle.positionOpt = "V";
                 }
 
                 if ((this.cells[11][17] == 0) && (this.cells[11][16] == 0) && (Random(0, 75) % 3 == 1)) {
 
-                    Vehicle vehicle = new Vehicle(...);
-                    this.cells[11][17] = vehicle.position;
-                    vehicle.positionOpt = "V";
+//                    Vehicle vehicle = new Vehicle(...);
+//                    this.cells[11][17] = vehicle.position;
+//                    vehicle.positionOpt = "V";
             }
 
 
                 //lights!
-                //Thread.sleep(0900); ---->      0.9 seconds
+                Thread.sleep(900); //---->      0.9 seconds
 
                 if (!flag) break;
             }
@@ -109,7 +109,7 @@ public class CrossRoads
         catch(InterruptedException e)
         {
             Thread.currentThread().interrupt();
-            JOptionPane.showMessageDialog(frame,"CrossRoads TIME exception -> run method");
+//            JOptionPane.showMessageDialog(frame,"CrossRoads TIME exception -> run method");
         }
     }
 }
