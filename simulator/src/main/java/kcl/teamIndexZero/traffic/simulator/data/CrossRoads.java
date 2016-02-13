@@ -1,6 +1,9 @@
 package kcl.teamIndexZero.traffic.simulator.data;
 
+import javax.swing.*;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by JK 12-02-16.
  */
@@ -11,14 +14,25 @@ public class CrossRoads
     public int[][] cells = int[];
     public Vehicle vehicle = null;
 
+    private boolean greenHorizontal;
+    private boolean greenVertical;
+    private int start;
+    private int timer;
+    private int end;
+
     cells = null;
 
     public CrossRoads(CrossRoads crossRoads)
     {
         this.cellsLength = new int[1];
         this.cellsLength[0] = 32;
-
         this.cells = new int[12][];
+
+        this.greenHorizontal = true;
+        this.greenVertical = false;
+        this.start = 0;
+        this.timer = 4;
+        this.end = 30;
 
         for (int i = 0; i < 12; i++) {
             this.cells[i] = new int[this.cellsLength[0]];
@@ -83,7 +97,8 @@ public class CrossRoads
                     this.cells[6][31] = vehicle.position;
                     vehicle.positionOpt = "H";
                 }
-
+                // the end of h. cars creating
+                //////////////////////////////
                 //II Vertical cars creating
                 if ((this.cells[0][16] == 0) && (this.cells[1][16] == 0) && (Random(0, 75) % 3 == 1)) {
 
@@ -97,19 +112,47 @@ public class CrossRoads
                     Vehicle vehicle = new Vehicle(...);
                     this.cells[11][17] = vehicle.position;
                     vehicle.positionOpt = "V";
-            }
 
+                 }
+                // the end of v. cars creating
+                //////////////////////////////
+                // Lights changing
+                for (int i = this.start, j = this.start; i < this.end; i=i+this.timer, j++ )
+                {
+                    if (j%2 == 0){
 
-                //lights!
-                //Thread.sleep(0900); ---->      0.9 seconds
+                        this.greenHorizontal = true;
+                        this.greenVertical = false;
+
+                        this.cells[4][14] = 1;
+                        this.cells[7][17] = 1;
+                        this.cells[4][17] =-1;
+                        this.cells[7][14] =-1;
+
+                        TimeUnit.SECONDS.sleep(this.timer);
+                    }
+                    else {
+                        this.greenHorizontal = false;
+                        this.greenVertical = true;
+
+                        this.cells[4][14] =-1;
+                        this.cells[7][17] =-1;
+                        this.cells[4][17] =1;
+                        this.cells[7][14] =1;
+
+                        TimeUnit.SECONDS.sleep(this.timer);
+                    }
+
+                }
+                //the end of Lights changing
+                ////////////////////////////
 
                 if (!flag) break;
+
             }
-        }
-        catch(InterruptedException e)
+        } catch (Exception e)
         {
-            Thread.currentThread().interrupt();
-            JOptionPane.showMessageDialog(frame,"CrossRoads TIME exception -> run method");
+            System.out.println("Timer in Lights !" + e.getMessage());
         }
     }
 }
