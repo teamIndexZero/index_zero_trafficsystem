@@ -11,16 +11,13 @@ public class CrossRoads
 {
     public CrossRoads crossRoads = null;
     public int[] cellsLength = null;
-    public int[][] cells = int[];
-    public Vehicle vehicle = null;
+    public int[][] cells = (int[][])null;
 
     private boolean greenHorizontal;
     private boolean greenVertical;
     private int start;
     private int timer;
     private int end;
-
-    cells = null;
 
     public CrossRoads(CrossRoads crossRoads)
     {
@@ -102,14 +99,15 @@ public class CrossRoads
                 //II Vertical cars creating
                 if ((this.cells[0][16] == 0) && (this.cells[1][16] == 0) && (Random(0, 75) % 3 == 1)) {
 
-                    Vehicle vehicle = new Vehicle(...);
-                    this.cells[0][16] = vehicle.position;
-                    vehicle.positionOpt = "V";
+                    //this.cells[0][16] = vehicle.position;
+                    int x = 0;
+                    int y = 16;
+                    Vehicle2 vehicle = new Vehicle2('V', 0 , 16);
                 }
 
                 if ((this.cells[11][17] == 0) && (this.cells[11][16] == 0) && (Random(0, 75) % 3 == 1)) {
 
-                    Vehicle vehicle = new Vehicle(...);
+                    Vehicle2 vehicle = new Vehicle2(...);
                     this.cells[11][17] = vehicle.position;
                     vehicle.positionOpt = "V";
 
