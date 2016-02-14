@@ -2,6 +2,7 @@ package kcl.teamIndexZero.traffic.simulator.data;
 
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * Created by lexaux on 07/02/2016.
  */
-public class SimulationMap implements ISimulationAware {
+public class SimulationMap implements ISimulationAware, Serializable {
 
 
     private final boolean map[][];
