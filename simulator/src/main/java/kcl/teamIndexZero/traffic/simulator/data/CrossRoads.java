@@ -82,37 +82,46 @@ public class CrossRoads
                 //I Horizontal cars creating
                 if ((this.cells[5][0] == 0) && (this.cells[5][1] == 0) && (Random(0, 75) % 3 == 1)) {
 
-//                    Vehicle vehicle = new Vehicle(...); //change constructor
-//                    this.cells[5][0] = vehicle.position;
-//                    vehicle.positionOpt = "H";
+                    int x = 5;
+                    int y = 0;
+                    Vehicle2 vehicle2 = new Vehicle2('H', x , y);
+                    vehicle2.movement();
+//                  this.cells[5][0] = vehicle.position;
+
                 }
                 //movement for vehicles inside the class vehicles
 
                 if ((this.cells[6][31] == 0) && (this.cells[6][30] == 0) && (Random(0, 75) % 3 == 1)) {
 
-//                    Vehicle vehicle = new Vehicle(...);
-//                    this.cells[6][31] = vehicle.position;
-//                    vehicle.positionOpt = "H";
+                    int x = 6;
+                    int y = 31;
+                    Vehicle2 vehicle2 = new Vehicle2('H', x , y);
+                    vehicle2.movement();
+//                  this.cells[6][31] = vehicle.position;
                 }
-                //the end of h cars creating
-                ////////////////////////////
+                //the end of h. cars creating
+                /////////////////////////////
                 //II Vertical cars creating
                 if ((this.cells[0][16] == 0) && (this.cells[1][16] == 0) && (Random(0, 75) % 3 == 1)) {
 
-//                    Vehicle vehicle = new Vehicle(...);
-//                    this.cells[0][16] = vehicle.position;
-//                    vehicle.positionOpt = "V";
+                    int x = 0;
+                    int y = 16;
+                    Vehicle2 vehicle2 = new Vehicle2('V', x , y);
+                    vehicle2.movement();
+//                  this.cells[0][16] = vehicle.position;
                 }
 
                 if ((this.cells[11][17] == 0) && (this.cells[11][16] == 0) && (Random(0, 75) % 3 == 1)) {
 
-//                    Vehicle vehicle = new Vehicle(...);
-//                    this.cells[11][17] = vehicle.position;
-//                    vehicle.positionOpt = "V";
+                    int x = 11;
+                    int y = 17;
+                    Vehicle2 vehicle2 = new Vehicle2('V', x , y);
+                    vehicle2.movement();
+//                  this.cells[11][17] = vehicle.position;
             }
 
-                //the end of cars creating
-                //////////////////////////
+                //the end of v. cars creating
+                /////////////////////////////
                 //Lights
 
                 for (int i = this.start, j = this.start; i < this.end; i=i+this.timer, j++ )
