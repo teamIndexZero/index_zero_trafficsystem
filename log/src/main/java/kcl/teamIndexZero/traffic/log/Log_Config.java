@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 /**
  * Created by Es on 27/01/2016.
  */
-//TODO make diagram for the logic steps in there
 public class Log_Config {
     private String global_file_name = "log"; //Default
     private int global_log_level = Log_Levels.WARNING; //Default
@@ -27,6 +26,7 @@ public class Log_Config {
     private String config_file_name = "log_config.cfg";
     private Log_TimeStamp ts = null;
 
+
     /**
      * Constructor (default)
      */
@@ -34,7 +34,7 @@ public class Log_Config {
         this.ts = new Log_TimeStamp();
         this.global_file_name += "_" + this.ts.getCustomStamp("yyyyMMdd'-'HHmmss");
         try {
-            if (!this.configurationLoader(config_file_name)) {
+            if (!this.loadConfiguration(config_file_name)) {
                 applyDefaultConfiguration();
             }
         } catch (IOException e) {
@@ -97,63 +97,59 @@ public class Log_Config {
      * @param file_name Name of the configuration file for the logger
      * @return Success
      */
-    private boolean configurationLoader(String file_name) {
+    private boolean loadConfiguration(String file_name) {
         try {
             FileInput in = new FileInput("", this.config_file_name);
             List<String> lines = in.read();
-            if (lines.size() < 1) { //Empty file
-                MicroLogger.INSTANCE.log("[Log_Config.configurationLoader()] Couldn't find anything in the config file.");
-                if (!writeDefaultsToFile()) {
-                    MicroLogger.INSTANCE.log_Fatal("[Log_Config.configurationLoader()] Failed to create/write a default config file!");
-                }
-                return false;
-            } else {
+            if (lines.size() > 0) {
                 int line_counter = 0;
                 int invalid_counter = 0;
                 for (String line : lines) {
                     line_counter++;
-                    if (configurationCheckerApplier(line) < 0) { //Invalid
-                        MicroLogger.INSTANCE.log_Error("[Log_Config.configurationLoader( ", file_name, " )] Line ", line_counter, " is invalid. Please check syntax.");
+                    if (!applyConfigurationLine(line)) {
+                        MicroLogger.INSTANCE.log_Error("[Log_Config.loadConfiguration( ", file_name, " )] Line ", line_counter, " is invalid. Please check syntax.");
                         invalid_counter++;
                     }
                 }
-                if (invalid_counter > 0) {
-                    MicroLogger.INSTANCE.log_Error("[Log_Config.configurationLoader( ", file_name, " )] Configuration file has ", invalid_counter, " invalid lines.");
-                    return false;
+                if (invalid_counter < 1) return true;
+            } else { //Empty file
+                MicroLogger.INSTANCE.log("[Log_Config.loadConfiguration()] Couldn't find anything in the config file.");
+                if (!writeDefaultsToFile()) {
+                    MicroLogger.INSTANCE.log_Fatal("[Log_Config.loadConfiguration()] Failed to create/write a default config file!");
                 }
             }
-            return true;
+            return false;
         } catch (IOException e) {
-            MicroLogger.INSTANCE.log_Error("IOException raised in [Log_Config.configurationLoader( ", file_name, " )] Cannot read/load the config file. Reverting to defaults.. ");
+            MicroLogger.INSTANCE.log_Error("IOException raised in [Log_Config.loadConfiguration( ", file_name, " )] Cannot read/load the config file. Reverting to defaults.. ");
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
             if (!writeDefaultsToFile()) {
-                MicroLogger.INSTANCE.log_Fatal("[Log_Config.configurationLoader( ", file_name, " )] Couldn't write a new defaults file for the configuration. Using hard-coded defaults.");
+                MicroLogger.INSTANCE.log_Fatal("[Log_Config.loadConfiguration( ", file_name, " )] Couldn't write a new defaults file for the configuration. Using hard-coded defaults.");
             } else {
-                MicroLogger.INSTANCE.log("[Log_Config.configurationLoader( ", file_name, " )] Success in creating a new default configuration file!");
+                MicroLogger.INSTANCE.log("[Log_Config.loadConfiguration( ", file_name, " )] Success in creating a new default configuration file!");
             }
             return false;
         } catch (InvalidPathException e) {
-            MicroLogger.INSTANCE.log_Error("InvalidPathException raised in [Log_Config.configurationLoader( ", file_name, " )] Cannot read/load the config file. Reverting to defaults.. ");
+            MicroLogger.INSTANCE.log_Error("InvalidPathException raised in [Log_Config.loadConfiguration( ", file_name, " )] Cannot read/load the config file. Reverting to defaults.. ");
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
             return false;
         } catch (RuntimeException e) {
-            MicroLogger.INSTANCE.log_Error("RuntimeException raised in [Log_Config.configurationLoader( ", file_name, " )] Couldn't create a valid file output from the configuration file.");
+            MicroLogger.INSTANCE.log_Error("RuntimeException raised in [Log_Config.loadConfiguration( ", file_name, " )] Couldn't create a valid file output from the configuration file.");
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
             return false;
         }
     }
 
     /**
-     * Configuration line checker
+     * Checks and applies the configuration line
      *
      * @param line Line to check
-     * @return Validity (-1:Invalid, 0:Ignore, 1:Valid)
+     * @return line validity
      * @throws RuntimeException when an output couldn't be created
      */
-    private int configurationCheckerApplier(String line) throws RuntimeException {
+    private boolean applyConfigurationLine(String line ) throws RuntimeException {
         try {
             if (line.matches("^//(?s:.)*$")) { //Comment ('//...')
-                return 0;
+                return true;
             }
             if (line.matches("^OUTPUT=<[A-Z]+,\\w+>$")) { //Output
                 final Pattern pattern = Pattern.compile(",(.+?)>");
@@ -161,68 +157,68 @@ public class Log_Config {
                     Matcher matcher = pattern.matcher(line);
                     matcher.find();
                     this.outputs.add(new Output_TXT(matcher.group(1) + "_" + this.ts.getCustomStamp("yyyyMMdd'-'HHmmss")));
-                    return 1;
+                    return true;
                 }
                 if (line.matches("^OUTPUT=<CSV,\\w+>$")) {
                     Matcher matcher = pattern.matcher(line);
                     matcher.find();
                     this.outputs.add(new Output_CSV(matcher.group(1) + "_" + this.ts.getCustomStamp("yyyyMMdd'-'HHmmss")));
-                    return 1;
+                    return true;
                 }
                 if (line.matches("^OUTPUT=<TERMINAL,\\w+>$")) {
                     Matcher matcher = pattern.matcher(line);
                     matcher.find();
                     this.outputs.add(new Output_TERM(matcher.group(1)));
-                    return 1;
+                    return true;
                 }
-                return -1;
+                return false;
             }
             if (line.matches("^FLAG=<[A-Z]+,[01]?>$")) { //Flag
                 if (line.matches("^FLAG=<EXCEPTIONS,0>$")) {
                     this.log_exception_flag = false;
-                    return 1;
+                    return true;
                 }
                 if (line.matches("^FLAG=<EXCEPTIONS,1>$")) {
                     this.log_exception_flag = true;
-                    return 1;
+                    return true;
                 }
-                return -1;
+                return false;
             }
             if (line.matches("^VARIABLE=<[A-Z]+,[A-Z]+>$")) { //Variable
                 if (line.matches("^VARIABLE=<LEVEL,OFF>$")) {
                     this.global_log_level = Log_Levels.OFF;
-                    return 1;
+                    return true;
                 }
                 if (line.matches("^VARIABLE=<LEVEL,FATAL>$")) {
                     this.global_log_level = Log_Levels.FATAL;
-                    return 1;
+                    return true;
                 }
                 if (line.matches("^VARIABLE=<LEVEL,ERROR>$")) {
                     this.global_log_level = Log_Levels.ERROR;
-                    return 1;
+                    return true;
                 }
                 if (line.matches("^VARIABLE=<LEVEL,WARNING>$")) {
                     this.global_log_level = Log_Levels.WARNING;
-                    return 1;
+                    return true;
                 }
                 if (line.matches("^VARIABLE=<LEVEL,MESSAGE>$")) {
                     this.global_log_level = Log_Levels.MSG;
-                    return 1;
+                    return true;
                 }
                 if (line.matches("^VARIABLE=<LEVEL,DEBUG>$")) {
                     this.global_log_level = Log_Levels.DEBUG;
-                    return 1;
+                    return true;
                 }
                 if (line.matches("^VARIABLE=<LEVEL,TRACE>$")) {
                     this.global_log_level = Log_Levels.TRACE;
-                    return 1;
+                    return true;
                 }
-                return -1;
+                return false;
             }
-            return -1;
+            return false;
         } catch (IOException e) {
-            MicroLogger.INSTANCE.log_Error("IOException raised in [Log_Config.configurationCheckerApplier()] Couldn't create file output.");
-            throw new RuntimeException("configurationCheckerApplier(..) couldn't apply an output.");
+            MicroLogger.INSTANCE.log_Error("IOException raised in [Log_Config.applyConfigurationLine()] Couldn't create file output.");
+            throw new RuntimeException("applyConfigurationLine(..) couldn't apply an output.");
         }
     }
 

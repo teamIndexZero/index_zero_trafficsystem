@@ -12,27 +12,37 @@ import java.awt.image.BufferedImage;
 import java.util.function.Consumer;
 
 /**
- * Created by lexaux on 07/02/2016.
+ * An implementation of {@link ISimulationAware} which outputs a buffered image of the map size in respose to every
+ * tick. This image can then be either packed into the video stream or directly shown on the window frame to show
+ * live representation.
  */
-public class SimulationObserver implements ISimulationAware {
-    protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulationObserver.class.getSimpleName());
+public class SimulationImageProducer implements ISimulationAware {
 
+    protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulationImageProducer.class.getSimpleName());
     private SimulationMap map;
-
     private Consumer<BufferedImage> imageConsumer;
     private final BufferedImage image;
+    private final Graphics2D graphics;
 
-    public SimulationObserver(SimulationMap map, Consumer<BufferedImage> imageConsumer) {
+    /**
+     * Constructor
+     *
+     * @param map           map to draw
+     * @param imageConsumer consumer which is actually going to consume the image to use.
+     */
+    public SimulationImageProducer(SimulationMap map, Consumer<BufferedImage> imageConsumer) {
         this.map = map;
         this.imageConsumer = imageConsumer;
-        image = new BufferedImage(map.getW(), map.getH(), BufferedImage.TYPE_INT_RGB);
+        image = new BufferedImage(map.getWidth(), map.getHeight(), BufferedImage.TYPE_INT_RGB);
+        graphics = (Graphics2D) image.getGraphics();
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void tick(SimulationTick tick) {
-        Graphics2D graphics = (Graphics2D) image.getGraphics();
-
         graphics.setBackground(Color.WHITE);
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
 
@@ -46,15 +56,7 @@ public class SimulationObserver implements ISimulationAware {
                     pos.width
             );
         });
-
-        graphics.dispose();
-
+        
         imageConsumer.accept(image);
-
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }
