@@ -2,6 +2,10 @@ package kcl.teamIndexZero.traffic.simulator;
 
 import kcl.teamIndexZero.traffic.simulator.data.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -23,7 +27,20 @@ public class SimulatorEntryPoint {
                 new SimulationParams(LocalDateTime.now(), 20, 100),
                 Arrays.asList(map)
         );
+try (FileOutputStream fs = new FileOutputStream("map_objects.bin")){
 
+    ObjectOutputStream os = new ObjectOutputStream(fs);
+
+    os.writeObject(map);
+    //os.writeObject(Vehicle);
+
+    os.close();
+
+} catch (FileNotFoundException e) {
+    e.printStackTrace();
+} catch (IOException e) {
+    e.printStackTrace();
+}
         simulator.start();
         simulator.stop();
     }
