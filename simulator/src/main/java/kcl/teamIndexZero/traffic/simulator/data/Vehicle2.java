@@ -18,8 +18,35 @@ public class Vehicle2 {
     }
 
     public void movement(){
+        switch (this.positionOpt) {
+
+            case 1: this.positionOpt = 'H';
+                /*switch (this.positionOpt) {
+                    case 1:
+
+                        break;
+                    case 2:
+
+                        break;
+                 }
+                */
+                break;
+
+
+            case 2: this.positionOpt = 'V';
+                /*switch (this.positionOpt) {
+                    case 1:
+
+                        break;
+                    case 2:
+
+                        break;
+                }
+                */
+                break;
+        }
+
         System.out.println("Let's move");
 
     }
-
 }

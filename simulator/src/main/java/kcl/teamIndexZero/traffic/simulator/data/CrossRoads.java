@@ -43,7 +43,7 @@ public class CrossRoads
             }
         }
 
-        for (int i = 5; i < 7; i++)
+        for (int i = 5; i < 7; i++) //creating the horizontal road
         {
             for (int j = 0; j < this.cellsLength[0]; j++)
             {
@@ -51,7 +51,7 @@ public class CrossRoads
             }
         }
 
-        for (int i = ((this.cellsLength[0]/2)-1); i < ((this.cellsLength[0]/2) +1); i++)
+        for (int i = ((this.cellsLength[0]/2)-1); i < ((this.cellsLength[0]/2) +1); i++) // vertical road
         {
             for (int j = 0; j < 12; j++)
             {
@@ -104,7 +104,7 @@ public class CrossRoads
                 //II Vertical cars creating
                 if ((this.cells[0][16] == 0) && (this.cells[1][16] == 0) && (Random(0, 75) % 3 == 1)) {
 
-                    int x = 0;
+                    int x = 0; //v. starting position
                     int y = 16;
                     Vehicle2 vehicle2 = new Vehicle2('V', x , y);
                     vehicle2.movement();
@@ -130,12 +130,12 @@ public class CrossRoads
                         this.greenHorizontal = true;
                         this.greenVertical = false;
 
-                        this.cells[4][14] = 1;
+                        this.cells[4][14] = 1; //lights positions
                         this.cells[7][17] = 1;
                         this.cells[4][17] =-1;
                         this.cells[7][14] =-1;
 
-                        TimeUnit.SECONDS.sleep(this.timer);
+                        TimeUnit.SECONDS.sleep(this.timer);//automatic lights
                     }
                     else {
                         this.greenHorizontal = false;
