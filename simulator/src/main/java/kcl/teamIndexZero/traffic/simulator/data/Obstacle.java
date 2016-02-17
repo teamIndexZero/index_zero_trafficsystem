@@ -4,6 +4,8 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
 
+import java.io.Serializable;
+
 /**
  * An Obstacle is a non-moving map object. Think of it as of fallen tree or a stone or roadworks something.
  */

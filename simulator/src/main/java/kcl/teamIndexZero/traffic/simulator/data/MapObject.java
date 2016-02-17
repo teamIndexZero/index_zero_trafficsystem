@@ -5,6 +5,7 @@ import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * An object (whether passive or active) belonging to map. For now it has color and position, and it is abstract (
@@ -13,7 +14,7 @@ import java.awt.*;
  * Map object is an abstraction over more complex entities (like vehicles and obstacles etc). {@link SimulationMap}
  * inserts itself into the {@link MapObject} when that one gets added to the map, so that
  */
-public abstract class MapObject implements ISimulationAware {
+public abstract class MapObject implements ISimulationAware, Serializable {
 
     protected static Logger_Interface LOG = Logger.getLoggerInstance(MapObject.class.getSimpleName());
 
