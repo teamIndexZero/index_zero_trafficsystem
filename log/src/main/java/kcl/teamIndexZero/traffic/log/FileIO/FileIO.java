@@ -137,7 +137,7 @@ public class FileIO {
      * @return Directory
      */
     protected String getDirectory() {
-        return this.file_name;
+        return this.directory;
     }
 
 }
