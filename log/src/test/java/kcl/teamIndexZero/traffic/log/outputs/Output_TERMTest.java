@@ -48,7 +48,7 @@ public class Output_TERMTest {
 
     @Test
     public void testOutput() throws Exception {
-        Output out = new Output("Output_Name", GlobalOutputTypes.TERMINAL);
+        Output out = new Output_TERM("Output_Name");
         LocalDateTime ltd = LocalDateTime.now();
         Log_TimeStamp ts = new Log_TimeStamp(ltd);
         out.output("Output_TERMTest", 4, new Long(100), ts, "Description message.");
@@ -58,7 +58,7 @@ public class Output_TERMTest {
 
     @Test
     public void testOutputException() throws Exception {
-        Output out = new Output("Output_Name", GlobalOutputTypes.TERMINAL);
+        Output out = new Output_TERM("Output_Name");
         LocalDateTime ltd = LocalDateTime.now();
         Log_TimeStamp ts = new Log_TimeStamp(ltd);
         Exception e = new IOException("Some exception message.");
