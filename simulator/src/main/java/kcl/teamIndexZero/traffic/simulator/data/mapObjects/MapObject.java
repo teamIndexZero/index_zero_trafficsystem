@@ -1,8 +1,9 @@
-package kcl.teamIndexZero.traffic.simulator.data;
+package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 
 import java.awt.*;
 

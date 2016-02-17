@@ -27,6 +27,6 @@ class CarRemover implements ISimulationAware {
     @Override
     public void tick(SimulationTick tick) {
         //todo probably we just want to skip that form simulation, or at least move to crossings/outlets, hm?
-        map.getObjectsOnMap().removeIf(object -> object.getPosition().x < 0 || object.getPosition().x > map.getHeight());
+        map.getObjectsOnSurface().removeIf(object -> object.getPosition().x < 0 || object.getPosition().x > map.getHeight());
     }
 }

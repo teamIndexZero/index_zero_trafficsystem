@@ -1,12 +1,14 @@
-package kcl.teamIndexZero.traffic.simulator.data;
+package kcl.teamIndexZero.traffic.simulator.data.features;
 
-import java.util.Arrays;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle2;
+
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by JK 12-02-16.
  */
-public class CrossRoads
+public class CrossRoads extends Feature
 {
     public CrossRoads crossRoads = null;
     public int[] cellsLength = null;

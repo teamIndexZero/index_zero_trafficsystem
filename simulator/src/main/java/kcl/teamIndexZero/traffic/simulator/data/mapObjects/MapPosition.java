@@ -1,4 +1,4 @@
-package kcl.teamIndexZero.traffic.simulator.data;
+package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
 
 /**
  * Class encapsulating position of the object on the map. For now it is simplistic - just a pair of int coordinates and

@@ -3,7 +3,7 @@ package kcl.teamIndexZero.traffic.gui;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
-import kcl.teamIndexZero.traffic.simulator.data.MapPosition;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
@@ -46,7 +46,7 @@ public class SimulationImageProducer implements ISimulationAware {
         graphics.setBackground(Color.WHITE);
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
 
-        map.getObjectsOnMap().forEach(object -> {
+        map.getObjectsOnSurface().forEach(object -> {
             graphics.setColor(object.getColor());
             MapPosition pos = object.getPosition();
             graphics.fillRect(

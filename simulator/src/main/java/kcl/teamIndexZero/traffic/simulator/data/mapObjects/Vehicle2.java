@@ -1,4 +1,6 @@
-package kcl.teamIndexZero.traffic.simulator.data;
+package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
+
+import kcl.teamIndexZero.traffic.simulator.data.features.CrossRoads;
 
 /**
  * Created by JK on 13-02-16.

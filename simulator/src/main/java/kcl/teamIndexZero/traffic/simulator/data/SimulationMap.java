@@ -1,6 +1,10 @@
 package kcl.teamIndexZero.traffic.simulator.data;
 
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.features.Link;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +29,10 @@ public class SimulationMap implements ISimulationAware {
 
     private final int width;
     private final int height;
-    private List<MapObject> objectsOnMap = new ArrayList<>();
+    private List<MapObject> objectsOnSurface = new ArrayList<>();
+
+    List<Feature> features;
+    List<Link> links;
 
     /**
      * Constructor.
@@ -43,7 +50,17 @@ public class SimulationMap implements ISimulationAware {
      */
     @Override
     public void tick(SimulationTick timeStep) {
-        objectsOnMap.forEach(
+        features.forEach(
+                feature -> {
+                    feature.tick(timeStep);
+                }
+        );
+        links.forEach(
+                link -> {
+                    link.tick(timeStep);
+                }
+        );
+        objectsOnSurface.forEach(
                 object -> {
                     object.tick(timeStep);
                 }
@@ -72,7 +89,7 @@ public class SimulationMap implements ISimulationAware {
      */
     public void addMapObject(MapObject mapObject) {
         //todo check if this really does not occupy some other object's space on map
-        objectsOnMap.add(mapObject);
+        objectsOnSurface.add(mapObject);
         mapObject.setMap(this);
     }
 
@@ -95,7 +112,7 @@ public class SimulationMap implements ISimulationAware {
      *
      * @return objects on map.
      */
-    public List<MapObject> getObjectsOnMap() {
-        return objectsOnMap;
+    public List<MapObject> getObjectsOnSurface() {
+        return objectsOnSurface;
     }
 }

@@ -1,9 +1,11 @@
 package kcl.teamIndexZero.traffic.simulator;
 
 import kcl.teamIndexZero.traffic.simulator.data.*;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Obstacle;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 
 /**

@@ -1,8 +1,11 @@
-package kcl.teamIndexZero.traffic.simulator.data;
+package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 
 /**
  * An Obstacle is a non-moving map object. Think of it as of fallen tree or a stone or roadworks something.

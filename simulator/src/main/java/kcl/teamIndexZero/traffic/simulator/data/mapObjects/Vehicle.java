@@ -1,4 +1,6 @@
-package kcl.teamIndexZero.traffic.simulator.data;
+package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
+
+import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
 /**
  * An active object on a map - a vehicle. Can be a car, or truck, or a bike (should check these subtypes later - if

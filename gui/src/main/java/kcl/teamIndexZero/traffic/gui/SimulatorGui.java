@@ -4,6 +4,8 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
 import kcl.teamIndexZero.traffic.simulator.data.*;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 
 import javax.swing.*;
 import java.time.LocalDateTime;

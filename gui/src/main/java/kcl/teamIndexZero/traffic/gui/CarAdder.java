@@ -1,10 +1,10 @@
 package kcl.teamIndexZero.traffic.gui;
 
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
-import kcl.teamIndexZero.traffic.simulator.data.MapPosition;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
-import kcl.teamIndexZero.traffic.simulator.data.Vehicle;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 
 /**
  * A traffic generator for adding cars into the map basing on some statistical approach.
