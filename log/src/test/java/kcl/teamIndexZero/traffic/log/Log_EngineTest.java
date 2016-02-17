@@ -20,9 +20,9 @@ public class Log_EngineTest {
 
     @Test
     public void testLoad() throws Exception {
-        Log_Engine mocked_engine = mock(Log_Engine.class);
-        Log_Engine.load(mocked_engine);
-        assertEquals(mocked_engine, Log_Engine.getInstance());
+        Log_Engine engine = new Log_Engine(new Log_Config());
+        Log_Engine.load(engine);
+        assertEquals(engine, Log_Engine.getInstance());
     }
 
     @Test

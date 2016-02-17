@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Alwlyan on 17/02/2016.
+ * Created by Es on 17/02/2016.
  */
 public class Output_TERMTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
@@ -48,17 +48,17 @@ public class Output_TERMTest {
 
     @Test
     public void testOutput() throws Exception {
-        Output out = new Output_TERM("Output_Name");
+        Output_TERM out = new Output_TERM("Output_Name");
         LocalDateTime ltd = LocalDateTime.now();
         Log_TimeStamp ts = new Log_TimeStamp(ltd);
         out.output("Output_TERMTest", 4, new Long(100), ts, "Description message.");
-        String expected = "[100] " + ts.getDate() + " - " + ts.getTime() + " " + Log_Levels.txtLevels[4] + " [Output_TERMTest] Please use specific output child class to see the message..." + System.lineSeparator();
+        String expected = "[ 100] " + ts.getDate() + " - " + ts.getTime() + " " + Log_Levels.txtLevels[4] + " + [Output_TERMTest] Description message." + System.lineSeparator();
         assertEquals(outContent.toString(), expected);
     }
 
     @Test
     public void testOutputException() throws Exception {
-        Output out = new Output_TERM("Output_Name");
+        Output_TERM out = new Output_TERM("Output_Name");
         LocalDateTime ltd = LocalDateTime.now();
         Log_TimeStamp ts = new Log_TimeStamp(ltd);
         Exception e = new IOException("Some exception message.");
@@ -66,7 +66,7 @@ public class Output_TERMTest {
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         out.output("Output_TERMTest", ts, new Long(100), e);
-        String expected = "[100]\t===Exception raised in [Output_TERMTest] at " + ts.getDate() + " - " + ts.getTime() + "===" + System.lineSeparator() + sw.toString() + System.lineSeparator() + System.lineSeparator();
+        String expected = "[ 100]\t===Exception raised in [Output_TERMTest]===" + System.lineSeparator() + "\t" + sw.toString() + System.lineSeparator() + System.lineSeparator();
         assertEquals(outContent.toString(), expected);
     }
 }
