@@ -30,7 +30,7 @@ public class FileOutput extends FileIO {
                 this.writer = Files.newBufferedWriter(super.getFilePath(), super.getCharset(), StandardOpenOption.APPEND);
             } else {
                 MicroLogger.INSTANCE.log_Error("[FileOutput.FileOutput( ", folder_path, ", ", file_name, " )] Couldn't create/access the file.");
-                throw new IOException("Failed to create/access the file " + getFilePath().toString());
+                throw new IOException("[FileOutput.FileOutput( " + folder_path + ", " + file_name + " )] Failed to create/access the file " + getFilePath().toString());
             }
         } catch (IOException e) {
             MicroLogger.INSTANCE.log_Error("IOException raised in [FileOutput.FileOutput( ", folder_path, ", ", file_name, " )]");
@@ -48,7 +48,7 @@ public class FileOutput extends FileIO {
      *
      * @return Success
      */
-    public boolean reOpenWriter() {
+    public synchronized boolean reOpenWriter() {
         try {
             if (super.createFile()) {
                 this.writer = Files.newBufferedWriter(super.getFilePath(), super.getCharset(), StandardOpenOption.APPEND);
@@ -72,13 +72,14 @@ public class FileOutput extends FileIO {
      *
      * @return Success (
      */
-    public boolean closeWriter() {
+    public synchronized boolean closeWriter() {
         if (this.writer != null) {
             try {
                 writer.close();
+                this.writer = null;
                 return true;
             } catch (IOException e) {
-                MicroLogger.INSTANCE.log_Error("InvalidPathException raised in [FileOutput.closeWriter()] for , ", super.getFilePath());
+                MicroLogger.INSTANCE.log_Error("IOException raised in [FileOutput.closeWriter()] for , ", super.getFilePath());
                 MicroLogger.INSTANCE.log_ExceptionMsg(e);
                 return false;
             }
@@ -92,12 +93,12 @@ public class FileOutput extends FileIO {
      * @param string String to append to file
      * @throws IOException when the file cannot be accessed
      */
-    public void appendString(String string) throws InvalidPathException, IOException {
+    public synchronized void appendString(String string) throws InvalidPathException, IOException {
         try {
             this.writer.write(string, 0, string.length());
             this.writer.flush();
         } catch (IOException e) {
-            MicroLogger.INSTANCE.log_Error("InvalidPathException raised in [FileOutput.appendString()] for ", super.getFilePath(), " with <", string, ">");
+            MicroLogger.INSTANCE.log_Error("IOException raised in [FileOutput.appendString()] for ", super.getFilePath(), " with <", string, ">");
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
             throw e;
         }
@@ -108,17 +109,15 @@ public class FileOutput extends FileIO {
      *
      * @return Success
      */
-    public boolean clearFileContent() {
+    public synchronized boolean clearFileContent() {
         try {
             PrintWriter pw = new PrintWriter(writer);
             pw.close();
-            reOpenWriter();
-            return true;
+            return reOpenWriter();
         } catch (SecurityException e) {
             MicroLogger.INSTANCE.log_Error("SecurityException raised in [FileOutput.clearFileContent()] for ", super.getFilePath());
             return false;
         }
-
     }
 
     /**
@@ -126,7 +125,7 @@ public class FileOutput extends FileIO {
      *
      * @return Success
      */
-    public boolean deleteFile() throws InvalidPathException, IOException {
+    public synchronized boolean deleteFile() throws InvalidPathException, IOException {
         try {
             return super.deleteFile();
         } catch (InvalidPathException e) {
@@ -156,5 +155,14 @@ public class FileOutput extends FileIO {
      */
     public String getDirectory() {
         return super.getDirectory();
+    }
+
+    /**
+     * Checks if the FileOutput file is open
+     *
+     * @return Opened state
+     */
+    public synchronized boolean isOpen() {
+        return this.writer != null;
     }
 }

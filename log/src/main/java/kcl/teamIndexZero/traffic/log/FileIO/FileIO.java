@@ -30,11 +30,16 @@ public class FileIO {
      *
      * @return Creation success
      */
-    public boolean createFile() {
+    public synchronized boolean createFile() {
         try {
             if (!Files.exists(getFilePath())) {
                 Files.createDirectories(getDirectoryPath());
                 Files.createFile(getFilePath());
+                System.out.println( "Looks like file has been created.." );
+            }
+            if( !Files.exists(getFilePath()) ) {
+                MicroLogger.INSTANCE.log_Error( "[FileIO.createFile()] Failed to create a new file (", getFilePath(), ").");
+                return false;
             }
             return true;
         } catch (SecurityException e) {
@@ -58,7 +63,7 @@ public class FileIO {
      * @throws InvalidPathException when the path description is invalid
      * @throws IOException          when the file cannot be accessed
      */
-    public boolean deleteFile() throws InvalidPathException, IOException {
+    public synchronized boolean deleteFile() throws InvalidPathException, IOException {
         try {
             if (Files.exists(this.getFilePath())) {
                 Files.delete(this.getFilePath());
