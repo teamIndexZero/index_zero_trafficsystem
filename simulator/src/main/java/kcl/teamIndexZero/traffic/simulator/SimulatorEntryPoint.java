@@ -1,5 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator;
 
+import kcl.teamIndexZero.traffic.log.Logger;
+import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.*;
 
 import javax.swing.*;
@@ -15,12 +17,15 @@ import java.util.Collections;
  */
 public class SimulatorEntryPoint {
 
+    protected static Logger_Interface LOG = Logger.getLoggerInstance(MapObject.class.getSimpleName());
     /**
      * Main method.
      *
      * @param args command line arguments.
      */
     public static void main(String[] args) {
+
+
 
         SimulationMap map = new SimulationMap(4, 400);
 
@@ -33,38 +38,53 @@ public class SimulatorEntryPoint {
                 new SimulationParams(LocalDateTime.now(), 20, 100),
                 Collections.singletonList(map)
         );
+
         //serialization
-try (FileOutputStream fs = new FileOutputStream("map_objects.bin")){
 
-    ObjectOutputStream os = new ObjectOutputStream(fs);
+        try (FileOutputStream fs = new FileOutputStream("map_objects.bin")){
 
-    os.writeObject(map);
-    //os.writeObject(Vehicle);
+            ObjectOutputStream os = new ObjectOutputStream(fs);
 
-    os.close();
+            os.writeObject(map);
+            //os.writeObject(Vehicle);
 
-} catch (FileNotFoundException e) {
-    e.printStackTrace();
-} catch (IOException e) {
-    e.printStackTrace();
-}
+            os.close();
+/**
+ *
+ *`Logger log = Logger.getLoggerInstance( Myclass.class.getName() )
+ * try { /** some stuff that raises an exception * }
+ *
+ * catch ( Exception e )
+ * { log.log_error( "An exception was raise because..." ),
+ * log.log_Exception( e ) }
+
+ */
+
+        } catch (FileNotFoundException e) {
+         LOG.log_Error("File not found");
+            LOG.log_Exception(e);
+
+        } catch (IOException e) {
+            LOG.log_Error("IO Error");
+            LOG.log_Exception(e);
+        }
         //deserialization
-  try (FileInputStream fi  = new FileInputStream("map_objects.bin")) {
+        try (FileInputStream fi  = new FileInputStream("map_objects.bin")) {
 
-      ObjectInputStream os = new ObjectInputStream(fi);
+            ObjectInputStream os = new ObjectInputStream(fi);
 
-      SimulationMap sm1 = (SimulationMap)os.readObject();
+            SimulationMap sm1 = (SimulationMap)os.readObject();
 
-      os.close();
+            os.close();
 
 
-  } catch (FileNotFoundException e) {
-      e.printStackTrace();
-  } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-  } catch (IOException e) {
-      e.printStackTrace();
-  }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         simulator.start();
         simulator.stop();
