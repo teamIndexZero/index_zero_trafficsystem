@@ -79,11 +79,16 @@ public class SimulatorEntryPoint {
 
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+           LOG.log_Error("FileNotFound");
+            LOG.log_Exception(e);
+
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            LOG.log_Error("Class not found");
+            LOG.log_Exception(e);
+
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.log_Error("IO error");
+            LOG.log_Exception(e);
         }
 
         simulator.start();
