@@ -29,10 +29,6 @@ public class Log_ConfigTest extends TestCase {
     @Test
     public void testGetGlobalLogLevel() throws Exception {
         assertEquals(config.getGlobalLogLevel(), Log_Levels.WARNING); //Default value
-
-        Log_Config mocked_config = mock(Log_Config.class);
-        when(mocked_config.getGlobalLogLevel()).thenReturn(Log_Levels.ERROR);
-        assertEquals(mocked_config.getGlobalLogLevel(), Log_Levels.ERROR);
     }
 
     @Test
