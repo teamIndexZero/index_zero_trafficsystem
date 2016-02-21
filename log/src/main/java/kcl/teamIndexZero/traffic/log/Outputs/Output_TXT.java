@@ -32,9 +32,10 @@ public class Output_TXT extends Output {
     }
 
     /**
-     * Constructor
+     * FileOutput instance
      *
-     * @param output FileOutput instance
+     * @param output Instance of the FileOutput
+     * @throws IOException creating a FileOutput fails
      */
     public Output_TXT(FileOutput output) throws IOException {
         super(output.getFileName(), GlobalOutputTypes.TXT);
