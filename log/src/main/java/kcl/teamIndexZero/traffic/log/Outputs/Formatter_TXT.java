@@ -29,7 +29,13 @@ public class Formatter_TXT implements Formatter_Interface {
      */
     @Override
     public String format(String origin_name, int log_level, Long log_number, Log_TimeStamp time_stamp, Object... objects) {
-        String s = "[" + log_number.toString() + "] " + time_stamp.getDate() + " - " + time_stamp.getTime() + " " + Log_Levels.txtLevels[log_level] + " [" + origin_name + "] ";
+        String s = String.format( "[%5d] %s - %s %s [%s] ",
+                log_number,
+                time_stamp.getDate(),
+                time_stamp.getTime(),
+                Log_Levels.txtLevels[log_level],
+                origin_name
+        );
         for (Object o : objects) {
             s += o.toString();
         }
@@ -47,7 +53,12 @@ public class Formatter_TXT implements Formatter_Interface {
      */
     @Override
     public String format(String origin_name, Log_TimeStamp time_stamp, Long log_number, Exception e) {
-        String s = "[" + log_number.toString() + "]\t===Exception raised in [" + origin_name + "] at " + time_stamp.getDate() + " - " + time_stamp.getTime() + "===";
+        String s = String.format("[%5d]\t===Exception raised in [%s] at %s - %s===",
+                log_number,
+                origin_name,
+                time_stamp.getDate(),
+                time_stamp.getTime()
+        );
         s += System.lineSeparator() + "\t";
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

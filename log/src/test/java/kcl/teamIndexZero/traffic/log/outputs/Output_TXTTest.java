@@ -56,7 +56,7 @@ public class Output_TXTTest {
     public void testOutput() throws Exception {
         LocalDateTime ltd = LocalDateTime.now();
         Log_TimeStamp ts = new Log_TimeStamp(ltd);
-        String expected = "[100] " + ts.getDate() + " - " + ts.getTime() + " " + Log_Levels.txtLevels[4] + " [Output_TERMTest] Description message." + System.lineSeparator();
+        String expected = "[  100] " + ts.getDate() + " - " + ts.getTime() + " " + Log_Levels.txtLevels[4] + " [Output_TERMTest] Description message." + System.lineSeparator();
         out.output("Output_TERMTest", 4, new Long(100), ts, "Description message.");
         verify(mocked_file_out).appendString(eq(expected));
     }
@@ -70,7 +70,7 @@ public class Output_TXTTest {
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         out.output("OutputTest", ts, new Long(100), e);
-        String expected = "[100]\t===Exception raised in [OutputTest] at " + ts.getDate() + " - " + ts.getTime() + "===" + System.lineSeparator() + "\t" + sw.toString() + System.lineSeparator();
+        String expected = "[  100]\t===Exception raised in [OutputTest] at " + ts.getDate() + " - " + ts.getTime() + "===" + System.lineSeparator() + "\t" + sw.toString() + System.lineSeparator();
         verify(mocked_file_out).appendString(eq(expected));
     }
 }
