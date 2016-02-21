@@ -16,8 +16,8 @@ public class Output_CSV extends Output {
 
     /**
      * Constructor
-     *
      * @param output_name Name of output
+     * @throws IOException when creating a FileOutput fails
      */
     public Output_CSV(String output_name) throws IOException {
         super(output_name, GlobalOutputTypes.CSV);
@@ -28,6 +28,16 @@ public class Output_CSV extends Output {
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
             throw e;
         }
+    }
+
+    /**
+     * Constructor
+     * @param output Name of output
+     * @throws IOException when creating a FileOutput fails
+     */
+    public Output_CSV(FileOutput output) throws IOException {
+        super(output.getFileName(), GlobalOutputTypes.CSV);
+        out = output;
     }
 
     /**
