@@ -9,7 +9,7 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 /**
  * An implementation of {@link ISimulationAware} which outputs a buffered image of the map size in respose to every
@@ -20,7 +20,7 @@ public class SimulationImageProducer implements ISimulationAware {
 
     protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulationImageProducer.class.getSimpleName());
     private SimulationMap map;
-    private Consumer<BufferedImage> imageConsumer;
+    private BiConsumer<BufferedImage, SimulationTick> imageConsumer;
     private final BufferedImage image;
     private final Graphics2D graphics;
 
@@ -30,7 +30,7 @@ public class SimulationImageProducer implements ISimulationAware {
      * @param map           map to draw
      * @param imageConsumer consumer which is actually going to consume the image to use.
      */
-    public SimulationImageProducer(SimulationMap map, Consumer<BufferedImage> imageConsumer) {
+    public SimulationImageProducer(SimulationMap map, BiConsumer<BufferedImage, SimulationTick> imageConsumer) {
         this.map = map;
         this.imageConsumer = imageConsumer;
         image = new BufferedImage(map.getWidth(), map.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -56,7 +56,7 @@ public class SimulationImageProducer implements ISimulationAware {
                     pos.width
             );
         });
-        
-        imageConsumer.accept(image);
+
+        imageConsumer.accept(image, tick);
     }
 }

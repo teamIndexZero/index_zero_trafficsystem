@@ -10,7 +10,7 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
  * <p>
  * TODO should be worth moving that into the inside of the map. For now looks like we're forced to expose map object due to this
  */
-class CarRemover implements ISimulationAware {
+public class CarRemover implements ISimulationAware {
 
     private final SimulationMap map;
 
