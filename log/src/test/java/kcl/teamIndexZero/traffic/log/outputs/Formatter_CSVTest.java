@@ -2,13 +2,11 @@ package kcl.teamIndexZero.traffic.log.outputs;
 
 import kcl.teamIndexZero.traffic.log.Log_Levels;
 import kcl.teamIndexZero.traffic.log.Log_TimeStamp;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Es on 08/02/2016.
@@ -26,8 +24,13 @@ public class Formatter_CSVTest {
     }
 
     @Test
-    @Ignore
     public void testFormat_Exception() throws Exception {
-        assertTrue( false ); //TODO Need to work out how to clean & parse the exception details for cvs
+        Formatter_CSV formatter = new Formatter_CSV();
+        LocalDateTime now = LocalDateTime.now();
+        Log_TimeStamp ts = new Log_TimeStamp(now);
+        Exception e = new IndexOutOfBoundsException("Exception message.");
+        String expected = "100;" + ts.getDate() + ";" + ts.getTime() + ";EXCEPTION;Formatter_CSVTest;java.lang.IndexOutOfBoundsException: Exception message.";
+        String returned = formatter.format("Formatter_CSVTest", ts, new Long(100), e);
+        assertEquals(expected, returned);
     }
 }

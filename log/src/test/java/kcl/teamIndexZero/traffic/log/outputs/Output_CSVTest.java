@@ -8,8 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
@@ -18,16 +16,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
- * Created by Alwlyan on 17/02/2016.
+ * Created by Es on 21/02/2016.
  */
-public class Output_TXTTest {
-    private Output_TXT out = null;
+public class Output_CSVTest {
+    private Output_CSV out = null;
     FileOutput mocked_file_out = null;
 
     @Before
     public void setUp() throws Exception {
         mocked_file_out = mock(FileOutput.class);
-        out = new Output_TXT(mocked_file_out);
+        out = new Output_CSV(mocked_file_out);
     }
 
     @After
@@ -49,15 +47,15 @@ public class Output_TXTTest {
 
     @Test
     public void testGetOutputType() throws Exception {
-        assertEquals(out.getOutputType(), GlobalOutputTypes.TXT);
+        assertEquals(out.getOutputType(), GlobalOutputTypes.CSV);
     }
 
     @Test
     public void testOutput() throws Exception {
         LocalDateTime ltd = LocalDateTime.now();
         Log_TimeStamp ts = new Log_TimeStamp(ltd);
-        String expected = "[  100] " + ts.getDate() + " - " + ts.getTime() + " " + Log_Levels.txtLevels[4] + " [Output_TERMTest] Description message." + System.lineSeparator();
-        out.output("Output_TERMTest", 4, new Long(100), ts, "Description message.");
+        String expected = "100;" + ts.getDate() + ";" + ts.getTime() + ";" + Log_Levels.csvLevels[4] + ";Output_CSVTest;Description message." + System.lineSeparator();
+        out.output("Output_CSVTest", 4, new Long(100), ts, "Description message.");
         verify(mocked_file_out).appendString(eq(expected));
     }
 
@@ -66,11 +64,8 @@ public class Output_TXTTest {
         LocalDateTime ltd = LocalDateTime.now();
         Log_TimeStamp ts = new Log_TimeStamp(ltd);
         Exception e = new IOException("Some exception message.");
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        out.output("OutputTest", ts, new Long(100), e);
-        String expected = "[  100]\t===Exception raised in [OutputTest] at " + ts.getDate() + " - " + ts.getTime() + "===" + System.lineSeparator() + "\t" + sw.toString() + System.lineSeparator();
+        out.output("Output_CSVTest", ts, new Long(100), e);
+        String expected = "100;" + ts.getDate() + ";" + ts.getTime() + ";EXCEPTION;Output_CSVTest;java.io.IOException: Some exception message.";
         verify(mocked_file_out).appendString(eq(expected));
     }
 }

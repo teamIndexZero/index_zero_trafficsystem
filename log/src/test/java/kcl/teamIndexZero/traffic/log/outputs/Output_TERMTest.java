@@ -52,7 +52,7 @@ public class Output_TERMTest {
         LocalDateTime ltd = LocalDateTime.now();
         Log_TimeStamp ts = new Log_TimeStamp(ltd);
         out.output("Output_TERMTest", 4, new Long(100), ts, "Description message.");
-        String expected = "[ 100] " + ts.getDate() + " - " + ts.getTime() + " " + Log_Levels.txtLevels[4] + " + [Output_TERMTest] Description message." + System.lineSeparator();
+        String expected = "[  100] " + ts.getDate() + " - " + ts.getTime() + " " + Log_Levels.txtLevels[4] + " + [Output_TERMTest] Description message." + System.lineSeparator();
         assertEquals(outContent.toString(), expected);
     }
 
@@ -66,7 +66,7 @@ public class Output_TERMTest {
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         out.output("Output_TERMTest", ts, new Long(100), e);
-        String expected = "[ 100]\t===Exception raised in [Output_TERMTest]===" + System.lineSeparator() + "\t" + sw.toString() + System.lineSeparator() + System.lineSeparator();
+        String expected = "[  100]\t===Exception raised in [Output_TERMTest]===" + System.lineSeparator() + "\t" + sw.toString() + System.lineSeparator() + System.lineSeparator();
         assertEquals(outContent.toString(), expected);
     }
 }
