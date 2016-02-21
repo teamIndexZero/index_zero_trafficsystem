@@ -22,7 +22,7 @@ public class Log_Config {
     private String global_file_name = "log"; //Default
     private int global_log_level = Log_Levels.WARNING; //Default
     private boolean log_exception_flag = true; //Default
-    private Vector<Output> outputs = new Vector<Output>();
+    private Vector<Output> outputs = new Vector<>();
     private String config_file_name = "log_config.cfg";
     private Log_TimeStamp ts = null;
 
@@ -42,15 +42,6 @@ public class Log_Config {
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Gets the current global file output name
-     *
-     * @return Global file output name
-     */
-    public String getFileName() {
-        return this.global_file_name;
     }
 
     /**

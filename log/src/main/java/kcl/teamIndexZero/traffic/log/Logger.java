@@ -11,6 +11,12 @@ public class Logger implements Logger_Interface {
     private static Log_Engine log_engine;
     private String calling_instance_name;
 
+    static {
+        Log_Engine.load(new Log_Engine(new Log_Config()));
+        log_engine = Log_Engine.getInstance();
+        loggers = new HashMap<>();
+    }
+
     /**
      * Constructor
      *
@@ -26,15 +32,15 @@ public class Logger implements Logger_Interface {
      * @param instance_name Name of the Logger instance
      * @return Logger
      */
-    public static Logger getLoggerInstance(String instance_name) {
-        if (loggers == null) loggers = new HashMap<String, Logger>();
-        if (log_engine == null) log_engine = Log_Engine.getInstance();
-        Logger logger_instance = loggers.get(instance_name);
-        if (logger_instance == null) {
-            logger_instance = new Logger(instance_name);
-            loggers.put(instance_name, logger_instance);
+    public static synchronized Logger getLoggerInstance(String instance_name) {
+        synchronized (Logger.class) {
+            Logger logger_instance = loggers.get(instance_name);
+            if (logger_instance == null) {
+                logger_instance = new Logger(instance_name);
+                loggers.put(instance_name, logger_instance);
+            }
+            return logger_instance;
         }
-        return logger_instance;
     }
 
     /**
@@ -107,6 +113,6 @@ public class Logger implements Logger_Interface {
      */
     @Override
     public void log_Exception(Exception e) {
-        log_engine.processException( new Log_TimeStamp(), calling_instance_name, e);
+        log_engine.processException(new Log_TimeStamp(), calling_instance_name, e);
     }
 }
