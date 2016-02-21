@@ -24,17 +24,18 @@ public class MapPanel extends JPanel {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        g.clearRect(0, 0, getWidth(), getHeight());
+
         if (model.getLastImage() == null) {
-            g.drawChars("Hello".toCharArray(), 0, 5, 10, 10);
+            String messageNotRunning = "Simulation not running.";
+            g.drawChars(messageNotRunning.toCharArray(), 0, messageNotRunning.length()-1, 30,30);
             return;
         }
         g.drawImage(
                 model.getLastImage(),
                 100,
                 20,
-                model.getLastImage().getWidth() * 6,
-                model.getLastImage().getHeight() * 2,
+                model.getLastImage().getWidth() * 4,
+                model.getLastImage().getHeight() * 4,
                 null);
     }
 }

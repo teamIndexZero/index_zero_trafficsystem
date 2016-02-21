@@ -6,13 +6,9 @@ import kcl.teamIndexZero.traffic.gui.mvc.GuiController;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
-import kcl.teamIndexZero.traffic.simulator.Simulator;
-import kcl.teamIndexZero.traffic.simulator.data.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 
 
 /**
@@ -60,4 +56,5 @@ public class SimulatorGui {
 
         model.reset();
     }
+
 }

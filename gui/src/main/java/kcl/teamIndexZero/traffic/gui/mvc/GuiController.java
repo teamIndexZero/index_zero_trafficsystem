@@ -47,7 +47,7 @@ public class GuiController {
         if (model.getStatus() == GuiModel.SimulationStatus.PAUSED) {
             simulator.resume();
         } else {
-            SimulationMap map = new SimulationMap(6, 300);
+            SimulationMap map = new SimulationMap(300, 6);
             SimulationImageProducer imageProducer = new SimulationImageProducer(
                     map,
                     (image, tick) -> {
@@ -75,6 +75,7 @@ public class GuiController {
             simulatorThread = new Thread(() -> {
                 simulator.start();
             }, "SimulatorThread");
+
             simulatorThread.start();
         }
         model.setStatus(GuiModel.SimulationStatus.INPROGRESS);

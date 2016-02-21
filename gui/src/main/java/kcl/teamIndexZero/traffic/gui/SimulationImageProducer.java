@@ -50,10 +50,10 @@ public class SimulationImageProducer implements ISimulationAware {
             graphics.setColor(object.getColor());
             MapPosition pos = object.getPosition();
             graphics.fillRect(
-                    pos.y,
                     pos.x,
-                    pos.height,
-                    pos.width
+                    pos.y,
+                    pos.width,
+                    pos.height
             );
         });
 
