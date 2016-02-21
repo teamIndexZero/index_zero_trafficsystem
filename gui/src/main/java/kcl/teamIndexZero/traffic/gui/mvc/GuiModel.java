@@ -30,6 +30,17 @@ public class GuiModel {
     private SimulationParams params;
     private BufferedImage lastImage;
 
+    public GuiModel() {
+        reset();
+    }
+
+    public void reset() {
+        tick = null;
+        status = SimulationStatus.OFF;
+        lastImage = null;
+        fireChangeEvent();
+    }
+
     public BufferedImage getLastImage() {
         return lastImage;
     }
@@ -72,5 +83,28 @@ public class GuiModel {
 
     private void fireChangeEvent() {
         listeners.forEach(ChangeListener::onModelChanged);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GuiModel guiModel = (GuiModel) o;
+
+        if (tick != null ? !tick.equals(guiModel.tick) : guiModel.tick != null) return false;
+        if (status != guiModel.status) return false;
+        if (params != null ? !params.equals(guiModel.params) : guiModel.params != null) return false;
+        return lastImage != null ? lastImage.equals(guiModel.lastImage) : guiModel.lastImage == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = tick != null ? tick.hashCode() : 0;
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (params != null ? params.hashCode() : 0);
+        result = 31 * result + (lastImage != null ? lastImage.hashCode() : 0);
+        return result;
     }
 }

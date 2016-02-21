@@ -55,16 +55,16 @@ public class Simulator {
             startedSimulationTimestamp = Instant.now();
 
             for (int i = 0; i < simParams.durationInTicks; i++) {
-                if (stopped.get()) {
-                    return;
-                }
-
                 if (paused.get()) {
                     try {
                         wait();
                     } catch (InterruptedException e) {
                         LOG.log_Exception(e);
                     }
+                }
+
+                if (stopped.get()) {
+                    return;
                 }
 
                 SimulationTick tick = nextTick();

@@ -1,12 +1,18 @@
 package kcl.teamIndexZero.traffic.gui;
 
 import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -45,5 +51,20 @@ public class GuiModelTest {
                         throw new RuntimeException("Error invoking method " + m1.getName(), e);
                     }
                 });
+    }
+
+    @Test
+    public void shouldModelReset() {
+        //given
+        GuiModel oldModel = new GuiModel();
+        model.setLastSimulationTickAndImage(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB), new SimulationTick(0, LocalDateTime.now(), 10));
+        model.setParams(new SimulationParams(LocalDateTime.now(), 20, 20));
+        model.setStatus(GuiModel.SimulationStatus.OFF);
+
+        // when
+        model.reset();
+
+        // then
+        assertThat(model).isEqualTo(oldModel);
     }
 }

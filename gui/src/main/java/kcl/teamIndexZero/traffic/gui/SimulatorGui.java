@@ -55,5 +55,9 @@ public class SimulatorGui {
         frame.pack();
         frame.setSize(200 + 6 * 6, 300 * 2 + 100);
         frame.setVisible(true);
+        frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+
+
+        model.reset();
     }
 }

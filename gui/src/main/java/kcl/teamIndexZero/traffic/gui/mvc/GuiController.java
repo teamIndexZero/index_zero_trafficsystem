@@ -40,7 +40,7 @@ public class GuiController {
             simulator.resume();
         }
         simulator.stop();
-        model.setStatus(GuiModel.SimulationStatus.OFF);
+        model.reset();
     }
 
     public void start() {
