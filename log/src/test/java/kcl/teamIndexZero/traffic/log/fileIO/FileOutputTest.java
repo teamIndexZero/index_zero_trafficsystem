@@ -1,7 +1,6 @@
 package kcl.teamIndexZero.traffic.log.fileIO;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -16,23 +15,16 @@ import static org.junit.Assert.*;
 public class FileOutputTest {
     FileOutput out = null;
 
-    @Before
-    public void setUp() throws Exception {
-        System.out.println("@setUP");
-        if (out == null) out = new FileOutput("", "testfile.test");
-    }
-
     @After
     public void tearDown() throws Exception {
-        System.out.println("@tearDown");
         if (out.isOpen()) out.closeWriter();
-        if (out.deleteFile()) System.out.println("Successfully deleted file...");
+        out.deleteFile();
         out = null;
     }
 
     @Test
     public void testReOpenWriter() throws Exception {
-        System.out.println("@testReOpenWriter()");
+        if (out == null) out = new FileOutput("", "testReOpenWriter.test");
         if (out.isOpen()) {
             out.closeWriter();
             assertFalse(out.isOpen());
@@ -46,7 +38,7 @@ public class FileOutputTest {
 
     @Test
     public void testCloseWriter() throws Exception {
-        System.out.println("@testCloseWriter()");
+        if (out == null) out = new FileOutput("", "testCloseWriter.test");
         System.out.println("OK");
         if (out.isOpen()) {
             out.closeWriter();
@@ -61,7 +53,7 @@ public class FileOutputTest {
 
     @Test
     public void testAppendString() throws Exception {
-        System.out.println("@testAppendString()");
+        if (out == null) out = new FileOutput("", "testAppendString.test");
         if (!out.isOpen()) out.reOpenWriter();
         assertTrue(out.clearFileContent());
 
@@ -83,7 +75,7 @@ public class FileOutputTest {
 
     @Test
     public void testClearFileContent() throws Exception {
-        System.out.println("@testClearFileContent()");
+        if (out == null) out = new FileOutput("", "testClearFileContent.test");
         assertTrue(out.clearFileContent());
         if (!out.isOpen()) out.reOpenWriter();
         out.appendString("String1" + System.lineSeparator());
@@ -111,18 +103,21 @@ public class FileOutputTest {
 
     @Test
     public void testDeleteFile() throws Exception {
-        System.out.println("testDeleteFile()");
+        if (out == null) out = new FileOutput("", "testDeleteFile.test");
+        assertTrue(Files.exists(out.getFilePath()));
+        out.deleteFile();
+        assertFalse(Files.exists(out.getFilePath()));
     }
 
     @Test
     public void testGetFileName() throws Exception {
-        System.out.println("@testGetFileName()");
-        assertEquals(out.getFileName(), "testfile.test");
+        if (out == null) out = new FileOutput("", "testGetFileName.test");
+        assertEquals(out.getFileName(), "testGetFileName.test");
     }
 
     @Test
     public void testGetDirectory() throws Exception {
-        System.out.println("@testGetDirectory()");
+        if (out == null) out = new FileOutput("", "testGetDirectory.test");
         assertEquals(out.getDirectory(), "");
     }
 }
