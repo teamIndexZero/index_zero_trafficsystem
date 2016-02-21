@@ -45,9 +45,9 @@ public class FileInput extends FileIO {
      * @throws InvalidPathException when the path description is invalid
      * @throws IOException          when the file cannot be accessed
      */
-    public List<String> read() throws InvalidPathException, IOException {
+    public synchronized List<String> read() throws InvalidPathException, IOException {
         try {
-            List<String> file_content = new ArrayList<String>();
+            List<String> file_content = new ArrayList<>();
             String line = null;
             while ((line = reader.readLine()) != null) {
                 file_content.add(line);
@@ -73,11 +73,31 @@ public class FileInput extends FileIO {
     }
 
     /**
+     * Closes the reader
+     *
+     * @return Success
+     */
+    public synchronized boolean closeReader() {
+        if (this.reader != null) {
+            try {
+                reader.close();
+                this.reader = null;
+                return true;
+            } catch (IOException e) {
+                MicroLogger.INSTANCE.log_Error("IOException raised in [FileInput.closeReader()] for , ", super.getFilePath());
+                MicroLogger.INSTANCE.log_ExceptionMsg(e);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Deletes the file
      *
      * @return Success
      */
-    public boolean deleteFile() {
+    public synchronized boolean deleteFile() {
         try {
             return super.deleteFile();
         } catch (IOException e) {
@@ -89,6 +109,15 @@ public class FileInput extends FileIO {
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
             return false;
         }
+    }
+
+    /**
+     * Checks if the FileInput file is open
+     *
+     * @return Opened state
+     */
+    public synchronized boolean isOpen() {
+        return this.reader != null;
     }
 
 }

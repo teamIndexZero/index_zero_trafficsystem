@@ -35,7 +35,6 @@ public class FileIO {
             if (!Files.exists(getFilePath())) {
                 Files.createDirectories(getDirectoryPath());
                 Files.createFile(getFilePath());
-                System.out.println( "Looks like file has been created.." );
             }
             if( !Files.exists(getFilePath()) ) {
                 MicroLogger.INSTANCE.log_Error( "[FileIO.createFile()] Failed to create a new file (", getFilePath(), ").");
