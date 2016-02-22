@@ -44,7 +44,7 @@ public class Formatter_CSV implements Formatter_Interface {
      */
     @Override
     public String format(String origin_name, Log_TimeStamp time_stamp, Long log_number, Exception e) {
-        String s = String.format( "%d;%s;%s;EXCEPTION;%s;%s",
+        String s = String.format("%d;%s;%s;EXCEPTION;%s;%s",
                 log_number,
                 time_stamp.getDate(),
                 time_stamp.getTime(),
