@@ -1,9 +1,7 @@
-package kcl.teamIndexZero.traffic.gui;
+package kcl.teamIndexZero.traffic.gui.mvc;
 
-import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,9 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * Testing various aspects of Gui Model

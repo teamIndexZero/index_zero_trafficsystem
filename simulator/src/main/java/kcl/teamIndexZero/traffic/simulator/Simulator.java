@@ -32,7 +32,7 @@ public class Simulator {
     private AtomicBoolean stopped = new AtomicBoolean(false);
 
     /**
-     * Creates a new simulator with the desired params and {@link List<ISimulationAware>} of instances listening to
+     * Creates a new simulator with the desired params and list of {@link ISimulationAware} of instances listening to
      * simulation events.
      *
      * @param params              {@link SimulationParams} generic parameters for simulation (time, duration etc)

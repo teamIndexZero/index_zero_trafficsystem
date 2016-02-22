@@ -15,7 +15,7 @@ public class Log_EngineTest {
 
     @Test(expected = NullPointerException.class)
     public void testGetInstanceEx() {
-        Log_Engine.load( null );
+        Log_Engine.load(null);
         Log_Engine.getInstance();
     }
 

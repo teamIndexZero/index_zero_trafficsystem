@@ -14,10 +14,12 @@ import java.net.URL;
 
 /**
  * Main toolbar of the application - is also an MVC subscriber.
+ * <p>
+ * Main Toolbar contains button related to actual simulation flow - this is a 'control interface' from architecture
+ * diagram. For now buttons are Pause, Stop and Play, and also a textbox which shows the current simulation step details.
  */
 public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
     protected static Logger_Interface LOG = Logger.getLoggerInstance(MainToolbar.class.getSimpleName());
-
 
     private final GuiModel model;
     private final GuiController controller;
@@ -27,6 +29,12 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
     private JTextField tickDetailsField;
 
 
+    /**
+     * Create toolbar off model and controller.
+     *
+     * @param model      GUI model
+     * @param controller GUI controller. Does actual things. Toolbar only forwards the commands to controller.
+     */
     public MainToolbar(GuiModel model, GuiController controller) {
         super("MainToolBar");
         this.model = model;
@@ -34,9 +42,13 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
         setFloatable(false);
         addButtons();
 
+        // subscribing to events after we are done creating UI.
         model.addChangeListener(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onModelChanged() {
         // updating button status
@@ -54,6 +66,9 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
         }
     }
 
+    /*
+    Helper method to add buttons to the panel.
+     */
     protected void addButtons() {
         playButton = makeButton(
                 "play",
@@ -82,6 +97,10 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
     }
 
 
+    /**
+     * Helper method to create button. We are using our own {@link Callback} interface within to ensure the flow is
+     * transferred to where it should belong.
+     */
     protected JButton makeButton(String imageName,
                                  String toolTipText,
                                  String altText,
@@ -109,11 +128,13 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
             }
         });
 
-        if (imageURL != null) {                      //image found
+        if (imageURL != null) {
+            //image found
             button.setIcon(new ImageIcon(imageURL, altText));
-        } else {                                     //no image found
+        } else {
+            //no image found
             button.setText(altText);
-            System.err.println("Resource not found: " + imgLocation);
+            LOG.log_Error("Could not find image ", imageURL);
         }
 
         return button;
