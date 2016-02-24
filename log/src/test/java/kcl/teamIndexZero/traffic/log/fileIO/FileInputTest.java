@@ -54,7 +54,7 @@ public class FileInputTest {
         FileOutput out = new FileOutput("", "testDeleteFile.test");
         out.closeWriter();
         in = new FileInput("", "testDeleteFile.test");
-        assertTrue( in.deleteFile() );
+        assertTrue(in.deleteFile());
     }
 
     @Test

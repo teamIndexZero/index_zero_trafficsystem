@@ -16,6 +16,7 @@ public class Output_CSV extends Output {
 
     /**
      * Constructor
+     *
      * @param output_name Name of output
      * @throws IOException when creating a FileOutput fails
      */
@@ -32,6 +33,7 @@ public class Output_CSV extends Output {
 
     /**
      * Constructor
+     *
      * @param output Name of output
      * @throws IOException when creating a FileOutput fails
      */
