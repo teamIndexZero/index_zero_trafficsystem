@@ -22,7 +22,7 @@ public class Formatter_TXTTest {
         Formatter_TXT formatter = new Formatter_TXT();
         LocalDateTime now = LocalDateTime.now();
         Log_TimeStamp ts = new Log_TimeStamp(now);
-        String expected = "[100] " + ts.getDate() + " - " + ts.getTime() + " " + Log_Levels.txtLevels[3] + " [Formatter_TXTTest] a description message." + System.lineSeparator();
+        String expected = "[  100] " + ts.getDate() + " - " + ts.getTime() + " " + Log_Levels.txtLevels[3] + " [Formatter_TXTTest] a description message." + System.lineSeparator();
         String returned = formatter.format("Formatter_TXTTest", 3, new Long(100), ts, "a description message.");
         assertEquals(returned, expected);
     }
@@ -33,7 +33,7 @@ public class Formatter_TXTTest {
         LocalDateTime now = LocalDateTime.now();
         Log_TimeStamp ts = new Log_TimeStamp(now);
         Exception e = new IOException("Exception message");
-        String expected = "[100]\t===Exception raised in [Formatter_TXTTest] at " + ts.getDate() + " - " + ts.getTime() + "===" + System.lineSeparator() + "\t";
+        String expected = "[  100]\t===Exception raised in [Formatter_TXTTest] at " + ts.getDate() + " - " + ts.getTime() + "===" + System.lineSeparator() + "\t";
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);

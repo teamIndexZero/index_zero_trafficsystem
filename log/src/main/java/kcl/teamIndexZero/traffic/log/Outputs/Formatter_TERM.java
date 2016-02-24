@@ -29,7 +29,7 @@ public class Formatter_TERM implements Formatter_Interface {
      */
     @Override
     public String format(String origin_name, int log_level, Long log_number, Log_TimeStamp time_stamp, Object... objects) {
-        String s = String.format("%4d %s - %s %s + [%s]",
+        String s = String.format("[%5d] %s - %s %s + [%s] ",
                 log_number,
                 time_stamp.getDate(),
                 time_stamp.getTime(),
@@ -53,7 +53,10 @@ public class Formatter_TERM implements Formatter_Interface {
      */
     @Override
     public String format(String origin_name, Log_TimeStamp time_stamp, Long log_number, Exception e) {
-        String s = "[" + log_number.toString() + "]\t===Exception raised in [" + origin_name + "]===";
+        String s = String.format("[%5d]\t===Exception raised in [%s]===",
+                log_number,
+                origin_name
+        );
         s += System.lineSeparator() + "\t";
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
