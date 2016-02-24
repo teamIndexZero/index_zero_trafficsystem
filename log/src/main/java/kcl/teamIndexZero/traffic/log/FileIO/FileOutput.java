@@ -70,21 +70,20 @@ public class FileOutput extends FileIO {
     /**
      * Closes the Writer
      *
-     * @return Success (
+     * @return Success
+     * @throws IOException when trying to close the opened file and fails
      */
-    public synchronized boolean closeWriter() {
+    public synchronized void closeWriter() throws IOException {
         if (this.writer != null) {
             try {
                 writer.close();
                 this.writer = null;
-                return true;
             } catch (IOException e) {
                 MicroLogger.INSTANCE.log_Error("IOException raised in [FileOutput.closeWriter()] for , ", super.getFilePath());
                 MicroLogger.INSTANCE.log_ExceptionMsg(e);
-                return false;
+                throw e;
             }
         }
-        return true;
     }
 
     /**
