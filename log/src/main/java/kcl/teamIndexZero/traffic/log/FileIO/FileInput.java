@@ -76,20 +76,19 @@ public class FileInput extends FileIO {
      * Closes the reader
      *
      * @return Success
+     * @throw IOException when trying to close the opened file and fails
      */
-    public synchronized boolean closeReader() {
+    public synchronized void closeReader() throws IOException {
         if (this.reader != null) {
             try {
                 reader.close();
                 this.reader = null;
-                return true;
             } catch (IOException e) {
                 MicroLogger.INSTANCE.log_Error("IOException raised in [FileInput.closeReader()] for , ", super.getFilePath());
                 MicroLogger.INSTANCE.log_ExceptionMsg(e);
-                return false;
+                throw e;
             }
         }
-        return true;
     }
 
     /**
