@@ -58,6 +58,7 @@ public class GuiModel {
         tick = null;
         status = SimulationStatus.OFF;
         lastImage = null;
+        params = null;
         fireChangeEvent();
     }
 
