@@ -49,16 +49,6 @@ public class SimulatorEntryPoint {
             //os.writeObject(Vehicle);
 
             os.close();
-/**
- *
- *`Logger log = Logger.getLoggerInstance( Myclass.class.getName() )
- * try { /** some stuff that raises an exception * }
- *
- * catch ( Exception e )
- * { log.log_error( "An exception was raise because..." ),
- * log.log_Exception( e ) }
-
- */
 
         } catch (FileNotFoundException e) {
          LOG.log_Error("File not found");
