@@ -39,7 +39,6 @@ public class FileOutputTest {
     @Test
     public void testCloseWriter() throws Exception {
         if (out == null) out = new FileOutput("", "testCloseWriter.test");
-        System.out.println("OK");
         if (out.isOpen()) {
             out.closeWriter();
             assertFalse(out.isOpen());
