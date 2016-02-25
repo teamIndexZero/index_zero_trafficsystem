@@ -17,8 +17,8 @@ public class Output_TXT extends Output {
     /**
      * Constructor
      *
-     * @param output_name
-     * @throws IOException
+     * @param output_name Name of the file
+     * @throws IOException when creating a FileOutput fails
      */
     public Output_TXT(String output_name) throws IOException {
         super(output_name, GlobalOutputTypes.TXT);
@@ -29,7 +29,17 @@ public class Output_TXT extends Output {
             MicroLogger.INSTANCE.log_ExceptionMsg(e);
             throw e;
         }
+    }
 
+    /**
+     * FileOutput instance
+     *
+     * @param output Instance of the FileOutput
+     * @throws IOException creating a FileOutput fails
+     */
+    public Output_TXT(FileOutput output) throws IOException {
+        super(output.getFileName(), GlobalOutputTypes.TXT);
+        out = output;
     }
 
     /**
