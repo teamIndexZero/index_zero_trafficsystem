@@ -4,10 +4,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.*;
 
-import javax.swing.*;
-import java.io.*;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 
 /**

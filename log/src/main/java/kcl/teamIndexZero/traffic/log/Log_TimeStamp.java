@@ -58,13 +58,13 @@ public class Log_TimeStamp {
         try {
             return now.format(DateTimeFormatter.ofPattern(formatter));
         } catch (IllegalArgumentException e) {
-            MicroLogger.INSTANCE.log_Error( "IllegalArgumentException raised in [Log_TimeStamp.getCustomStamp( ", formatter, " )]");
-            MicroLogger.INSTANCE.log_ExceptionMsg( e );
+            MicroLogger.INSTANCE.log_Error("IllegalArgumentException raised in [Log_TimeStamp.getCustomStamp( ", formatter, " )]");
+            MicroLogger.INSTANCE.log_ExceptionMsg(e);
             try {
                 return now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-            } catch ( IllegalArgumentException ee ) {
-                MicroLogger.INSTANCE.log_Error( "IllegalArgumentException raised in [Log_TimeStamp.getCustomStamp( \'yyyyMMddHHmmss\' )] <-Default fallback value has failed.");
-                MicroLogger.INSTANCE.log_ExceptionMsg( e );
+            } catch (IllegalArgumentException ee) {
+                MicroLogger.INSTANCE.log_Error("IllegalArgumentException raised in [Log_TimeStamp.getCustomStamp( \'yyyyMMddHHmmss\' )] <-Default fallback value has failed.");
+                MicroLogger.INSTANCE.log_ExceptionMsg(e);
                 return "";
             }
         }
@@ -72,6 +72,7 @@ public class Log_TimeStamp {
 
     /**
      * Gets the string representation of the object
+     *
      * @return String time stamp
      */
     public String toString() {
