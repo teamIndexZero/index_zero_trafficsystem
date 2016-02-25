@@ -29,7 +29,7 @@ public class Formatter_TXT implements Formatter_Interface {
      */
     @Override
     public String format(String origin_name, int log_level, Long log_number, Log_TimeStamp time_stamp, Object... objects) {
-        String s = String.format( "[%5d] %s - %s %s [%s] ",
+        String s = String.format("[%5d] %s - %s %s [%s] ",
                 log_number,
                 time_stamp.getDate(),
                 time_stamp.getTime(),

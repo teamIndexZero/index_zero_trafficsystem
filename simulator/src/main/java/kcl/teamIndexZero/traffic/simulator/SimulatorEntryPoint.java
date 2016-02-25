@@ -3,7 +3,6 @@ package kcl.teamIndexZero.traffic.simulator;
 import kcl.teamIndexZero.traffic.simulator.data.*;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 
 /**

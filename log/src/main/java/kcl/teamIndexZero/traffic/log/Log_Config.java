@@ -137,7 +137,7 @@ public class Log_Config {
      * @return line validity
      * @throws RuntimeException when an output couldn't be created
      */
-    private boolean applyConfigurationLine(String line ) throws RuntimeException {
+    private boolean applyConfigurationLine(String line) throws RuntimeException {
         try {
             if (line.matches("^//(?s:.)*$")) { //Comment ('//...')
                 return true;
