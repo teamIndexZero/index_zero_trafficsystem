@@ -7,10 +7,10 @@ import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
-import kcl.teamIndexZero.traffic.simulator.data.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
-import kcl.teamIndexZero.traffic.simulator.data.Vehicle;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 
 import javax.swing.*;
 import java.awt.*;

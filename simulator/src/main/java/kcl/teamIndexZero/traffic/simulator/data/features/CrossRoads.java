@@ -1,4 +1,7 @@
-package kcl.teamIndexZero.traffic.simulator.data;
+package kcl.teamIndexZero.traffic.simulator.data.features;
+
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle2;
 
 import java.util.concurrent.TimeUnit;
 
