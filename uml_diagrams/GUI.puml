@@ -1,0 +1,45 @@
+@startuml
+
+class GuiModel {
+  -listeners:ChangeListener[]
+  -image:BufferedImage
+  -tick:currentTick
+  -status:status
+}
+
+interface ChangeListener {
+ +onModelChanged()
+}
+
+GuiModel "1" o-> "*" ChangeListener
+
+class GuiController {
+ -simulator
+ -simulatorThread
+ +start()
+ +stop()
+ +pause()
+}
+
+class Simulator {
+}
+GuiController --> Simulator: Thread, \ncreate,\ncommand
+Simulator --> GuiController: Invoke tick() \nmethod on \nsimulation \nupdates
+
+
+GuiController -> GuiModel: Update model state
+
+class MainToolbar {
+}
+
+class MapPanel {
+}
+
+ChangeListener <|-- MainToolbar
+ChangeListener <|-- MapPanel
+
+MainToolbar <-- GuiModel
+MapPanel <-- GuiModel
+
+MainToolbar --> GuiController
+@enduml

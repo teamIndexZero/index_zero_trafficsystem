@@ -46,7 +46,7 @@ public class FileInputTest {
         assertTrue(in.isOpen());
         in.closeReader();
         assertFalse(in.isOpen());
-        assertTrue(out.deleteFile());
+        out.deleteFile();
     }
 
     @Test
@@ -54,7 +54,7 @@ public class FileInputTest {
         FileOutput out = new FileOutput("", "testDeleteFile.test");
         out.closeWriter();
         in = new FileInput("", "testDeleteFile.test");
-        assertTrue( in.deleteFile() );
+        assertTrue(in.deleteFile());
     }
 
     @Test

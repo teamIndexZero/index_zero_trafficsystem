@@ -9,7 +9,7 @@ import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 /**
  * A traffic generator for adding cars into the map basing on some statistical approach.
  */
-class CarAdder implements ISimulationAware {
+public class CarAdder implements ISimulationAware {
 
     int counter = 1;
     boolean addedCarOnPrevStep = false;

@@ -24,4 +24,23 @@ public class SimulationParams {
         this.tickSeconds = tickSeconds;
         this.durationInTicks = durationInTicks;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SimulationParams that = (SimulationParams) o;
+
+        if (tickSeconds != that.tickSeconds) return false;
+        return durationInTicks == that.durationInTicks;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = tickSeconds;
+        result = 31 * result + durationInTicks;
+        return result;
+    }
 }

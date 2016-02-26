@@ -10,7 +10,7 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
  * <p>
  * TODO should be worth moving that into the inside of the map. For now looks like we're forced to expose map object due to this
  */
-class CarRemover implements ISimulationAware {
+public class CarRemover implements ISimulationAware {
 
     private final SimulationMap map;
 
@@ -27,6 +27,6 @@ class CarRemover implements ISimulationAware {
     @Override
     public void tick(SimulationTick tick) {
         //todo probably we just want to skip that form simulation, or at least move to crossings/outlets, hm?
-        map.getObjectsOnSurface().removeIf(object -> object.getPosition().x < 0 || object.getPosition().x > map.getHeight());
+        map.getObjectsOnSurface().removeIf(object -> object.getPosition().x < 0 || object.getPosition().x > map.getWidth());
     }
 }
