@@ -45,6 +45,7 @@ public class SimulationImageProducer implements ISimulationAware {
     public void tick(SimulationTick tick) {
         graphics.setBackground(Color.WHITE);
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
+        new GUI_Primitives().drawDoubleCrossRoad(20,50,50,50,20,50,20,15,graphics);
 
         map.getObjectsOnMap().forEach(object -> {
             graphics.setColor(object.getColor());
