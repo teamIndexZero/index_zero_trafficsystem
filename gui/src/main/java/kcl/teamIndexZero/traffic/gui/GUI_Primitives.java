@@ -47,13 +47,22 @@ public class GUI_Primitives {
         */
         drawLine(xi,yi,x,y,g);
         drawLine(xi,yi,x1,y3,g);
-        xi = xi+width2;
+        d = (x-x2)*(y1-y3)-(y-y)*(x3-x3);
+        xi = ((x3-x3)*(x*y-y*x2)-(x-x2)*(x3*y3-y1*x3))/d;
+        yi = ((y1-y3)*(x*y-y*x2)-(y-y)*(x3*y3-y1*x3))/d;
+        //xi = xi+width2;
         drawLine(xi,yi,x2,y,g);
         drawLine(xi,yi,x3,y3,g);
-        yi= yi+width;
+        d = (x-x2)*(y1-y3)-(y2-y2)*(x3-x3);
+        xi = ((x3-x3)*(x*y2-y2*x2)-(x-x2)*(x3*y3-y1*x3))/d;
+        yi = ((y1-y3)*(x*y2-y2*x2)-(y2-y2)*(x3*y3-y1*x3))/d;
+        //yi= yi+width;
         drawLine(xi,yi,x2,y2,g);
         drawLine(xi,yi,x3,y1,g);
-        xi = xi-width2;
+        d = (x-x2)*(y1-y3)-(y2-y2)*(x1-x1);
+        xi = ((x1-x1)*(x*y2-y2*x2)-(x-x2)*(x1*y3-y1*x1))/d;
+        yi = ((y1-y3)*(x*y2-y2*x2)-(y2-y2)*(x1*y3-y1*x1))/d;
+        //xi = xi-width2;
         drawLine(xi,yi,x,y2,g);
         drawLine(xi,yi,x1,y1,g);
     }
