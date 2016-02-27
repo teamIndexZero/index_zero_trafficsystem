@@ -18,7 +18,7 @@ public class GUI_Primitives {
         q.setCurve(x1, y1, ctrlx, ctrly, x2, y2);
         g2.draw(q);
     }
-    public void drawDoubleCrossRoad(int length, int width, int x,int y, int length2, int width2, int x1,int y1)
+    public void drawDoubleCrossRoad(int length, int width, int x,int y, int length2, int width2, int x1,int y1, Graphics g)
     {
         /*
         The x and y give the coordinates of the start point of the first road, x1 y1 give the start point of the second road.
@@ -45,16 +45,16 @@ public class GUI_Primitives {
         /*
         Now we have got one intersection point so we can go ahead and draw the complete road.
         */
-        drawLine(xi,yi,x,y);
-        drawLine(xi,yi,x1,y3);
+        drawLine(xi,yi,x,y,g);
+        drawLine(xi,yi,x1,y3,g);
         xi = xi+width2;
-        drawLine(xi,yi,x2,y);
-        drawLine(xi,yi,x3,y3);
+        drawLine(xi,yi,x2,y,g);
+        drawLine(xi,yi,x3,y3,g);
         yi= yi+width;
-        drawLine(xi,yi,x2,y2);
-        drawLine(xi,yi,x3,y1);
+        drawLine(xi,yi,x2,y2,g);
+        drawLine(xi,yi,x3,y1,g);
         xi = xi-width2;
-        drawLine(xi,yi,x,y2);
-        drawLine(xi,yi,x1,y1);
+        drawLine(xi,yi,x,y2,g);
+        drawLine(xi,yi,x1,y1,g);
     }
 }
