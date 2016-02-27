@@ -26,10 +26,10 @@ class SimulationImageProducer {
 }
 
 class Primitives {
-+drawVehicle(obj, pos, graphics)
-+drawObstacle(obj, pos, graphics)
 +drawRoad(obj, pos, graphics)
-+drawLane(obj, pos, graphics)
++drawVehicle(obj, pos, graphics)
++drawSigns(obj, pos, graphics)
++drawMisc(obj, pos, graphics)
 }
 
 Simulator --> SimulationImageProducer: calls tick()
