@@ -57,9 +57,7 @@ public class SimulationMap implements ISimulationAware {
                 (id, link) -> link.tick(timeStep)
         );
         objectsOnSurface.forEach(
-                object -> {
-                    object.tick(timeStep);
-                }
+                object -> object.tick(timeStep)
         );
     }
 
@@ -101,6 +99,24 @@ public class SimulationMap implements ISimulationAware {
         // TODO  check that we don't have overlaps
         MapPosition oldPos = object.getPosition();
         object.setPosition(pos);
+    }
+
+    /**
+     * Adds a Feature to the map
+     *
+     * @param feature
+     */
+    public void addMapFeature(Feature feature) {
+        this.mapFeatures.put(feature.getID(), feature);
+    }
+
+    /**
+     * Adds a Link to the map;
+     *
+     * @param link
+     */
+    public void addMapLink(Link link) {
+        this.mapLinks.put(link.getID(), link);
     }
 
     /**
