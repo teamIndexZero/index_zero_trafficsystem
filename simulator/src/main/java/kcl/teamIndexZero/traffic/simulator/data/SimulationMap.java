@@ -2,15 +2,17 @@ package kcl.teamIndexZero.traffic.simulator.data;
 
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.features.ID;
 import kcl.teamIndexZero.traffic.simulator.data.features.Link;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
- * An umbrella object containing map deails for the simulation. Its responsibilities are clearly divided with Simulator:
+ * An umbrella object containing map details for the simulation. Its responsibilities are clearly divided with Simulator:
  * {@link kcl.teamIndexZero.traffic.simulator.Simulator} is a control interface whilst the {@link SimulationMap} is a
  * collection of objects relating to the map
  * <p>
@@ -26,7 +28,8 @@ import java.util.List;
  * from these coordinate system composition.
  */
 public class SimulationMap implements ISimulationAware {
-
+    private HashMap<ID, Feature> mapFeatures;
+    private HashMap<ID, Link> mapLinks;
     private final int width;
     private final int height;
     private List<MapObject> objectsOnSurface = new ArrayList<>();
@@ -47,15 +50,11 @@ public class SimulationMap implements ISimulationAware {
      */
     @Override
     public void tick(SimulationTick timeStep) {
-        Feature.getFeature().forEach(
-                feature -> {
-                    feature.tick(timeStep);
-                }
+        mapFeatures.forEach(
+                (id, feature) -> feature.tick(timeStep)
         );
-        Link.getLinks().forEach(
-                link -> {
-                    link.tick(timeStep);
-                }
+        mapLinks.forEach(
+                (id, link) -> link.tick(timeStep)
         );
         objectsOnSurface.forEach(
                 object -> {
