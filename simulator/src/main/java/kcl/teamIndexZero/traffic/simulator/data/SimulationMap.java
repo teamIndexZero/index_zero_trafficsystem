@@ -31,9 +31,6 @@ public class SimulationMap implements ISimulationAware {
     private final int height;
     private List<MapObject> objectsOnSurface = new ArrayList<>();
 
-    List<Feature> features;
-    List<Link> links;
-
     /**
      * Constructor.
      *
@@ -50,12 +47,12 @@ public class SimulationMap implements ISimulationAware {
      */
     @Override
     public void tick(SimulationTick timeStep) {
-        features.forEach(
+        Feature.getFeature().forEach(
                 feature -> {
                     feature.tick(timeStep);
                 }
         );
-        links.forEach(
+        Link.getLinks().forEach(
                 link -> {
                     link.tick(timeStep);
                 }

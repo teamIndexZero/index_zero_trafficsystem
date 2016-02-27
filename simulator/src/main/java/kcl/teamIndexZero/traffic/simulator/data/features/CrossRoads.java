@@ -8,11 +8,37 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by JK 12-02-16.
  */
-public class CrossRoads {
-    public CrossRoads crossRoads = null;
-    public int[] cellsLength = null;
-    public static int[][] cells = (int[][]) null;
-    public Vehicle vehicle = null;
+public class CrossRoads extends Feature {
+
+
+    /**
+     * Constructor, inherited from Feature class
+     *
+     * @param type       feature type
+     * @param horizontal feature hor. size
+     * @param vertical   feature vert. size
+     * @param neighbours number of neighbours
+     */
+    public CrossRoads(Character type, int horizontal, int vertical, int neighbours, int numberOfLines,char typeOfRoad) {
+
+        super(type, horizontal, vertical, neighbours, numberOfLines, typeOfRoad);
+
+        /***************
+         *creating lines
+         ***************/
+
+        int j = 0; //line number in this feature, first horizontal than vertical lines
+        for (int hor = horizontal, vert; hor > 0; hor--, j++) {// j = 0,1 ... horizontal-1
+            Lines line = new Lines('h', 0, j, horizontal, j);
+        }
+        for (int vert = vertical, k = 0; vert > 0; vert--, j++, k++) { //k = 0,1 ...vertical-1
+            Lines line = new Lines('h', 0, k, vertical, j);            //j =horizontal, ... , vertical+horizontal-1
+        }
+
+    }
+}
+
+    /*
 
     private boolean greenHorizontal;
     private boolean greenVertical;
@@ -201,4 +227,5 @@ public class CrossRoads {
             System.out.println("Timer in Lights !" + e.getMessage());
         }
     }
-}
+    */
+//}
