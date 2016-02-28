@@ -47,7 +47,7 @@ public class SimulationMap implements ISimulationAware {
      * @throws EmptySimMapException   when there are no features
      * @throws OrphanFeatureException when there is 1+ unconnected features
      */
-    public SimulationMap(int width, int height, Map<ID, Feature> featureMap, Map<ID, Link> linkMap) throws EmptySimMapException, OrphanFeatureException {
+    public SimulationMap(int width, int height, Map<ID, Feature> featureMap, Map<ID, Link> linkMap) throws EmptySimMapException, OrphanFeatureException, MapIntegrityException {
         this.width = width;
         this.height = height;
         if (featureMap.isEmpty()) {
@@ -57,11 +57,27 @@ public class SimulationMap implements ISimulationAware {
         if (featureMap.size() > 1 && linkMap.isEmpty()) {
             LOG.log_Error(featureMap.size(), " features are present but no Links were passed to the simulation map.");
             throw new OrphanFeatureException("Orphaned features exist in the map.");
-
         }
-        //TODO Do a sanity check on the features making sure none are orphaned
         this.mapFeatures = featureMap;
         this.mapLinks = linkMap;
+        try {
+            constructMapGraph();
+        } catch (MapIntegrityException e) {
+            LOG.log_Error("Integrity of the map created from the features and links given is inconsistent.");
+            LOG.log_Exception(e);
+            throw e;
+        }
+
+    }
+
+    /**
+     * Constructs the graph from the features and links
+     */
+    private void constructMapGraph() throws MapIntegrityException {
+        //TODO construct graph
+        //TODO check duplicate linkage + LOG if found
+
+        //TODO sanity check
     }
 
     /**
