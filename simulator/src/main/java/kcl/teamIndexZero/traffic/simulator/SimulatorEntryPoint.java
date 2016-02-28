@@ -4,6 +4,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.*;
 
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
@@ -36,47 +37,7 @@ public class SimulatorEntryPoint {
                 Collections.singletonList(map)
         );
 
-        //serialization
 
-        try (FileOutputStream fs = new FileOutputStream("map_objects.bin")){
-
-            ObjectOutputStream os = new ObjectOutputStream(fs);
-
-            os.writeObject(map);
-            //os.writeObject(Vehicle);
-
-            os.close();
-
-        } catch (FileNotFoundException e) {
-         LOG.log_Error("File not found");
-            LOG.log_Exception(e);
-
-        } catch (IOException e) {
-            LOG.log_Error("IO Error");
-            LOG.log_Exception(e);
-        }
-        //deserialization
-        try (FileInputStream fi  = new FileInputStream("map_objects.bin")) {
-
-            ObjectInputStream os = new ObjectInputStream(fi);
-
-            SimulationMap sm1 = (SimulationMap)os.readObject();
-
-            os.close();
-
-
-        } catch (FileNotFoundException e) {
-           LOG.log_Error("FileNotFound");
-            LOG.log_Exception(e);
-
-        } catch (ClassNotFoundException e) {
-            LOG.log_Error("Class not found");
-            LOG.log_Exception(e);
-
-        } catch (IOException e) {
-            LOG.log_Error("IO error");
-            LOG.log_Exception(e);
-        }
 
         simulator.start();
         simulator.stop();
