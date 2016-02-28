@@ -1,5 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data;
 
+import kcl.teamIndexZero.traffic.log.Logger;
+import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.ID;
@@ -28,6 +30,7 @@ import java.util.List;
  * from these coordinate system composition.
  */
 public class SimulationMap implements ISimulationAware {
+    private static Logger_Interface LOG = Logger.getLoggerInstance(SimulationMap.class.getSimpleName());
     private HashMap<ID, Feature> mapFeatures;
     private HashMap<ID, Link> mapLinks;
     private final int width;
@@ -37,12 +40,28 @@ public class SimulationMap implements ISimulationAware {
     /**
      * Constructor.
      *
-     * @param width  map width
-     * @param height map height
+     * @param width    map width
+     * @param height   map height
+     * @param features map features
+     * @param links    map links
+     * @throws EmptySimMapException   when there are no features
+     * @throws OrphanFeatureException when there is 1+ unconnected features
      */
-    public SimulationMap(int width, int height) {
+    public SimulationMap(int width, int height, HashMap<ID, Feature> features, HashMap<ID, Link> links) throws EmptySimMapException, OrphanFeatureException {
         this.width = width;
         this.height = height;
+        if (features.isEmpty()) {
+            LOG.log_Error("No Features were passed to the simulation map.");
+            throw new EmptySimMapException("No features were passed to the simulation map.");
+        }
+        if (features.size() > 1 && links.isEmpty()) {
+            LOG.log_Error(features.size(), " features are present but no Links were passed to the simulation map.");
+            throw new OrphanFeatureException("Orphaned features exist in the map.");
+
+        }
+        //TODO Do a sanity check on the features making sure none are orphaned
+        this.mapFeatures = features;
+        this.mapLinks = links;
     }
 
     /**
@@ -99,24 +118,6 @@ public class SimulationMap implements ISimulationAware {
         // TODO  check that we don't have overlaps
         MapPosition oldPos = object.getPosition();
         object.setPosition(pos);
-    }
-
-    /**
-     * Adds a Feature to the map
-     *
-     * @param feature
-     */
-    public void addMapFeature(Feature feature) {
-        this.mapFeatures.put(feature.getID(), feature);
-    }
-
-    /**
-     * Adds a Link to the map;
-     *
-     * @param link
-     */
-    public void addMapLink(Link link) {
-        this.mapLinks.put(link.getID(), link);
     }
 
     /**
