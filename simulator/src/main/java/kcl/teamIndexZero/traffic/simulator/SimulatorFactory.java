@@ -1,7 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator;
 
 /**
- * Factory for simulator object.
+ * MapFactory for simulator object.
  */
 public interface SimulatorFactory {
     /**

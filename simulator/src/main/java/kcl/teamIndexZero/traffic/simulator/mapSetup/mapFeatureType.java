@@ -8,6 +8,6 @@ public enum mapFeatureType {
     SIMPLE_ONE_WAY_ROAD,    //1 lane
     SIMPLE_TWO_WAY_ROAD,    //1 lane on either side
     DUAL_CARRIAGEWAY,       //2 lanes on either side
-    T_JUNCTION,
-    X_JUNCTION
+    T_JUNCTION,             //Generic T Junction
+    X_JUNCTION              //Generic X Junction
 }

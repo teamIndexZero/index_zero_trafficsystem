@@ -10,8 +10,8 @@ import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An umbrella object containing map details for the simulation. Its responsibilities are clearly divided with Simulator:
@@ -31,8 +31,8 @@ import java.util.List;
  */
 public class SimulationMap implements ISimulationAware {
     private static Logger_Interface LOG = Logger.getLoggerInstance(SimulationMap.class.getSimpleName());
-    private HashMap<ID, Feature> mapFeatures;
-    private HashMap<ID, Link> mapLinks;
+    private Map<ID, Feature> mapFeatures;
+    private Map<ID, Link> mapLinks;
     private final int width;
     private final int height;
     private List<MapObject> objectsOnSurface = new ArrayList<>();
@@ -40,28 +40,28 @@ public class SimulationMap implements ISimulationAware {
     /**
      * Constructor.
      *
-     * @param width    map width
-     * @param height   map height
-     * @param features map features
-     * @param links    map links
+     * @param width      map width
+     * @param height     map height
+     * @param featureMap map features
+     * @param linkMap    map links
      * @throws EmptySimMapException   when there are no features
      * @throws OrphanFeatureException when there is 1+ unconnected features
      */
-    public SimulationMap(int width, int height, HashMap<ID, Feature> features, HashMap<ID, Link> links) throws EmptySimMapException, OrphanFeatureException {
+    public SimulationMap(int width, int height, Map<ID, Feature> featureMap, Map<ID, Link> linkMap) throws EmptySimMapException, OrphanFeatureException {
         this.width = width;
         this.height = height;
-        if (features.isEmpty()) {
+        if (featureMap.isEmpty()) {
             LOG.log_Error("No Features were passed to the simulation map.");
             throw new EmptySimMapException("No features were passed to the simulation map.");
         }
-        if (features.size() > 1 && links.isEmpty()) {
-            LOG.log_Error(features.size(), " features are present but no Links were passed to the simulation map.");
+        if (featureMap.size() > 1 && linkMap.isEmpty()) {
+            LOG.log_Error(featureMap.size(), " features are present but no Links were passed to the simulation map.");
             throw new OrphanFeatureException("Orphaned features exist in the map.");
 
         }
         //TODO Do a sanity check on the features making sure none are orphaned
-        this.mapFeatures = features;
-        this.mapLinks = links;
+        this.mapFeatures = featureMap;
+        this.mapLinks = linkMap;
     }
 
     /**

@@ -14,7 +14,7 @@ public class ID {
      * Constructor
      * @param id Identification tag
      */
-    ID( String id ) {
+    public ID( String id ) {
         this.id = id;
     }
 
