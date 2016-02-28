@@ -29,6 +29,5 @@ public class Link implements ISimulationAware {
 
     @Override
     public void tick(SimulationTick tick) {
-
     }
 }
