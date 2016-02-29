@@ -14,25 +14,25 @@ public class CrossRoads extends Feature {
     /**
      * Constructor, inherited from Feature class
      *
-     * @param type       feature type
      * @param horizontal feature hor. size
      * @param vertical   feature vert. size
      * @param neighbours number of neighbours
+     * @param numberOfLanes number of lines
      */
-    public CrossRoads(Character type, int horizontal, int vertical, int neighbours, int numberOfLines,char typeOfRoad) {
+    public CrossRoads(int horizontal, int vertical, int neighbours, int numberOfLanes) {
 
-        super(type, horizontal, vertical, neighbours, numberOfLines, typeOfRoad);
+        super( horizontal, vertical, neighbours, numberOfLanes);
 
         /***************
-         *creating lines
+         *creating lanes
          ***************/
 
         int j = 0; //line number in this feature, first horizontal than vertical lines
         for (int hor = horizontal, vert; hor > 0; hor--, j++) {// j = 0,1 ... horizontal-1
-            Lines line = new Lines('h', 0, j, horizontal, j);
+            Lanes line = new Lanes('h', 0, j, horizontal, j);
         }
         for (int vert = vertical, k = 0; vert > 0; vert--, j++, k++) { //k = 0,1 ...vertical-1
-            Lines line = new Lines('h', 0, k, vertical, j);            //j =horizontal, ... , vertical+horizontal-1
+            Lanes line = new Lanes('h', 0, k, vertical, j);            //j =horizontal, ... , vertical+horizontal-1
         }
 
     }
