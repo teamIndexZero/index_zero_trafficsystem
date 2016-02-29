@@ -15,13 +15,11 @@ import java.util.List;
 public class Feature implements ISimulationAware{
 
     public Feature feature = null;
-    public Character type;
     public int horizontal_size;
     public int vertical_size;
     public int[][] cells = (int[][])null;
     public int neighbours;
-    public int numberOfLines;
-    public Character typeOfRoad;
+    public int numberOfLanes;
 
     private static List<Feature> features = new ArrayList<Feature>();
     public Link newlink = null;
@@ -30,22 +28,20 @@ public class Feature implements ISimulationAware{
     /**
      * Constructor.
      *
-     * @param type feature type
      * @param horizontal feature hor. size
      * @param vertical feature vert. size
      * @param neighbours number of neighbours
+     * @param numberOfLanes number of lanes
      *
      */
-        public Feature(Character type, int horizontal, int vertical, int neighbours, int numberOfLines, char typeOfRoad) {
+        public Feature(int horizontal, int vertical, int neighbours, int numberOfLanes) {
 
-            this.type = type;
             this.horizontal_size= horizontal;
             this.vertical_size = vertical;
             this.cells = new int[horizontal][vertical];
             this.neighbours = neighbours;
-            this.numberOfLines = numberOfLines;
-            this.typeOfRoad=typeOfRoad; //only for roads if they are vertical or horizontal for all others not important!
-                                        // typeOfRoad in CAPITAL LETTERS please!
+            this.numberOfLanes = numberOfLanes;
+
 
             features.add(feature); //adding new feature to the list
 
