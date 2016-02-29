@@ -21,25 +21,20 @@ public class TrafficLight {
     }
     public void setColor(TrafficLight.State state, int timer, int length) {
 
-
-        try {
-
             for (int i = 0, j = 1; i < this.length; i = i + this.timer, j++) {
                 if (j % 2 == 0) {
 
                     TrafficLight.State State = TrafficLight.State.RED;
-                    TimeUnit.SECONDS.sleep(5);//automatic lights
+
 
                 } else {
 
                     TrafficLight.State State = TrafficLight.State.GREEN;
-                    TimeUnit.SECONDS.sleep(this.timer);
+
                 }
             }
 
-        } catch (Exception e) {
-            System.out.println("Timer in Lights !" + e.getMessage());
-        }
+
 
     }
 }
