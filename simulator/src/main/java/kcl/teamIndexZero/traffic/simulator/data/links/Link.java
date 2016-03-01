@@ -29,6 +29,9 @@ public class Link implements ISimulationAware {
         return this.id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void tick(SimulationTick tick) {
     }

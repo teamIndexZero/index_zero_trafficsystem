@@ -9,17 +9,20 @@ public class LinkDescription {
     ID fromID;
     ID toID;
     LinkType type;
+    ID linkID;
 
     /**
      * Constructor
      *
-     * @param from From ID tag
-     * @param to   To ID tag
-     * @param type Link type
+     * @param from   From ID tag
+     * @param to     To ID tag
+     * @param type   Link type
+     * @param linkID Link's ID tag
      */
-    LinkDescription(ID from, ID to, LinkType type) {
+    LinkDescription(ID from, ID to, LinkType type, ID linkID) {
         this.fromID = from;
         this.toID = to;
         this.type = type;
+        this.linkID = linkID;
     }
 }
