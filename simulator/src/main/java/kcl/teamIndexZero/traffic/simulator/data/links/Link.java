@@ -15,18 +15,29 @@ public class Link implements ISimulationAware {
 
     /**
      * Constructor
+     *
      * @param id Link ID tag
      */
-    public Link( ID id ) {
+    public Link(ID id) {
         this.id = id;
     }
 
     /**
      * Get the Link's ID tag
+     *
      * @return ID tag
      */
     public ID getID() {
         return this.id;
+    }
+
+    /**
+     * Checks of the link is connected to only one feature
+     *
+     * @return Dead end state
+     */
+    public boolean isDeadEnd() {
+        return (one == null || two == null);
     }
 
     /**
