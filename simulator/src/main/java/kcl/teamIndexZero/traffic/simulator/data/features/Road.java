@@ -43,7 +43,25 @@ public class Road {
      *
      * @return Length of road
      */
-    public int getRoadLenth() {
+    public int getRoadLength() {
         return this.roadSpecs.length;
+    }
+
+    /**
+     * Gets the number of lanes on the left from the start view
+     *
+     * @return Number of left lanes
+     */
+    public int getLeftLaneCount() {
+        return this.leftSide.getNumberOfLanes();
+    }
+
+    /**
+     * Gets the number of lanes on the right from the start view
+     *
+     * @return Number of right lanes
+     */
+    public int getRightLaneCount() {
+        return this.rightSide.getNumberOfLanes();
     }
 }
