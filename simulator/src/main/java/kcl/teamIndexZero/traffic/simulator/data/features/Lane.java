@@ -2,35 +2,26 @@ package kcl.teamIndexZero.traffic.simulator.data.features;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
+import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
 /**
  * Created by Es on 28/02/2016.
  */
-public class Lane {
+public class Lane extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Lane.class.getSimpleName());
-    private double length;
-    private double width = 3.2; //Default
-
-    /**
-     * Constructor (with default width = 3.2m)
-     *
-     * @param length Length of the lane in meters
-     */
-    public Lane(double length) {
-        LOG.log("New lane created: length=", length, "m, width=", width, "m.");
-        this.length = length;
-    }
+    private RoadSpecs roadSpecs;
+    private ID id;
 
     /**
      * Constructor
      *
-     * @param length Length of the lane in meters
-     * @param width  Width of the lane in meters
+     * @param road_specs Road specifications
      */
-    public Lane(double length, double width) {
-        LOG.log("New lane created: length=", length, "m, width=", width, "m.");
-        this.length = length;
-        this.width = width;
+    public Lane(ID id, RoadSpecs road_specs) {
+        super(id);
+        this.roadSpecs = road_specs;
+        LOG.log("New lane (", id.toString(), ") created: length=", this.roadSpecs.length, "m, width=", this.roadSpecs.width, "m.");
     }
 
     /**
@@ -39,7 +30,7 @@ public class Lane {
      * @return Width in meters
      */
     public double getWidth() {
-        return this.width;
+        return this.roadSpecs.width;
     }
 
     /**
@@ -48,8 +39,23 @@ public class Lane {
      * @return Length in meters
      */
     public double getLength() {
-        return this.length;
+        return this.roadSpecs.length;
     }
 
+    /**
+     * Gets the Lane's ID
+     *
+     * @return ID tag for the lane
+     */
+    public ID getID() {
+        return this.id;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void tick(SimulationTick tick) {
+
+    }
 }

@@ -2,10 +2,10 @@ package kcl.teamIndexZero.traffic.simulator.mapSetup;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
-import kcl.teamIndexZero.traffic.simulator.data.features.ID;
-import kcl.teamIndexZero.traffic.simulator.data.features.Link;
-import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.links.Link;
+import kcl.teamIndexZero.traffic.simulator.exeptions.AlreadyExistsException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +36,6 @@ public class MapFactory {
                 //TODO
                 break;
             case SIMPLE_TWO_WAY_ROAD:
-                features.put(id, new Road(id, 1, 1, 1000));
                 //TODO
                 break;
             case DUAL_CARRIAGEWAY:

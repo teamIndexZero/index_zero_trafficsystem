@@ -7,14 +7,15 @@ import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
-import kcl.teamIndexZero.traffic.simulator.data.EmptySimMapException;
-import kcl.teamIndexZero.traffic.simulator.data.OrphanFeatureException;
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
-import kcl.teamIndexZero.traffic.simulator.data.features.ID;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
-import kcl.teamIndexZero.traffic.simulator.mapSetup.AlreadyExistsException;
+import kcl.teamIndexZero.traffic.simulator.exeptions.AlreadyExistsException;
+import kcl.teamIndexZero.traffic.simulator.exeptions.EmptySimMapException;
+import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
+import kcl.teamIndexZero.traffic.simulator.exeptions.OrphanFeatureException;
 import kcl.teamIndexZero.traffic.simulator.mapSetup.MapFactory;
 import kcl.teamIndexZero.traffic.simulator.mapSetup.mapFeatureType;
 
@@ -109,6 +110,10 @@ public class SimulatorGui {
             e.printStackTrace();
         } catch (OrphanFeatureException e) {
             LOG.log_Fatal("There are orphan (unconnected) features in the map graph!");
+            LOG.log_Exception(e);
+            e.printStackTrace();
+        } catch (MapIntegrityException e) {
+            LOG.log_Fatal("Map integrity compromised.");
             LOG.log_Exception(e);
             e.printStackTrace();
         } finally {

@@ -1,4 +1,4 @@
-package kcl.teamIndexZero.traffic.simulator.mapSetup;
+package kcl.teamIndexZero.traffic.simulator.exeptions;
 
 /**
  * Created by Es on 28/02/2016.

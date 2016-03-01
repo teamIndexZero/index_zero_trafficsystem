@@ -4,10 +4,12 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
-import kcl.teamIndexZero.traffic.simulator.data.features.ID;
-import kcl.teamIndexZero.traffic.simulator.data.features.Link;
+import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
+import kcl.teamIndexZero.traffic.simulator.exeptions.EmptySimMapException;
+import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
+import kcl.teamIndexZero.traffic.simulator.exeptions.OrphanFeatureException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +67,10 @@ public class SimulationMap implements ISimulationAware {
         } catch (MapIntegrityException e) {
             LOG.log_Error("Integrity of the map created from the features and links given is inconsistent.");
             LOG.log_Exception(e);
+            mapFeatures.clear();
+            mapLinks.clear();
             throw e;
         }
-
     }
 
     /**
@@ -76,7 +79,6 @@ public class SimulationMap implements ISimulationAware {
     private void constructMapGraph() throws MapIntegrityException {
         //TODO construct graph
         //TODO check duplicate linkage + LOG if found
-
         //TODO sanity check
     }
 

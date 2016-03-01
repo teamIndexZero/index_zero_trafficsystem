@@ -3,7 +3,9 @@ package kcl.teamIndexZero.traffic.simulator.data.features;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,9 @@ public class Feature implements ISimulationAware {
         return this.id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void tick(SimulationTick tick) {
 
