@@ -78,22 +78,27 @@ public class GraphConstructor {
      */
     private void createGraph(List<LinkDescription> node_vertices) throws UnrecognisedLinkException {
         for (LinkDescription l : node_vertices) {
-            //TODO what if it's a one way street with nothing at one end (no feature) <- adapt the code for that!
             Feature feature_one = mapFeatures.get(l.fromID);
             Feature feature_two = mapFeatures.get(l.toID);
-            if (feature_one == null) {
-                LOG.log_Error("ID: '", l.fromID.toString(), "' not in loaded features.");
-                throw new UnrecognisedLinkException("ID pointing to a Feature that is not loaded.");
-            }
-            if (feature_two == null) {
-                LOG.log_Error("ID: '", l.toID.toString(), "' not in loaded feature.");
+            if (feature_one == null && feature_two == null) {
+                LOG.log_Error("IDs '", l.fromID.toString(), "' and '", l.toID, "' not in loaded features.");
                 throw new UnrecognisedLinkException("ID pointing to a Feature that is not loaded.");
             }
             Link link = createLink(l.type, l.linkID);
-            feature_one.addLink(link);
-            feature_two.addLink(link);
-            link.one = feature_one;
-            link.two = feature_two;
+            if (feature_one != null) {
+                feature_one.addLink(link);
+                link.one = feature_one;
+            } else {
+                LOG.log_Warning("Link description's fromID '", l.fromID, "' is null. Must be a one-way path.");
+                //TODO maybe put traffic generators on the null ends of links ?
+            }
+            if (feature_two != null) {
+                feature_two.addLink(link);
+                link.two = feature_two;
+            } else {
+                LOG.log_Warning("link description's toID '", l.toID, "' is null. Must be a one-way path.");
+                //TODO maybe put traffic generators on the null ends of links ?
+            }
         }
     }
 
@@ -103,6 +108,7 @@ public class GraphConstructor {
      * @throws OrphanFeatureException when a feature with no connection to anything is found
      * @throws MapIntegrityException  when the graph integrity is compromised
      */
+
     private void checkGraphIntegrity() throws OrphanFeatureException, MapIntegrityException {
         //TODO check the integrity of the graph (no orphan features and no infinite directed loops with no exit  -o)
     }

@@ -2,9 +2,8 @@ package kcl.teamIndexZero.traffic.simulator;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
-import kcl.teamIndexZero.traffic.simulator.data.ID;
-import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
-import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
+import kcl.teamIndexZero.traffic.simulator.data.*;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Obstacle;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
@@ -16,7 +15,7 @@ import kcl.teamIndexZero.traffic.simulator.mapSetup.MapFactory;
 import kcl.teamIndexZero.traffic.simulator.mapSetup.mapFeatureType;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Main class (entry point) for the Simulator command line interface.
@@ -36,9 +35,10 @@ public class SimulatorEntryPoint {
             MapFactory ezFactory = new MapFactory();
             ezFactory.newFeature(mapFeatureType.SIMPLE_TWO_WAY_ROAD, new ID("road1"));
             //TODO do some map entity creation
-
-
-            SimulationMap map = new SimulationMap(4, 400, ezFactory.getFeatures(), ezFactory.getLinks());
+            Map<ID, Feature> featureMap = new HashMap<>();
+            List<LinkDescription> links = new LinkedList<LinkDescription>();
+            GraphConstructor graph = new GraphConstructor(featureMap, links); //TODO temp stuff. need to take care of the exceptions too
+            SimulationMap map = new SimulationMap(4, 400, graph);
 
 
             map.addMapObject(new Obstacle("Fallen tree 1", new MapPosition(0, 0, 2, 4)));
