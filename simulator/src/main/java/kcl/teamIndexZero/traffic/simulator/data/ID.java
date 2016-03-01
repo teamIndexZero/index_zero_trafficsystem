@@ -17,7 +17,7 @@ public class ID {
      * @param discriminant Discriminant to add to the copied tag
      */
     public ID(ID id, String discriminant) {
-        this.id += id.getId() + ":" + discriminant;
+        this.id = id.getId() + ":" + discriminant;
     }
 
     /**

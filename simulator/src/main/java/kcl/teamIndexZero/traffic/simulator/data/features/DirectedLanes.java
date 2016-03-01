@@ -1,5 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.features;
 
+import kcl.teamIndexZero.traffic.log.Logger;
+import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 
 import java.util.ArrayList;
@@ -9,17 +11,16 @@ import java.util.List;
  * Created by Es on 01/03/2016.
  */
 public class DirectedLanes {
+    private static Logger_Interface LOG = Logger.getLoggerInstance(DirectedLanes.class.getSimpleName());
     private ID id;
     List<Lane> lanes = new ArrayList<>();
     RoadSpecs roadSpecs;
-    private int numberOfLanes;
 
     /**
      * Constructor
      */
     public DirectedLanes(ID id) {
         this.id = id;
-        numberOfLanes = 0;
     }
 
     /**
@@ -33,7 +34,7 @@ public class DirectedLanes {
         this.id = id;
         this.roadSpecs = road_specs;
         for (int i = 0; i < number_of_lanes; i++) {
-            lanes.add(new Lane(new ID(this.id, Integer.toString(i)), roadSpecs));
+            lanes.add(new Lane(new ID(id, Integer.toString(i)), roadSpecs));
         }
     }
 
@@ -43,6 +44,14 @@ public class DirectedLanes {
      * @return Number of lanes
      */
     public int getNumberOfLanes() {
-        return numberOfLanes;
+        return this.lanes.size();
+    }
+
+    public ID getLaneID(int lane_index) throws ArrayIndexOutOfBoundsException {
+        if (lane_index >= this.lanes.size()) {
+            LOG.log_Error("Lane index '", lane_index, "' is not in the lanes available ('", this.lanes.size(), "').");
+            throw new ArrayIndexOutOfBoundsException("Lane index not in group of Lanes.");
+        }
+        return lanes.get(lane_index).getID();
     }
 }

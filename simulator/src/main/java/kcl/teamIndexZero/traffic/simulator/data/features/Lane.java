@@ -11,7 +11,6 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 public class Lane extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Lane.class.getSimpleName());
     private RoadSpecs roadSpecs;
-    private ID id;
 
     /**
      * Constructor
@@ -38,7 +37,7 @@ public class Lane extends Feature {
      *
      * @return Length in meters
      */
-    public double getLength() {
+    public int getLength() {
         return this.roadSpecs.length;
     }
 
@@ -48,7 +47,7 @@ public class Lane extends Feature {
      * @return ID tag for the lane
      */
     public ID getID() {
-        return this.id;
+        return super.getID();
     }
 
     /**
