@@ -25,4 +25,13 @@ public class LinkDescription {
         this.type = type;
         this.linkID = linkID;
     }
+
+    /**
+     * toString method
+     *
+     * @return String with the LinkDescription's info
+     */
+    public String toString() {
+        return this.linkID + "[ " + fromID + " -> " + toID + " ]";
+    }
 }
