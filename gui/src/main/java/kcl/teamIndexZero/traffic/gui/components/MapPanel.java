@@ -43,8 +43,8 @@ public class MapPanel extends JComponent {
                 model.getLastImage(),
                 100,
                 20,
-                model.getLastImage().getWidth() * 2,
-                model.getLastImage().getHeight() * 2,
+                model.getLastImage().getWidth(),
+                model.getLastImage().getHeight(),
                 null);
     }
 }

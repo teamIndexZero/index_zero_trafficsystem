@@ -3,7 +3,6 @@ package kcl.teamIndexZero.traffic.gui;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
-import kcl.teamIndexZero.traffic.simulator.data.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
@@ -38,27 +37,30 @@ public class SimulationImageProducer implements ISimulationAware {
 
     }
 
+    private double alpha = 0;
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void tick(SimulationTick tick) {
+        alpha += 0.1;
         graphics.setBackground(Color.WHITE);
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
-        new GUI_Primitives().drawSmallCar(50,50,30,graphics);
+        new GUI_Primitives().drawSmallCar(50, 50, alpha, graphics);
         //new GUI_Primitives().drawSmallCar(60,60,30,graphics);
         //new GUI_Primitives().drawSmallCar(70,70,0,graphics);
-        new GUI_Primitives().drawSingleRoad(50,25,35,35,52,64,78,45,graphics);
-        map.getObjectsOnMap().forEach(object -> {
-            graphics.setColor(object.getColor());
-            MapPosition pos = object.getPosition();
-            graphics.fillRect(
-                    pos.x,
-                    pos.y,
-                    pos.width,
-                    pos.height
-            );
-        });
+        new GUI_Primitives().drawSingleRoad(50, 25, 35, 35, 52, 64, 78, 45, graphics);
+//        map.getObjectsOnMap().forEach(object -> {
+//            graphics.setColor(object.getColor());
+//            MapPosition pos = object.getPosition();
+//            graphics.fillRect(
+//                    pos.x,
+//                    pos.y,
+//                    pos.width,
+//                    pos.height
+//            );
+//        });
 
         imageConsumer.accept(image, tick);
     }
