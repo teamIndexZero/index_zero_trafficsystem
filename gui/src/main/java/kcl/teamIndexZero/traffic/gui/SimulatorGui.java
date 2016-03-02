@@ -46,7 +46,7 @@ public class SimulatorGui {
     public SimulatorGui() {
         model = new GuiModel();
         controller = new GuiController(model, () -> {
-            SimulationMap map = new SimulationMap(300, 6);
+            SimulationMap map = new SimulationMap(300, 300);
             SimulationImageProducer imageProducer = new SimulationImageProducer(
                     map,
                     (image, tick) -> {

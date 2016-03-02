@@ -1,6 +1,8 @@
 package kcl.teamIndexZero.traffic.gui;
 import java.awt.*;
 import java.awt.geom.QuadCurve2D;
+import java.math.*;
+import java.lang.*;
 
 /**
  * Created by kumar awijeet on 2/24/2016. thanks for Working!!
@@ -22,6 +24,28 @@ public class GUI_Primitives {
     {
         drawLine(x,y,x1,y1,g);
         drawLine(x2,y2,x3,y3,g);
+    }
+    public void drawSmallCar (int x3, int y3, double a, Graphics g)
+    {
+        /*
+        Assuming that b is the size of the car and this is splitting median of the design of the car in the ratio 2:1
+        The shape of the car is a triangle.
+        */
+        int b;
+        b = 10;
+        int c,d;
+        c = (int) (Math.sin(a)*b);
+        d = (int) (Math.cos(a)*b);
+        int x, y, x1, y1, x2, y2, e;
+        e = b+(b/2);
+        x = x3 + c;
+        y = y3 + d;
+        c = (int) (Math.sin(35)*e);
+        d = (int) (Math.cos(35)*e);
+        x1 = x + c;
+        y1 = y + d;
+        x2 = x - c;
+        x2 = x - d;
     }
     public void drawDoubleCrossRoad(int length, int width, int x,int y, int length2, int width2, int x1,int y1, Graphics g)
     {
