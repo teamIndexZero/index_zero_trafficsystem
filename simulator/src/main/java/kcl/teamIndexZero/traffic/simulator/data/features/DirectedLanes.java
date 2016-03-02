@@ -15,13 +15,7 @@ public class DirectedLanes {
     private ID id;
     List<Lane> lanes = new ArrayList<>();
     RoadSpecs roadSpecs;
-
-    /**
-     * Constructor
-     */
-    public DirectedLanes(ID id) {
-        this.id = id;
-    }
+    private final Road road;
 
     /**
      * Constructor
@@ -30,11 +24,12 @@ public class DirectedLanes {
      * @param number_of_lanes Number of lanes on this direction
      * @param road_specs      Road specifications
      */
-    public DirectedLanes(ID id, int number_of_lanes, RoadSpecs road_specs) {
+    public DirectedLanes(ID id, int number_of_lanes, RoadSpecs road_specs, Road road) {
         this.id = id;
         this.roadSpecs = road_specs;
+        this.road = road;
         for (int i = 0; i < number_of_lanes; i++) {
-            lanes.add(new Lane(new ID(id, Integer.toString(i)), roadSpecs));
+            lanes.add(new Lane(new ID(id, Integer.toString(i)), roadSpecs, this));
         }
     }
 
@@ -53,5 +48,13 @@ public class DirectedLanes {
             throw new ArrayIndexOutOfBoundsException("Lane index not in group of Lanes.");
         }
         return lanes.get(lane_index).getID();
+    }
+
+    public Road getRoad() {
+        return road;
+    }
+
+    public List<Lane> getLanes() {
+        return lanes;
     }
 }

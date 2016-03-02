@@ -46,4 +46,20 @@ public class ID {
     public String toString() {
         return this.id;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ID id1 = (ID) o;
+
+        return id != null ? id.equals(id1.id) : id1.id == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

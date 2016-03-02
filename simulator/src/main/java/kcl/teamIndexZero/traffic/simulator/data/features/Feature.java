@@ -17,22 +17,25 @@ public class Feature implements ISimulationAware {
 
     /**
      * Constructor
+     *
      * @param id Feature ID tag
      */
-    public Feature( ID id ) {
+    public Feature(ID id) {
         this.id = id;
     }
 
     /**
      * Adds a Link to the Feature
+     *
      * @param link Link to add
      */
-    public void addLink( Link link ) {
-        links.add( link );
+    public void addLink(Link link) {
+        links.add(link);
     }
 
     /**
      * Gets the links connected to the Feature
+     *
      * @return List of links connected
      */
     public List<Link> getLinks() {
@@ -41,6 +44,7 @@ public class Feature implements ISimulationAware {
 
     /**
      * Gets the Feature's ID tag
+     *
      * @return ID tag
      */
     public ID getID() {
@@ -48,6 +52,7 @@ public class Feature implements ISimulationAware {
     }
 
     /**
+     * By default, do nothing
      * {@inheritDoc}
      */
     @Override

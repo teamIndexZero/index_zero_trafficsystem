@@ -6,6 +6,7 @@ import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
+import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
@@ -16,6 +17,7 @@ import kcl.teamIndexZero.traffic.simulator.exeptions.OrphanFeatureException;
 import kcl.teamIndexZero.traffic.simulator.exeptions.UnrecognisedLinkException;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +29,8 @@ import java.util.Map;
  */
 public class GraphConstructor {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Link.class.getSimpleName());
-    private Map<ID, Feature> mapFeatures;
-    private Map<ID, Link> mapLinks;
+    private Map<ID, Feature> mapFeatures = new HashMap<>();
+    private Map<ID, Link> mapLinks = new HashMap<>();
 
     public GraphConstructor(List<Junction> junction_list, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException {
         //TODO make it so that a lone single feature can be passed to the sim
@@ -37,37 +39,38 @@ public class GraphConstructor {
             throw new MapIntegrityException("Nothing was passed to the GraphConstructor.");
         }
         try {
+            createFeatures(road_descriptions, junction_list);
             createGraph(link_descriptions);
             checkGraphIntegrity();
         } catch (UnrecognisedLinkException e) {
             LOG.log_Error("A LinkDescription describes one or more features that do not appear in the loaded collection.");
             LOG.log_Exception(e);
-            throw new MapIntegrityException("Description of map doesn't match reality!");
-        } catch (
-                MissingImplementationException e
-                )
-
-        {
+            throw new MapIntegrityException("Description of map doesn't match reality!", e);
+        } catch (MissingImplementationException e) {
             LOG.log_Error("Implementation for a case is missing in the code base!");
-            throw new MapIntegrityException("Implementation for a case is missing!");
-        } catch (
-                OrphanFeatureException e
-                )
-
-        {
+            throw new MapIntegrityException("Implementation for a case is missing!", e);
+        } catch (OrphanFeatureException e) {
             LOG.log_Error("A feature with no links to anything has been found.");
             LOG.log_Exception(e);
-            throw new MapIntegrityException();
-        } catch (
-                MapIntegrityException e
-                )
-
-        {
+            throw new MapIntegrityException("Orphan feature", e);
+        } catch (MapIntegrityException e) {
             LOG.log_Error("Integrity of the map created from the features and link descriptions given is inconsistent.");
             LOG.log_Exception(e);
             throw e;
         }
+    }
 
+    private void createFeatures(List<RoadDescription> roadDescriptions, List<Junction> junctions) {
+        roadDescriptions.forEach(rd -> {
+            Road r = new Road(rd.getId(), rd.getLaneCountA(), rd.getLaneCountA(), rd.getLength());
+            mapFeatures.put(r.getID(), r);
+            r.getRightSide().getLanes().forEach(lane -> {
+                mapFeatures.put(lane.getID(), lane);
+            });
+            r.getLeftSide().getLanes().forEach(lane -> {
+                mapFeatures.put(lane.getID(), lane);
+            });
+        });
     }
 
     /**

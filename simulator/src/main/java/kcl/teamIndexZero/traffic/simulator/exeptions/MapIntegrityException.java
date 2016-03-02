@@ -8,6 +8,10 @@ public class MapIntegrityException extends Exception {
     public MapIntegrityException() {
     }
 
+    public MapIntegrityException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public MapIntegrityException(String message) {
         super(message);
     }

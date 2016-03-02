@@ -8,11 +8,13 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
 import kcl.teamIndexZero.traffic.simulator.data.GraphConstructor;
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
+import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
@@ -20,8 +22,8 @@ import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 
 
 /**
@@ -31,11 +33,11 @@ public class SimulatorGui {
 
     protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulatorGui.class.getSimpleName());
 
-    private final JFrame frame;
-    private final MainToolbar mainToolBar;
-    private final GuiController controller;
-    private final GuiModel model;
-    private final MapPanel mapPanel;
+    private JFrame frame;
+    private MainToolbar mainToolBar;
+    private GuiController controller;
+    private GuiModel model;
+    private MapPanel mapPanel;
 
     /**
      * Entry point.
@@ -52,9 +54,14 @@ public class SimulatorGui {
     public SimulatorGui() {
         try {
             //TODO factory then pass the stuff below to graph constructor
-            java.util.List<Junction> junctions = new LinkedList<>();
-            java.util.List<LinkDescription> links = new LinkedList<LinkDescription>();
-            java.util.List<RoadDescription> roads = new LinkedList<>();
+            java.util.List<Junction> junctions = new ArrayList<>();
+            java.util.List<LinkDescription> links = new ArrayList<>();
+            java.util.List<RoadDescription> roads = new ArrayList<>();
+            roads.add(new RoadDescription(2, 2, new ID("Road1"), 10));
+            roads.add(new RoadDescription(2, 2, new ID("Road2"), 10));
+            links.add(new LinkDescription(new ID("Road1"), new ID("Road2"), LinkType.SYNC_TL, new ID("Link1")));
+            junctions.add(new Junction(new ID("Junction1")));
+
             GraphConstructor graph = new GraphConstructor(junctions, roads, links); //TODO temp stuff. need to take care of the exceptions too
             SimulationMap map = new SimulationMap(4, 400, graph);
             model = new GuiModel();

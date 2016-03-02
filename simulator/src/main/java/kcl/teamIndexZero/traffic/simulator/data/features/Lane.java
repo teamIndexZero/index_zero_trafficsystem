@@ -11,14 +11,16 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 public class Lane extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Lane.class.getSimpleName());
     private RoadSpecs roadSpecs;
+    private final DirectedLanes lanes;
 
     /**
      * Constructor
      *
      * @param road_specs Road specifications
      */
-    public Lane(ID id, RoadSpecs road_specs) {
+    public Lane(ID id, RoadSpecs road_specs, DirectedLanes parent) {
         super(id);
+        this.lanes = parent;
         this.roadSpecs = road_specs;
         LOG.log("New lane (", id.toString(), ") created: length=", this.roadSpecs.length, "m, width=", this.roadSpecs.width, "m.");
     }
