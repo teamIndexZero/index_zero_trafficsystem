@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.gui;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.QuadCurve2D;
 
 /**
@@ -24,33 +25,26 @@ public class GUI_Primitives {
         drawLine(x2, y2, x3, y3, g);
     }
 
-    public void drawSmallCar(int x3, int y3, double angleToXAxis, Graphics g) {
-        /*
-        Assuming that b is the size of the car and this is splitting median of the design of the car in the ratio 2:1
-        The shape of the car is a triangle.
-        */
+    public void drawSmallCar(int x3, int y3, double angleToXAxis, Graphics g)
+    {
+        //g.drawPolygon(new int[] {0, 50, 25}, new int[] {0, 0, 50}, 3);
         g.setColor(Color.BLACK);
-        int b;
+        int b, c, d, x, y, x1, y1, x2, y2, e,f,i,j,k,l;
         b = 10;
-        int c, d;
-        c = (int) (Math.sin(angleToXAxis) * b);
-        d = (int) (Math.cos(angleToXAxis) * b);
-        int x, y, x1, y1, x2, y2, e;
-        e = b + (b / 2);
-        x = x3 + c;
-        y = y3 + d;
-        c = (int) (Math.sin(30) * e);
-        d = (int) (Math.cos(30) * e);
-        x1 = x + c;
-        y1 = y + d;
-        c = (int) (Math.sin(30) * e);
-        d = (int) (Math.cos(30) * e);
-        x2 = x + c;
-        y2 = x + d;
-        g.drawPolygon(new int[] {x, x1, x2}, new int[] {y, y1, y2}, 3);
-        //drawLine(x, y, x1, y1, g);
-        //drawLine(x1, y1, x2, y2, g);
-        //drawLine(x2, y2, x, y, g);
+        x = b;
+        y= y3+b;
+        x1 = x3;
+        y1 = y3;
+        x2 = b+x3;
+        y2 = b;
+        Graphics2D h = (Graphics2D) g;
+        AffineTransform at = new AffineTransform();
+        //at.rotate(angleToXAxis,(x+x1+x2)/3,(y+y1+y2)/3);
+        //this is rotation with reference to middle of the car, the one below is rotation with reference to
+        //the front of the car.
+        at.rotate(angleToXAxis,x1,y1);
+        h.setTransform(at);
+        g.drawPolygon(new int[] {x , x1, x2}, new int[] {y , y1 , y2}, 3);
     }
 
     public void drawDoubleCrossRoad(int length, int width, int x, int y, int length2, int width2, int x1, int y1, Graphics g) {

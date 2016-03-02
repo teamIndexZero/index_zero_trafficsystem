@@ -47,10 +47,8 @@ public class SimulationImageProducer implements ISimulationAware {
         alpha += 0.1;
         graphics.setBackground(Color.WHITE);
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
-        new GUI_Primitives().drawSmallCar(50, 50, alpha, graphics);
-        //new GUI_Primitives().drawSmallCar(60,60,30,graphics);
-        //new GUI_Primitives().drawSmallCar(70,70,0,graphics);
-        new GUI_Primitives().drawSingleRoad(50, 25, 35, 35, 52, 64, 78, 45, graphics);
+        new GUI_Primitives().drawSmallCar(70,70,alpha,graphics);
+        //new GUI_Primitives().drawSingleRoad(50, 25, 35, 35, 52, 64, 78, 45, graphics);
 //        map.getObjectsOnMap().forEach(object -> {
 //            graphics.setColor(object.getColor());
 //            MapPosition pos = object.getPosition();
