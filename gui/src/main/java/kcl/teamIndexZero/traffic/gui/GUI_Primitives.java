@@ -31,6 +31,7 @@ public class GUI_Primitives {
         Assuming that b is the size of the car and this is splitting median of the design of the car in the ratio 2:1
         The shape of the car is a triangle.
         */
+        g.setColor(Color.BLACK);
         int b;
         b = 10;
         int c,d;
@@ -44,8 +45,13 @@ public class GUI_Primitives {
         d = (int) (Math.cos(35)*e);
         x1 = x + c;
         y1 = y + d;
-        x2 = x - c;
-        x2 = x - d;
+        c = (int) (Math.sin(5)*e);
+        d = (int) (Math.cos(5)*e);
+        x2 = x + c;
+        y2 = x + d;
+        drawLine(x,y,x1,y1,g);
+        drawLine(x1,y1,x2,y2,g);
+        drawLine(x2,y2,x,y,g);
     }
     public void drawDoubleCrossRoad(int length, int width, int x,int y, int length2, int width2, int x1,int y1, Graphics g)
     {
