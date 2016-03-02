@@ -18,6 +18,11 @@ public class GUI_Primitives {
         q.setCurve(x1, y1, ctrlx, ctrly, x2, y2);
         g2.draw(q);
     }
+    public void drawSingleRoad (int x, int y, int x1, int y1, int x2, int y2, int x3, int y3, Graphics g)
+    {
+        drawLine(x,y,x1,y1,g);
+        drawLine(x2,y2,x3,y3,g);
+    }
     public void drawDoubleCrossRoad(int length, int width, int x,int y, int length2, int width2, int x1,int y1, Graphics g)
     {
         /*
