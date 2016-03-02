@@ -5,10 +5,9 @@ import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
-import kcl.teamIndexZero.traffic.simulator.exeptions.EmptySimMapException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.OrphanFeatureException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.UnrecognisedLinkException;
+import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
+import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
+import kcl.teamIndexZero.traffic.simulator.exeptions.*;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +40,9 @@ public class GraphConstructor {
             LOG.log_Error("A LinkDescription describes one or more features that do not appear in the loaded collection.");
             LOG.log_Exception(e);
             throw new MapIntegrityException("Description of map doesn't match reality!");
+        } catch (MissingImplementationException e) {
+            LOG.log_Error("Implementation for a case is missing in the code base!");
+            throw new MapIntegrityException("Implementation for a case is missing!");
         } catch (OrphanFeatureException e) {
             LOG.log_Error("A feature with no links to anything has been found.");
             LOG.log_Exception(e);
@@ -76,7 +78,7 @@ public class GraphConstructor {
      * @param node_vertices Description of the map links
      * @throws UnrecognisedLinkException when a link description points to a feature not loaded into the featureMap
      */
-    private void createGraph(List<LinkDescription> node_vertices) throws UnrecognisedLinkException {
+    private void createGraph(List<LinkDescription> node_vertices) throws UnrecognisedLinkException, MissingImplementationException {
         for (LinkDescription l : node_vertices) {
             Feature feature_one = mapFeatures.get(l.fromID);
             Feature feature_two = mapFeatures.get(l.toID);
@@ -84,20 +86,26 @@ public class GraphConstructor {
                 LOG.log_Error("IDs '", l.fromID.toString(), "' and '", l.toID, "' not in loaded features.");
                 throw new UnrecognisedLinkException("ID pointing to a Feature that is not loaded.");
             }
-            Link link = createLink(l.type, l.linkID);
-            if (feature_one != null) {
-                feature_one.addLink(link);
-                link.one = feature_one;
-            } else {
-                LOG.log_Warning("Link description's fromID '", l.fromID, "' is null. Must be a one-way path.");
-                //TODO maybe put traffic generators on the null ends of links ?
-            }
-            if (feature_two != null) {
-                feature_two.addLink(link);
-                link.two = feature_two;
-            } else {
-                LOG.log_Warning("link description's toID '", l.toID, "' is null. Must be a one-way path.");
-                //TODO maybe put traffic generators on the null ends of links ?
+            try {
+                Link link = createLink(l.type, l.linkID);
+                if (feature_one != null) {
+                    feature_one.addLink(link);
+                    link.one = feature_one;
+                } else {
+                    LOG.log_Warning("Link description's fromID '", l.fromID, "' is null. Must be a one-way path.");
+                    //TODO maybe put traffic generators on the null ends of links ?
+                }
+                if (feature_two != null) {
+                    feature_two.addLink(link);
+                    link.two = feature_two;
+                } else {
+                    LOG.log_Warning("link description's toID '", l.toID, "' is null. Must be a one-way path.");
+                    //TODO maybe put traffic generators on the null ends of links ?
+                }
+            } catch (MissingImplementationException e) {
+                LOG.log_Fatal("Creating Link failed.");
+                LOG.log_Exception(e);
+                throw e;
             }
         }
     }
@@ -110,6 +118,8 @@ public class GraphConstructor {
      */
 
     private void checkGraphIntegrity() throws OrphanFeatureException, MapIntegrityException {
+        //TODO count dead-ends
+        //TODO count infinite loops
         //TODO check the integrity of the graph (no orphan features and no infinite directed loops with no exit  -o)
     }
 
@@ -120,8 +130,17 @@ public class GraphConstructor {
      * @param linkID ID tag of the new link
      * @return New link
      */
-    private Link createLink(LinkType type, ID linkID) {
-        //TODO switch for the LinkType and return relevant new link object
-        return new Link(linkID);
+    private Link createLink(LinkType type, ID linkID) throws MissingImplementationException {
+        switch (type) {
+            case GENERIC:
+                return new Link(linkID);
+            case AUTONOMOUS_TL:
+                return new TrafficLight(linkID);
+            case SYNC_TL:
+                return new TrafficLightInSet(linkID);
+            default:
+                LOG.log_Error("LinkType not implemented in .createLink(..)!");
+                throw new MissingImplementationException("LinkType not implemented!");
+        }
     }
 }
