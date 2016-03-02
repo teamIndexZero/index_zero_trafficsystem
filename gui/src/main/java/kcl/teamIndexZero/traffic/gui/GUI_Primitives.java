@@ -39,17 +39,18 @@ public class GUI_Primitives {
         e = b + (b / 2);
         x = x3 + c;
         y = y3 + d;
-        c = (int) (Math.sin(40) * e);
-        d = (int) (Math.cos(40) * e);
+        c = (int) (Math.sin(30) * e);
+        d = (int) (Math.cos(30) * e);
         x1 = x + c;
         y1 = y + d;
-        c = (int) (Math.sin(40) * e);
-        d = (int) (Math.cos(40) * e);
+        c = (int) (Math.sin(30) * e);
+        d = (int) (Math.cos(30) * e);
         x2 = x + c;
         y2 = x + d;
-        drawLine(x, y, x1, y1, g);
-        drawLine(x1, y1, x2, y2, g);
-        drawLine(x2, y2, x, y, g);
+        g.drawPolygon(new int[] {x, x1, x2}, new int[] {y, y1, y2}, 3);
+        //drawLine(x, y, x1, y1, g);
+        //drawLine(x1, y1, x2, y2, g);
+        //drawLine(x2, y2, x, y, g);
     }
 
     public void drawDoubleCrossRoad(int length, int width, int x, int y, int length2, int width2, int x1, int y1, Graphics g) {
