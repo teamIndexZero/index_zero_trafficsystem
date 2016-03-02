@@ -29,22 +29,26 @@ public class GUI_Primitives {
     {
         //g.drawPolygon(new int[] {0, 50, 25}, new int[] {0, 0, 50}, 3);
         g.setColor(Color.BLACK);
-        int b, c, d, x, y, x1, y1, x2, y2, e,f,i,j,k,l;
-        b = 10;
+        int b, x, y, x1, y1, x2, y2;
+        b = 0;
         x = b;
-        y= y3+b;
+        y= b+x3;
         x1 = x3;
-        y1 = y3;
+        y1 = x3;
         x2 = b+x3;
         y2 = b;
+        AffineTransform c;
         Graphics2D h = (Graphics2D) g;
+        c = h.getTransform();
         AffineTransform at = new AffineTransform();
-        //at.rotate(angleToXAxis,(x+x1+x2)/3,(y+y1+y2)/3);
+        at.rotate(angleToXAxis,(x+x1+x2)/3,(y+y1+y2)/3);
         //this is rotation with reference to middle of the car, the one below is rotation with reference to
         //the front of the car.
-        at.rotate(angleToXAxis,x1,y1);
+        //at.rotate(angleToXAxis,x1,y1);
         h.setTransform(at);
+        //at.translate(x3,y3);
         g.drawPolygon(new int[] {x , x1, x2}, new int[] {y , y1 , y2}, 3);
+        h.setTransform(c);
     }
 
     public void drawDoubleCrossRoad(int length, int width, int x, int y, int length2, int width2, int x1, int y1, Graphics g) {
