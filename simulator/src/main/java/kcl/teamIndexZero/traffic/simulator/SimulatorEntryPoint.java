@@ -2,7 +2,11 @@ package kcl.teamIndexZero.traffic.simulator;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
-import kcl.teamIndexZero.traffic.simulator.data.*;
+import kcl.teamIndexZero.traffic.simulator.data.GraphConstructor;
+import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Obstacle;

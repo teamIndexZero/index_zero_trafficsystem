@@ -2,6 +2,7 @@ package kcl.teamIndexZero.traffic.simulator.data;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;

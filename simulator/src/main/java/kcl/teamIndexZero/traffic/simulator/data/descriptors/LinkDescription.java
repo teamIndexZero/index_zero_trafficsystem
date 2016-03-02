@@ -1,15 +1,16 @@
-package kcl.teamIndexZero.traffic.simulator.data;
+package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 
 /**
  * Created by Es on 01/03/2016.
  */
 public class LinkDescription {
-    ID fromID;
-    ID toID;
-    LinkType type;
-    ID linkID;
+    public ID fromID;
+    public ID toID;
+    public LinkType type;
+    public ID linkID;
 
     /**
      * Constructor
@@ -19,7 +20,7 @@ public class LinkDescription {
      * @param type   Link type
      * @param linkID Link's ID tag
      */
-    LinkDescription(ID from, ID to, LinkType type, ID linkID) {
+    public LinkDescription(ID from, ID to, LinkType type, ID linkID) {
         this.fromID = from;
         this.toID = to;
         this.type = type;

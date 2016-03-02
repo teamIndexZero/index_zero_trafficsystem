@@ -1,5 +1,6 @@
 package kcl.teamIndexZero.traffic.simulator.data;
 
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import org.junit.Test;
 
