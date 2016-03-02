@@ -7,19 +7,20 @@ import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
-import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
+import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Obstacle;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 import kcl.teamIndexZero.traffic.simulator.exeptions.AlreadyExistsException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.EmptySimMapException;
 import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.OrphanFeatureException;
 import kcl.teamIndexZero.traffic.simulator.mapSetup.MapFactory;
 import kcl.teamIndexZero.traffic.simulator.mapSetup.mapFeatureType;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Main class (entry point) for the Simulator command line interface.
@@ -39,9 +40,10 @@ public class SimulatorEntryPoint {
             MapFactory ezFactory = new MapFactory();
             ezFactory.newFeature(mapFeatureType.SIMPLE_TWO_WAY_ROAD, new ID("road1"));
             //TODO do some map entity creation
-            Map<ID, Feature> featureMap = new HashMap<>();
+            List<Junction> junctions = new LinkedList<>();
             List<LinkDescription> links = new LinkedList<LinkDescription>();
-            GraphConstructor graph = new GraphConstructor(featureMap, links); //TODO temp stuff. need to take care of the exceptions too
+            List<RoadDescription> roads = new LinkedList<>();
+            GraphConstructor graph = new GraphConstructor(junctions, roads, links); //TODO temp stuff. need to take care of the exceptions too
             SimulationMap map = new SimulationMap(4, 400, graph);
 
 
@@ -60,14 +62,6 @@ public class SimulatorEntryPoint {
         } catch (AlreadyExistsException e) {
             LOG.log_Error("Tying to use an ID tag that's already been used before for a new Feature!");
             LOG.log_Exception(e);
-        } catch (EmptySimMapException e) {
-            LOG.log_Fatal("The map graph is empty of features!");
-            LOG.log_Exception(e);
-            e.printStackTrace();
-        } catch (OrphanFeatureException e) {
-            LOG.log_Fatal("There are orphan (unconnected) features in the map graph!");
-            LOG.log_Exception(e);
-            e.printStackTrace();
         } catch (MapIntegrityException e) {
             LOG.log_Fatal("Map integrity is compromised.");
             LOG.log_Exception(e);

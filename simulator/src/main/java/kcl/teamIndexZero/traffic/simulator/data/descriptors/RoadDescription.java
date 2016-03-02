@@ -4,8 +4,8 @@ package kcl.teamIndexZero.traffic.simulator.data.descriptors;
  * Created by Es on 02/03/2016.
  */
 public class RoadDescription {
-    int laneCountA;
-    int laneCountB;
+    public int laneCountA;
+    public int laneCountB;
 
     /**
      * Constructor

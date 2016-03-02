@@ -3,13 +3,19 @@ package kcl.teamIndexZero.traffic.simulator.data;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
-import kcl.teamIndexZero.traffic.simulator.exeptions.*;
+import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
+import kcl.teamIndexZero.traffic.simulator.exeptions.MissingImplementationException;
+import kcl.teamIndexZero.traffic.simulator.exeptions.OrphanFeatureException;
+import kcl.teamIndexZero.traffic.simulator.exeptions.UnrecognisedLinkException;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -24,16 +30,12 @@ public class GraphConstructor {
     private Map<ID, Feature> mapFeatures;
     private Map<ID, Link> mapLinks;
 
-    public GraphConstructor(Map<ID, Feature> features, List<LinkDescription> link_descriptions) throws EmptySimMapException, OrphanFeatureException, MapIntegrityException {
-        if (features.isEmpty()) {
-            LOG.log_Error("No Features were passed to the GraphConstructor.");
-            throw new EmptySimMapException("No features were passed to the GraphConstructor.");
+    public GraphConstructor(List<Junction> junction_list, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException {
+        //TODO make it so that a lone single feature can be passed to the sim
+        if (checkEmpty(junction_list, road_descriptions, link_descriptions)) {
+            LOG.log_Error("Nothing was passed to the GraphConstructor.");
+            throw new MapIntegrityException("Nothing was passed to the GraphConstructor.");
         }
-        if (features.size() > 1 && link_descriptions.isEmpty()) {
-            LOG.log_Error(features.size(), " features are present but no Link descriptions were passed to the GraphConstructor.");
-            throw new OrphanFeatureException("Orphaned features exist in the GraphConstructor.");
-        }
-        this.mapFeatures = features;
         try {
             createGraph(link_descriptions);
             checkGraphIntegrity();
@@ -41,18 +43,31 @@ public class GraphConstructor {
             LOG.log_Error("A LinkDescription describes one or more features that do not appear in the loaded collection.");
             LOG.log_Exception(e);
             throw new MapIntegrityException("Description of map doesn't match reality!");
-        } catch (MissingImplementationException e) {
+        } catch (
+                MissingImplementationException e
+                )
+
+        {
             LOG.log_Error("Implementation for a case is missing in the code base!");
             throw new MapIntegrityException("Implementation for a case is missing!");
-        } catch (OrphanFeatureException e) {
+        } catch (
+                OrphanFeatureException e
+                )
+
+        {
             LOG.log_Error("A feature with no links to anything has been found.");
             LOG.log_Exception(e);
-            throw e;
-        } catch (MapIntegrityException e) {
+            throw new MapIntegrityException();
+        } catch (
+                MapIntegrityException e
+                )
+
+        {
             LOG.log_Error("Integrity of the map created from the features and link descriptions given is inconsistent.");
             LOG.log_Exception(e);
             throw e;
         }
+
     }
 
     /**
@@ -79,6 +94,7 @@ public class GraphConstructor {
      * @param node_vertices Description of the map links
      * @throws UnrecognisedLinkException when a link description points to a feature not loaded into the featureMap
      */
+
     private void createGraph(List<LinkDescription> node_vertices) throws UnrecognisedLinkException, MissingImplementationException {
         for (LinkDescription l : node_vertices) {
             Feature feature_one = mapFeatures.get(l.fromID);
@@ -143,5 +159,22 @@ public class GraphConstructor {
                 LOG.log_Error("LinkType not implemented in .createLink(..)!");
                 throw new MissingImplementationException("LinkType not implemented!");
         }
+    }
+
+
+    /**
+     * Checks if collections is/are empty
+     *
+     * @param collections Collections to check
+     * @return Status: 1+ Collections is empty
+     */
+    private boolean checkEmpty(Collection<?>... collections) {
+        boolean empty_flag = false;
+        for (Collection<?> c : collections) {
+            if (c.isEmpty()) {
+                empty_flag = true;
+            }
+        }
+        return empty_flag;
     }
 }

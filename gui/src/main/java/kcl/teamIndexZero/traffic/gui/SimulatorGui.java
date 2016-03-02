@@ -7,22 +7,21 @@ import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
-import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.GraphConstructor;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
+import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
-import kcl.teamIndexZero.traffic.simulator.exeptions.AlreadyExistsException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.EmptySimMapException;
 import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.OrphanFeatureException;
-import kcl.teamIndexZero.traffic.simulator.mapSetup.MapFactory;
-import kcl.teamIndexZero.traffic.simulator.mapSetup.mapFeatureType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 
 /**
@@ -52,9 +51,12 @@ public class SimulatorGui {
      */
     public SimulatorGui() {
         try {
-            MapFactory ezFactory = new MapFactory();
-            ezFactory.newFeature(mapFeatureType.SIMPLE_TWO_WAY_ROAD, new ID("road1"));
-            SimulationMap map = new SimulationMap(4, 400, ezFactory.getFeatures(), ezFactory.getLinks());
+            //TODO factory then pass the stuff below to graph constructor
+            java.util.List<Junction> junctions = new LinkedList<>();
+            java.util.List<LinkDescription> links = new LinkedList<LinkDescription>();
+            java.util.List<RoadDescription> roads = new LinkedList<>();
+            GraphConstructor graph = new GraphConstructor(junctions, roads, links); //TODO temp stuff. need to take care of the exceptions too
+            SimulationMap map = new SimulationMap(4, 400, graph);
             model = new GuiModel();
             controller = new GuiController(model, () -> {
                 SimulationImageProducer imageProducer = new SimulationImageProducer(
@@ -101,23 +103,10 @@ public class SimulatorGui {
 
             // that's where we reset model into default state - before the simulation is started.
             model.reset();
-        } catch (AlreadyExistsException e) {
-            LOG.log_Error("Tying to use an ID tag that's already been used before for a new Feature!");
-            LOG.log_Exception(e);
-        } catch (EmptySimMapException e) {
-            LOG.log_Fatal("The map graph is empty of features!");
-            LOG.log_Exception(e);
-            e.printStackTrace();
-        } catch (OrphanFeatureException e) {
-            LOG.log_Fatal("There are orphan (unconnected) features in the map graph!");
-            LOG.log_Exception(e);
-            e.printStackTrace();
         } catch (MapIntegrityException e) {
             LOG.log_Fatal("Map integrity compromised.");
             LOG.log_Exception(e);
             e.printStackTrace();
-        } finally {
-            throw new RuntimeException();
         }
     }
 
