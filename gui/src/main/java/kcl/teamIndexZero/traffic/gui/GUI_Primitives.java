@@ -41,12 +41,12 @@ public class GUI_Primitives {
         e = b+(b/2);
         x = x3 + c;
         y = y3 + d;
-        c = (int) (Math.sin(35)*e);
-        d = (int) (Math.cos(35)*e);
+        c = (int) (Math.sin(40)*e);
+        d = (int) (Math.cos(40)*e);
         x1 = x + c;
         y1 = y + d;
-        c = (int) (Math.sin(5)*e);
-        d = (int) (Math.cos(5)*e);
+        c = (int) (Math.sin(40)*e);
+        d = (int) (Math.cos(40)*e);
         x2 = x + c;
         y2 = x + d;
         drawLine(x,y,x1,y1,g);
