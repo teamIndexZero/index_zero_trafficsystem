@@ -44,6 +44,10 @@ public class GuiModel {
     private SimulationParams params;
     private BufferedImage lastImage;
 
+    private int mapPanelWidthPixels;
+    private int mapPanelHeightPixels;
+
+
     /**
      * Default constructor.
      */
@@ -66,10 +70,24 @@ public class GuiModel {
         return lastImage;
     }
 
-    public void setLastSimulationTickAndImage(BufferedImage lastImage, SimulationTick tick) {
+    public void setLastSimulationImageAndTick(BufferedImage lastImage, SimulationTick tick) {
         this.lastImage = lastImage;
         this.tick = tick;
         fireChangeEvent();
+    }
+
+    public void setMapPanelSize(int width, int height) {
+        this.mapPanelWidthPixels = width;
+        this.mapPanelHeightPixels = height;
+        fireChangeEvent();
+    }
+
+    public int getMapPanelWidthPixels() {
+        return mapPanelWidthPixels;
+    }
+
+    public int getMapPanelHeightPixels() {
+        return mapPanelHeightPixels;
     }
 
     public SimulationTick getTick() {

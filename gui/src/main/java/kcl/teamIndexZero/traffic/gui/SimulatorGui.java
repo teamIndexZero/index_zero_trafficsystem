@@ -1,10 +1,9 @@
 package kcl.teamIndexZero.traffic.gui;
 
-import kcl.teamIndexZero.traffic.gui.components.MainToolbar;
-import kcl.teamIndexZero.traffic.gui.components.MapPanel;
+import kcl.teamIndexZero.traffic.gui.components.MainWindow;
+import kcl.teamIndexZero.traffic.gui.components.simulationChooserDialog.ChooserDialog;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiController;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
-import kcl.teamIndexZero.traffic.gui.simulationChooserDialog.ChooserDialog;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
@@ -21,10 +20,6 @@ import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,9 +47,7 @@ public class SimulatorGui {
      * Default constructor.
      */
     public SimulatorGui() {
-        ChooserDialog.showForOSMLoadResult(result -> {
-            startSimulatorWindow(result);
-        });
+        ChooserDialog.showForOSMLoadResult(this::startSimulatorWindow);
     }
 
     private void startSimulatorWindow(OsmParseResult result) {
@@ -77,17 +70,7 @@ public class SimulatorGui {
 
             model = new GuiModel();
 
-            SimulationImageProducer imageProducer = new SimulationImageProducer(
-                    map,
-                    (image, tick) -> {
-                        // here, careful! We are working in another thread, but we want to update UI. In this case, we
-                        // need a carfeul message passing mechanism to update UI thread. We'd rather invoke model
-                        // update in UI thread, since it will then natively fire the UI redraw.
-                        SwingUtilities.invokeLater(() -> {
-                            model.setLastSimulationTickAndImage(image, tick);
-                        });
-                    }
-            );
+            SimulationImageProducer imageProducer = new SimulationImageProducer(map, model);
 
             GuiController controller = new GuiController(model, () -> {
 
@@ -108,27 +91,12 @@ public class SimulatorGui {
                                 delay)
                 );
             });
-            MainToolbar mainToolBar = new MainToolbar(model, controller);
-
-            MapPanel mapPanel = new MapPanel(model);
-
-            JFrame frame = new JFrame("Simulation - One Road 2 DirectedLanes Each Way");
-            frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            frame.getContentPane().setLayout(new BorderLayout());
-            frame.add(mainToolBar, BorderLayout.PAGE_START);
-            frame.add(mapPanel, BorderLayout.CENTER);
-            frame.pack();
-            frame.setVisible(true);
-
-            mapPanel.addComponentListener(new ComponentAdapter() {
-                public void componentResized(ComponentEvent e) {
-                    imageProducer.setPixelSize(e.getComponent().getWidth(), e.getComponent().getHeight());
-                }
-            });
 
             // that's where we reset model into default state - before the simulation is started.
+
             model.reset();
+            MainWindow window = new MainWindow(model, controller);
+            window.setVisible(true);
         } catch (MapIntegrityException e) {
             LOG.log_Fatal("Map integrity compromised.");
             LOG.log_Exception(e);

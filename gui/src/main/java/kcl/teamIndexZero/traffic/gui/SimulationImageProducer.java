@@ -1,5 +1,6 @@
 package kcl.teamIndexZero.traffic.gui;
 
+import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
@@ -8,9 +9,9 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.function.BiConsumer;
 
 /**
  * An implementation of {@link ISimulationAware} which outputs a buffered image of the map size in respose to every
@@ -21,23 +22,26 @@ public class SimulationImageProducer implements ISimulationAware {
 
     protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulationImageProducer.class.getSimpleName());
     private SimulationMap map;
-    private BiConsumer<BufferedImage, SimulationTick> imageConsumer;
+    private final GuiModel model;
 
     private int pixelWidth;
     private int pixelHeight;
 
-    private BufferedImage image;
+    private BufferedImage image = null;
     private Graphics2D graphics;
 
     /**
      * Constructor
      *
-     * @param map           map to draw
-     * @param imageConsumer consumer which is actually going to consume the image to use.
+     * @param map map to draw
      */
-    public SimulationImageProducer(SimulationMap map, BiConsumer<BufferedImage, SimulationTick> imageConsumer) {
+    public SimulationImageProducer(SimulationMap map, GuiModel model) {
         this.map = map;
-        this.imageConsumer = imageConsumer;
+        this.model = model;
+
+        model.addChangeListener(() -> {
+            setPixelSize(model.getMapPanelWidthPixels(), model.getMapPanelHeightPixels());
+        });
     }
 
     public int convertLatToY(double lat) {
@@ -50,7 +54,16 @@ public class SimulationImageProducer implements ISimulationAware {
         return (int) Math.round((lon - map.lonStart) * scaleX);
     }
 
-    public void setPixelSize(int width, int height) {
+    private void setPixelSize(int width, int height) {
+
+        if (width == 0 && height == 0) {
+            return;
+        }
+
+        if (width == this.pixelWidth && height == this.pixelHeight) {
+            return;
+        }
+
         this.pixelWidth = width;
         this.pixelHeight = height;
         image = new BufferedImage(pixelWidth, pixelHeight, BufferedImage.TYPE_INT_RGB);
@@ -58,12 +71,15 @@ public class SimulationImageProducer implements ISimulationAware {
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
     public void tick(SimulationTick tick) {
+        if (image == null) {
+            return;
+        }
+
         graphics.setBackground(Color.WHITE);
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
 
@@ -93,6 +109,8 @@ public class SimulationImageProducer implements ISimulationAware {
 //            );
 //        });
 
-        imageConsumer.accept(image, tick);
+        SwingUtilities.invokeLater(() -> {
+            model.setLastSimulationImageAndTick(image, tick);
+        });
     }
 }

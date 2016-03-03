@@ -1,4 +1,4 @@
-package kcl.teamIndexZero.traffic.gui.simulationChooserDialog;
+package kcl.teamIndexZero.traffic.gui.components.simulationChooserDialog;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
@@ -9,7 +9,6 @@ import kcl.teamIndexZero.traffic.simulator.osm.OsmParser;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Consumer;
