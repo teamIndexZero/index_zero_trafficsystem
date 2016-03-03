@@ -1,5 +1,6 @@
 package kcl.teamIndexZero.traffic.gui;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.QuadCurve2D;
@@ -27,27 +28,17 @@ public class GUI_Primitives {
 
     public void drawSmallCar(int x3, int y3, double angleToXAxis, Graphics g)
     {
-        //g.drawPolygon(new int[] {0, 50, 25}, new int[] {0, 0, 50}, 3);
-        g.setColor(Color.BLACK);
-        int b, x, y, x1, y1, x2, y2;
-        b = 0;
-        x = b;
-        y= b+x3;
-        x1 = x3;
-        y1 = x3;
-        x2 = b+x3;
-        y2 = b;
+        g.setColor(Color.black);
         AffineTransform c;
         Graphics2D h = (Graphics2D) g;
         c = h.getTransform();
         AffineTransform at = new AffineTransform();
-        at.rotate(angleToXAxis,(x+x1+x2)/3,(y+y1+y2)/3);
-        //this is rotation with reference to middle of the car, the one below is rotation with reference to
-        //the front of the car.
-        //at.rotate(angleToXAxis,x1,y1);
+        at.rotate(angleToXAxis,x3,y3);
         h.setTransform(at);
-        //at.translate(x3,y3);
-        g.drawPolygon(new int[] {x , x1, x2}, new int[] {y , y1 , y2}, 3);
+        Image img = null;
+        img = new ImageIcon("C:/Users/kumarawijeet/OneDrive/MSc/Group Project/bmw_z_top_view_clip_art_18132.jpg").getImage();
+        // file taken from http://all-free-download.com/free-vector/car-vector-top-view-download.html
+        h.drawImage(img,x3-18,y3-18,40,40,null);
         h.setTransform(c);
     }
 
