@@ -22,7 +22,7 @@ public class ChooserDialog extends JFrame {
 
     private static final Map<String, String> filesAvailable =
             Arrays.stream(new String[][]{
-                    {"Strand area", "/sampleData/elephant_and_castle.osm"},
+                    {"Strand area", "/sampleData/strand.osm"},
                     {"Elephant and Castle strange roundabout", "/sampleData/elephant_and_castle.osm"},
                     {"Buckingham Palace area", "/sampleData/buckingham_area.osm"},
             }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
@@ -38,7 +38,7 @@ public class ChooserDialog extends JFrame {
         this.resultConsumer = resultConsumer;
         new JFrame("Please choose simulation map");
         setSize(400, 400);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
         ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(new JLabel("Please choose one of the available presets for simulation area:"));
@@ -50,7 +50,8 @@ public class ChooserDialog extends JFrame {
                     try {
                         OsmParseResult result = new OsmParser().parse(file, this.getClass().getResourceAsStream(file));
                         resultConsumer.accept(result);
-                        ChooserDialog.this.dispatchEvent(new WindowEvent(ChooserDialog.this, WindowEvent.WINDOW_CLOSING));
+                        ChooserDialog.this.setVisible(false);
+                        ChooserDialog.this.dispose();
                     } catch (MapParseException e1) {
                         e1.printStackTrace();
                         LOG.log_Exception(e1);
