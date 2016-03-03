@@ -1,11 +1,13 @@
 package kcl.teamIndexZero.traffic.simulator.data.features;
 
+import kcl.teamIndexZero.traffic.simulator.data.GeoSegment;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by Es on 01/03/2016.
@@ -16,8 +18,8 @@ public class RoadTest {
 
     @Before
     public void setUp() throws Exception {
-        r1 = new Road(new ID("RoadTest"), 3, 5, 12000);
-        r2 = new Road(new ID("RoadTest"), 10, 0, 10000);
+        r1 = new Road(new ID("RoadTest"), 3, 5, 12000, mock(GeoSegment.class));
+        r2 = new Road(new ID("RoadTest"), 10, 0, 10000, mock(GeoSegment.class));
     }
 
     @After

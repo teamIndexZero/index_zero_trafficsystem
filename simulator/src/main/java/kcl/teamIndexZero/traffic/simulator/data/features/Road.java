@@ -2,6 +2,7 @@ package kcl.teamIndexZero.traffic.simulator.data.features;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
+import kcl.teamIndexZero.traffic.simulator.data.GeoSegment;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 
 /**
@@ -13,6 +14,7 @@ public class Road extends Feature {
     private RoadSpecs roadSpecs = new RoadSpecs();
     public DirectedLanes rightSide;
     public DirectedLanes leftSide;
+    private GeoSegment segment;
 
     /**
      * Constructor
@@ -23,8 +25,9 @@ public class Road extends Feature {
      * @param roadLength      Length of the road
      * @throws IllegalArgumentException when the number of lanes given is less than 1 or the road length is < 0.5
      */
-    public Road(ID id, int leftLanesCount, int rightLanesCount, int roadLength) throws IllegalArgumentException {
+    public Road(ID id, int leftLanesCount, int rightLanesCount, int roadLength, GeoSegment segment) throws IllegalArgumentException {
         super(id);
+        this.segment = segment;
         if (leftLanesCount < 1 && rightLanesCount < 1) {
             LOG.log_Error("Total number of lanes given is ", leftLanesCount + rightLanesCount, ".");
             throw new IllegalArgumentException("Number of lanes on road is 0! A road must have at least 1 lane.");
@@ -72,5 +75,9 @@ public class Road extends Feature {
 
     public DirectedLanes getRightSide() {
         return rightSide;
+    }
+
+    public GeoSegment getSegment() {
+        return segment;
     }
 }

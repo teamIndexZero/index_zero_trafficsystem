@@ -38,6 +38,7 @@ public class GraphConstructor {
             LOG.log_Error("Nothing was passed to the GraphConstructor.");
             throw new MapIntegrityException("Nothing was passed to the GraphConstructor.");
         }
+
         try {
             createFeatures(road_descriptions, junction_list);
             createGraph(link_descriptions);
@@ -62,7 +63,7 @@ public class GraphConstructor {
 
     private void createFeatures(List<RoadDescription> roadDescriptions, List<Junction> junctions) {
         roadDescriptions.forEach(rd -> {
-            Road r = new Road(rd.getId(), rd.getLaneCountA(), rd.getLaneCountA(), rd.getLength());
+            Road r = new Road(rd.getId(), rd.getLaneCountA(), rd.getLaneCountA(), rd.getLength(), rd.getGeoSegment());
             mapFeatures.put(r.getID(), r);
             r.getRightSide().getLanes().forEach(lane -> {
                 mapFeatures.put(lane.getID(), lane);

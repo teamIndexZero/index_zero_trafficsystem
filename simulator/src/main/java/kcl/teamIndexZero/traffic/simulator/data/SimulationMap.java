@@ -32,12 +32,26 @@ import java.util.Map;
  * from these coordinate system composition.
  */
 public class SimulationMap implements ISimulationAware {
+
+    public double lonStart;
+    public double latStart;
+    public double lonEnd;
+    public double latEnd;
+
     private static Logger_Interface LOG = Logger.getLoggerInstance(SimulationMap.class.getSimpleName());
     private Map<ID, Feature> mapFeatures;
     private Map<ID, Link> mapLinks;
     private final int width;
     private final int height;
     private List<MapObject> objectsOnSurface = new ArrayList<>();
+
+    public Map<ID, Feature> getMapFeatures() {
+        return mapFeatures;
+    }
+
+    public Map<ID, Link> getMapLinks() {
+        return mapLinks;
+    }
 
     /**
      * Constructor.

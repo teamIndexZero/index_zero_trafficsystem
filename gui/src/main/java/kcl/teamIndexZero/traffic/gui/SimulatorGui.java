@@ -4,6 +4,7 @@ import kcl.teamIndexZero.traffic.gui.components.MainToolbar;
 import kcl.teamIndexZero.traffic.gui.components.MapPanel;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiController;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
+import kcl.teamIndexZero.traffic.gui.simulationChooserDialog.ChooserDialog;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
@@ -18,9 +19,12 @@ import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
+import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,11 +37,7 @@ public class SimulatorGui {
 
     protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulatorGui.class.getSimpleName());
 
-    private JFrame frame;
-    private MainToolbar mainToolBar;
-    private GuiController controller;
     private GuiModel model;
-    private MapPanel mapPanel;
 
     /**
      * Entry point.
@@ -52,31 +52,44 @@ public class SimulatorGui {
      * Default constructor.
      */
     public SimulatorGui() {
+        ChooserDialog.showForOSMLoadResult(result -> {
+            startSimulatorWindow(result);
+        });
+    }
+
+    private void startSimulatorWindow(OsmParseResult result) {
         try {
             //TODO factory then pass the stuff below to graph constructor
             java.util.List<Junction> junctions = new ArrayList<>();
             java.util.List<LinkDescription> links = new ArrayList<>();
-            java.util.List<RoadDescription> roads = new ArrayList<>();
-            roads.add(new RoadDescription(2, 2, new ID("Road1"), 10));
-            roads.add(new RoadDescription(2, 2, new ID("Road2"), 10));
-            links.add(new LinkDescription(new ID("Road1"), new ID("Road2"), LinkType.SYNC_TL, new ID("Link1")));
+            java.util.List<RoadDescription> roads = result.descriptionList;
+
+            links.add(new LinkDescription(roads.get(0).getId(), roads.get(1).getId(), LinkType.SYNC_TL, new ID("Link1")));
             junctions.add(new Junction(new ID("Junction1")));
 
             GraphConstructor graph = new GraphConstructor(junctions, roads, links); //TODO temp stuff. need to take care of the exceptions too
+
             SimulationMap map = new SimulationMap(4, 400, graph);
+            map.latStart = result.boundingBox.start.latitude;
+            map.latEnd = result.boundingBox.end.latitude;
+            map.lonStart = result.boundingBox.start.longitude;
+            map.lonEnd = result.boundingBox.end.longitude;
+
             model = new GuiModel();
-            controller = new GuiController(model, () -> {
-                SimulationImageProducer imageProducer = new SimulationImageProducer(
-                        map,
-                        (image, tick) -> {
-                            // here, careful! We are working in another thread, but we want to update UI. In this case, we
-                            // need a carfeul message passing mechanism to update UI thread. We'd rather invoke model
-                            // update in UI thread, since it will then natively fire the UI redraw.
-                            SwingUtilities.invokeLater(() -> {
-                                model.setLastSimulationTickAndImage(image, tick);
-                            });
-                        }
-                );
+
+            SimulationImageProducer imageProducer = new SimulationImageProducer(
+                    map,
+                    (image, tick) -> {
+                        // here, careful! We are working in another thread, but we want to update UI. In this case, we
+                        // need a carfeul message passing mechanism to update UI thread. We'd rather invoke model
+                        // update in UI thread, since it will then natively fire the UI redraw.
+                        SwingUtilities.invokeLater(() -> {
+                            model.setLastSimulationTickAndImage(image, tick);
+                        });
+                    }
+            );
+
+            GuiController controller = new GuiController(model, () -> {
 
                 SimulationDelay delay = new SimulationDelay(50);
                 CarAdder adder = new CarAdder(map);
@@ -95,11 +108,11 @@ public class SimulatorGui {
                                 delay)
                 );
             });
-            mainToolBar = new MainToolbar(model, controller);
+            MainToolbar mainToolBar = new MainToolbar(model, controller);
 
-            mapPanel = new MapPanel(model);
+            MapPanel mapPanel = new MapPanel(model);
 
-            frame = new JFrame("Simulation - One Road 2 DirectedLanes Each Way");
+            JFrame frame = new JFrame("Simulation - One Road 2 DirectedLanes Each Way");
             frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.getContentPane().setLayout(new BorderLayout());
@@ -108,12 +121,17 @@ public class SimulatorGui {
             frame.pack();
             frame.setVisible(true);
 
+            mapPanel.addComponentListener(new ComponentAdapter() {
+                public void componentResized(ComponentEvent e) {
+                    imageProducer.setPixelSize(e.getComponent().getWidth(), e.getComponent().getHeight());
+                }
+            });
+
             // that's where we reset model into default state - before the simulation is started.
             model.reset();
         } catch (MapIntegrityException e) {
             LOG.log_Fatal("Map integrity compromised.");
             LOG.log_Exception(e);
-            e.printStackTrace();
         }
     }
 

@@ -1,0 +1,75 @@
+package kcl.teamIndexZero.traffic.gui.simulationChooserDialog;
+
+import kcl.teamIndexZero.traffic.log.Logger;
+import kcl.teamIndexZero.traffic.log.Logger_Interface;
+import kcl.teamIndexZero.traffic.simulator.osm.MapParseException;
+import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
+import kcl.teamIndexZero.traffic.simulator.osm.OsmParser;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+/**
+ */
+public class ChooserDialog extends JFrame {
+    protected static Logger_Interface LOG = Logger.getLoggerInstance(ChooserDialog.class.getSimpleName());
+
+    private static final Map<String, String> filesAvailable =
+            Arrays.stream(new String[][]{
+                    {"Strand area", "/sampleData/elephant_and_castle.osm"},
+                    {"Elephant and Castle strange roundabout", "/sampleData/elephant_and_castle.osm"},
+                    {"Buckingham Palace area", "/sampleData/buckingham_area.osm"},
+            }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
+
+    private Consumer<OsmParseResult> resultConsumer;
+
+    public static void showForOSMLoadResult(Consumer<OsmParseResult> resultConsumer) {
+        new ChooserDialog(resultConsumer).showForResult();
+    }
+
+
+    private ChooserDialog(Consumer<OsmParseResult> resultConsumer) {
+        this.resultConsumer = resultConsumer;
+        new JFrame("Please choose simulation map");
+        setSize(400, 400);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
+        ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        add(new JLabel("Please choose one of the available presets for simulation area:"));
+        filesAvailable.forEach((caption, file) -> {
+            JButton button = new JButton(caption);
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        OsmParseResult result = new OsmParser().parse(file, this.getClass().getResourceAsStream(file));
+                        resultConsumer.accept(result);
+                        ChooserDialog.this.dispatchEvent(new WindowEvent(ChooserDialog.this, WindowEvent.WINDOW_CLOSING));
+                    } catch (MapParseException e1) {
+                        e1.printStackTrace();
+                        LOG.log_Exception(e1);
+                        JOptionPane.showMessageDialog(
+                                ChooserDialog.this,
+                                "Error loading data from packaged file. Please check logs.",
+                                "Load error.",
+                                JOptionPane.ERROR_MESSAGE);
+
+                    }
+                }
+            });
+            add(button);
+        });
+        pack();
+        setLocationRelativeTo(null); //center window
+    }
+
+    private void showForResult() {
+        setVisible(true);
+    }
+}
