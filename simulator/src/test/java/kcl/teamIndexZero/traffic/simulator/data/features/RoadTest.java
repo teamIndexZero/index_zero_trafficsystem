@@ -36,13 +36,13 @@ public class RoadTest {
 
     @Test
     public void testGetLeftLaneCount() throws Exception {
-        assertEquals(3, r1.getLeftLaneCount());
-        assertEquals(10, r2.getLeftLaneCount());
+        assertEquals(3, r1.getOutgoingLaneCount());
+        assertEquals(10, r2.getOutgoingLaneCount());
     }
 
     @Test
     public void testGetRightLaneCount() throws Exception {
-        assertEquals(5, r1.getRightLaneCount());
-        assertEquals(0, r2.getRightLaneCount());
+        assertEquals(5, r1.getIncomingLaneCount());
+        assertEquals(0, r2.getIncomingLaneCount());
     }
 }
