@@ -5,35 +5,32 @@ import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 
 /**
  * Class to contain the specifications of a road
+ * TODO add understanding of what is forward/backward.
  */
 public class RoadDescription {
-    private final int length;
+    private final ID id;
     private GeoPolyline geoPolyline;
     private String roadName;
-    private int laneCountA;
-    private int laneCountB;
-    private final ID id;
-
-    public GeoPolyline getGeoPolyline() {
-        return geoPolyline;
-    }
+    private int laneCountForward;
+    private int laneCountBackward;
 
     /**
      * Constructor
      *
-     * @param laneCountA Number of lanes on side A of the road
-     * @param laneCountB Number of lanes on side B of the road
-     * @param id         Road's ID tag
-     * @param length     Length of the road
-     * @param geoSegment
+     * @param laneCountForward  Number of lanes on side A of the road
+     * @param laneCountBackward Number of lanes on side B of the road
+     * @param id                Road's ID tag
      */
-    public RoadDescription(int laneCountA, int laneCountB, ID id, int length, GeoPolyline geoPolyline, String roadName) {
-        this.laneCountA = laneCountA;
-        this.laneCountB = laneCountB;
+    public RoadDescription(ID id, String roadName, GeoPolyline geoPolyline, int laneCountForward, int laneCountBackward) {
+        this.laneCountForward = laneCountForward;
+        this.laneCountBackward = laneCountBackward;
         this.id = id;
-        this.length = length;
         this.geoPolyline = geoPolyline;
         this.roadName = roadName;
+    }
+
+    public GeoPolyline getGeoPolyline() {
+        return geoPolyline;
     }
 
     /**
@@ -41,8 +38,8 @@ public class RoadDescription {
      *
      * @return Lane count
      */
-    public int getLaneCountA() {
-        return laneCountA;
+    public int getLaneCountForward() {
+        return laneCountForward;
     }
 
     /**
@@ -50,8 +47,8 @@ public class RoadDescription {
      *
      * @return Lane count
      */
-    public int getLaneCountB() {
-        return laneCountB;
+    public int getLaneCountBackward() {
+        return laneCountBackward;
     }
 
     /**
@@ -68,8 +65,8 @@ public class RoadDescription {
      *
      * @return Length
      */
-    public int getLength() {
-        return length;
+    public double getLength() {
+        return geoPolyline.getPolylineLength();
     }
 
     public String getRoadName() {

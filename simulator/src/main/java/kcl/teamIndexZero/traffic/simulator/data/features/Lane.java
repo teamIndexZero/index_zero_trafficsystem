@@ -39,7 +39,7 @@ public class Lane extends Feature {
      *
      * @return Length in meters
      */
-    public int getLength() {
+    public double getLength() {
         return this.roadSpecs.length;
     }
 

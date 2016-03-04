@@ -30,8 +30,8 @@ public class RoadTest {
 
     @Test
     public void testGetRoadLength() throws Exception {
-        assertEquals(12000, r1.getRoadLength());
-        assertEquals(10000, r2.getRoadLength());
+        assertEquals(12000, r1.getRoadLength(), 0);
+        assertEquals(10000, r2.getRoadLength(), 0);
     }
 
     @Test

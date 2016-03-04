@@ -2,9 +2,14 @@ package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Created by Es on 04/03/2016.
+ * This is the all information we can actually get from OSM.
  */
 public class JunctionDescription {
-    public ID id;
+    private ID id;
+    private List<ID> connectedRoadIDs = new ArrayList<>();
+    private boolean hasTrafficLight;
 }

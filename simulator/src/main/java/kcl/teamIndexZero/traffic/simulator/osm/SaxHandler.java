@@ -17,14 +17,12 @@ import java.util.*;
  */
 class SaxHandler extends DefaultHandler {
 
-    private Logger LOG = Logger.getLoggerInstance(SaxHandler.class.getName());
-
     public static final String BOUNDS_ELEMENT = "bounds";
     public static final String NODE_ELEMENT = "node";
     public static final String WAY_ELEMENT = "way";
     public static final String NODE_WITHIN_WAY_ELEMENT = "nd";
     public static final String TAG = "tag";
-
+    private Logger LOG = Logger.getLoggerInstance(SaxHandler.class.getName());
     private OsmParseResult result;
     private Set<String> interestingElements = new HashSet<>(Arrays.asList(BOUNDS_ELEMENT, NODE_ELEMENT, WAY_ELEMENT, NODE_WITHIN_WAY_ELEMENT, TAG));
     private Map<String, GeoPoint> points = new HashMap<>();
@@ -140,12 +138,12 @@ class SaxHandler extends DefaultHandler {
 
     private void handleWayClose() {
         RoadDescription description = new RoadDescription(
-                1,
-                1,
                 new ID(currentRoadId),
-                100,
+                currentRoadName,
                 currentRoadPolyline,
-                currentRoadName);
+                1,
+                1
+        );
 
         result.descriptionList.add(description);
         currentRoadPolyline = null;

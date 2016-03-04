@@ -64,8 +64,8 @@ public class GraphConstructor {
     private void createFeatures(List<RoadDescription> roadDescriptions, List<Junction> junctions) {
         roadDescriptions.forEach(rd -> {
             Road r = new Road(rd.getId(),
-                    rd.getLaneCountA(),
-                    rd.getLaneCountA(),
+                    rd.getLaneCountForward(),
+                    rd.getLaneCountForward(),
                     rd.getLength(),
                     rd.getGeoPolyline(),
                     rd.getRoadName());

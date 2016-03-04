@@ -24,7 +24,7 @@ public class LaneTest {
         RoadSpecs rs = new RoadSpecs();
         rs.length = 10;
         Lane l = new Lane(new ID("LaneTest"), rs, mock(DirectedLanes.class));
-        assertEquals(10, l.getLength());
+        assertEquals(10f, l.getLength(), 0.0001);
     }
 
     @Test
