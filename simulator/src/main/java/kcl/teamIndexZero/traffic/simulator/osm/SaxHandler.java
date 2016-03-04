@@ -1,10 +1,11 @@
 package kcl.teamIndexZero.traffic.simulator.osm;
 
 import kcl.teamIndexZero.traffic.log.Logger;
-import kcl.teamIndexZero.traffic.simulator.data.GeoPoint;
-import kcl.teamIndexZero.traffic.simulator.data.GeoSegment;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -12,19 +13,47 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.util.*;
 
 /**
- * SAX Xml handler to read stuff from OSM
+ * SAX Xml handler to read elements from OpenStreetMap.
  */
 class SaxHandler extends DefaultHandler {
+
     private Logger LOG = Logger.getLoggerInstance(SaxHandler.class.getName());
+
+    public static final String BOUNDS_ELEMENT = "bounds";
+    public static final String NODE_ELEMENT = "node";
+    public static final String WAY_ELEMENT = "way";
+    public static final String NODE_WITHIN_WAY_ELEMENT = "nd";
+    public static final String TAG = "tag";
+
     private OsmParseResult result;
-    private Set<String> interestingElements = new HashSet<>(Arrays.asList("node", "bounds", "nd", "way"));
+    private Set<String> interestingElements = new HashSet<>(Arrays.asList(BOUNDS_ELEMENT, NODE_ELEMENT, WAY_ELEMENT, NODE_WITHIN_WAY_ELEMENT, TAG));
     private Map<String, GeoPoint> points = new HashMap<>();
-    private String previousNodeInWayID;
-    private String currentWayId;
+
+    private GeoPolyline currentRoadPolyline = null;
+    private String currentRoadId;
+    private String currentRoadName;
+
+    private double boundsMinLon;
+    private double boundsMinLat;
+    private boolean boundsHandled = false;
 
     public SaxHandler(OsmParseResult result) {
-
         this.result = result;
+    }
+
+    private static double getDistanceMeters(double lat1, double lon1, double lat2, double lon2) {
+        double R = 6371000;
+
+        double phi1 = Math.toRadians(lat1);
+        double phi2 = Math.toRadians(lat2);
+        double deltaPhi = Math.toRadians(lat2 - lat1);
+        double deltaLambda = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) + Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2)
+                * Math.sin(deltaLambda / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
     }
 
     public void startElement(String uri, String localName, String qName,
@@ -35,22 +64,53 @@ class SaxHandler extends DefaultHandler {
         }
 
         // if we are in bounds?
-        if ("bounds".equals(qName)) {
+        if (BOUNDS_ELEMENT.equals(qName)) {
             handleBounds(attributes);
         }
 
-        if ("node".equals(qName)) {
+        if (NODE_ELEMENT.equals(qName)) {
             handleNode(attributes);
         }
 
-        if ("way".equals(qName)) {
+        if (WAY_ELEMENT.equals(qName)) {
             handleWayOpen(attributes);
         }
 
-        if ("nd".equals(qName)) {
+        if (NODE_WITHIN_WAY_ELEMENT.equals(qName)) {
             handleNodeWithinWay(attributes);
         }
+
+        if (TAG.equals(qName)) {
+            handleTag(attributes);
+        }
     }
+
+    private void handleTag(Attributes attributes) {
+//        <tag k="name" v="Pall Mall"/>
+//        <tag k="oneway" v="yes"/>
+//        <tag k="maxspeed" v="30 mph"/>
+//        <tag k="lanes" v="1"/>
+        if (currentRoadId == null) {
+            return;
+        }
+
+        String key = attributes.getValue("k");
+        String value = attributes.getValue("v");
+        if ("name".equals(key)) {
+            this.currentRoadName = value;
+        }
+    }
+
+    public void endElement(String uri, String localName,
+                           String qName) throws SAXException {
+        if (!interestingElements.contains(qName)) {
+            return;
+        }
+        if (WAY_ELEMENT.equals(qName)) {
+            handleWayClose();
+        }
+    }
+
 
     private void handleNodeWithinWay(Attributes attributes) {
         // <way id="8032768" version="20" timestamp="2016-03-02T22:08:00Z" uid="352985" user="ecatmur"
@@ -58,35 +118,13 @@ class SaxHandler extends DefaultHandler {
         // <nd ref="108192"/>
 
         String nodeId = attributes.getValue("ref");
-        if (previousNodeInWayID == null) {
-            // quick exit - this is the first node in path; we don't do anything yet.
-            previousNodeInWayID = nodeId;
-            return;
-        }
 
         // at this moment, it is at least 2nd node in graph. So we can create a RoadDescriptor with a segment, and record
         // our current node as previous:
-        GeoPoint prevPoint = points.get(previousNodeInWayID);
         GeoPoint thisPoint = points.get(nodeId);
-
-        if (thisPoint == null || prevPoint == null) {
-            // some of the points is outside of bbox, which is OK
-            return;
+        if (thisPoint != null) {
+            currentRoadPolyline.addPoint(thisPoint);
         }
-        GeoSegment segment = new GeoSegment(
-                prevPoint,
-                thisPoint,
-                2
-        );
-        RoadDescription description = new RoadDescription(
-                1,
-                1,
-                new ID(currentWayId + "-" + previousNodeInWayID),
-                100,
-                segment);
-        LOG.log_Warning("Adding a way for segment ", segment);
-        result.descriptionList.add(description);
-        previousNodeInWayID = nodeId;
     }
 
     private void handleWayOpen(Attributes attributes) {
@@ -96,49 +134,59 @@ class SaxHandler extends DefaultHandler {
         //        <nd ref="108193"/>
         //        <tag k="lit" v="yes"/>
         //        </way>
-        currentWayId = attributes.getValue("id");
+        currentRoadId = attributes.getValue("id");
+        currentRoadPolyline = new GeoPolyline();
     }
 
     private void handleWayClose() {
-        currentWayId = null;
-        previousNodeInWayID = null;
+        RoadDescription description = new RoadDescription(
+                1,
+                1,
+                new ID(currentRoadId),
+                100,
+                currentRoadPolyline,
+                currentRoadName);
+
+        result.descriptionList.add(description);
+        currentRoadPolyline = null;
+        currentRoadId = null;
+        currentRoadName = null;
     }
 
 
     private void handleNode(Attributes attributes) {
         // <node id="2684347240" version="1" timestamp="2016-03-02T22:08:00Z" uid="1016290"
         // user="Amaroussi" changeset="20704202" lat="51.4971865" lon="-0.1002579"/>
+        if (!boundsHandled) {
+            throw new IllegalStateException("Can not handle node as bounds are not loaded yet = no conversion to meters.");
+        }
+        double lat = Double.parseDouble(attributes.getValue("lat"));
+        double lon = Double.parseDouble(attributes.getValue("lon"));
         points.put(attributes.getValue("id"),
                 new GeoPoint(
-                        Double.parseDouble(attributes.getValue("lat")),
-                        Double.parseDouble(attributes.getValue("lon"))
-                ));
+                        getDistanceMeters(0, 0, lat - boundsMinLat, 0),
+                        getDistanceMeters(0, 0, 0, lon - boundsMinLon)));
     }
 
     private void handleBounds(Attributes attributes) {
-        // <bounds minlon="-0.10625" minlat="51.49189" maxlon="-0.09609" maxlat="51.49982" origin="osmconvert 0.7T"/>
+        // <bounds minlon="-0.10625" minlat="51.49189" maxlon="-0.09609"
+        //                          maxlat="51.49982" origin="osmconvert 0.7T"/>
+        boundsHandled = true;
+        this.boundsMinLat = Double.parseDouble(attributes.getValue("minlat"));
+        this.boundsMinLon = Double.parseDouble(attributes.getValue("minlon"));
+
+        double latDiff = boundsMinLat - Double.parseDouble(attributes.getValue("maxlat"));
+        double lonDiff = boundsMinLon - Double.parseDouble(attributes.getValue("maxlon"));
+
         GeoSegment segment = new GeoSegment(
+                new GeoPoint(0, 0),
                 new GeoPoint(
-                        Double.parseDouble(attributes.getValue("minlat")),
-                        Double.parseDouble(attributes.getValue("minlon"))
-                ),
-                new GeoPoint(
-                        Double.parseDouble(attributes.getValue("maxlat")),
-                        Double.parseDouble(attributes.getValue("maxlon"))
-                ),
+                        getDistanceMeters(0, 0, latDiff, 0),
+                        getDistanceMeters(0, 0, 0, lonDiff)),
                 2
         );
         LOG.log_Warning("Got bounds ", segment);
         result.boundingBox = segment;
     }
 
-    public void endElement(String uri, String localName,
-                           String qName) throws SAXException {
-        if (!interestingElements.contains(qName)) {
-            return;
-        }
-        if ("way".equals(qName)) {
-            handleWayClose();
-        }
-    }
 }

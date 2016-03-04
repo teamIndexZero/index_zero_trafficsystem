@@ -1,4 +1,4 @@
-package kcl.teamIndexZero.traffic.gui.components.simulationChooserDialog;
+package kcl.teamIndexZero.traffic.gui.components;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
@@ -24,23 +24,25 @@ public class ChooserDialog extends JFrame {
                     {"Strand area", "/sampleData/strand.osm"},
                     {"Elephant and Castle strange roundabout", "/sampleData/elephant_and_castle.osm"},
                     {"Buckingham Palace area", "/sampleData/buckingham_area.osm"},
+                    {"Paris, Arc de Trioumphe", "/sampleData/paris_arc_de_trioumphe_ways.osm"},
+                    {"Simple one-way square", "/sampleData/square.osm"},
             }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
 
-    private Consumer<OsmParseResult> resultConsumer;
 
     public static void showForOSMLoadResult(Consumer<OsmParseResult> resultConsumer) {
         new ChooserDialog(resultConsumer).showForResult();
     }
 
-
     private ChooserDialog(Consumer<OsmParseResult> resultConsumer) {
-        this.resultConsumer = resultConsumer;
         new JFrame("Please choose simulation map");
         setSize(400, 400);
+
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
         ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         add(new JLabel("Please choose one of the available presets for simulation area:"));
+
         filesAvailable.forEach((caption, file) -> {
             JButton button = new JButton(caption);
             button.addActionListener(new ActionListener() {
@@ -65,6 +67,7 @@ public class ChooserDialog extends JFrame {
             });
             add(button);
         });
+
         pack();
         setLocationRelativeTo(null); //center window
     }

@@ -14,6 +14,7 @@ import java.awt.event.ComponentEvent;
 public class MainWindow extends JFrame {
     private final GuiModel model;
     private final GuiController controller;
+    private final MapPanel mapPanel;
 
     public MainWindow(GuiModel model, GuiController controller) {
         super("Simulation - One Road 2 DirectedLanes Each Way");
@@ -21,7 +22,7 @@ public class MainWindow extends JFrame {
         this.model = model;
         this.controller = controller;
 
-        MapPanel mapPanel = new MapPanel(model);
+        mapPanel = new MapPanel(model);
 
         MainToolbar mainToolBar = new MainToolbar(model, controller);
 
@@ -30,6 +31,7 @@ public class MainWindow extends JFrame {
         getContentPane().setLayout(new BorderLayout());
         add(mainToolBar, BorderLayout.PAGE_START);
         add(mapPanel, BorderLayout.CENTER);
+        add(new SimulationDetailsPanel(model, controller), BorderLayout.WEST);
         pack();
 
         mapPanel.addComponentListener(new ComponentAdapter() {
@@ -37,5 +39,9 @@ public class MainWindow extends JFrame {
                 model.setMapPanelSize(e.getComponent().getWidth(), e.getComponent().getHeight());
             }
         });
+    }
+
+    public MapPanel getMapPanel() {
+        return mapPanel;
     }
 }

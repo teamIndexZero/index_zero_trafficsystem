@@ -1,11 +1,10 @@
 package kcl.teamIndexZero.traffic.gui.mvc;
 
+import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
-import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -21,7 +20,7 @@ public class GuiModelTest {
 
     @Before
     public void setup() {
-        model = new GuiModel();
+        model = new GuiModel(mock(SimulationMap.class));
     }
 
     @Test
@@ -52,8 +51,7 @@ public class GuiModelTest {
     @Test
     public void shouldModelReset() {
         //given
-        GuiModel oldModel = new GuiModel();
-        model.setLastSimulationImageAndTick(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB), new SimulationTick(0, LocalDateTime.now(), 10));
+        GuiModel oldModel = new GuiModel(mock(SimulationMap.class));
         model.setParams(new SimulationParams(LocalDateTime.now(), 20, 20));
         model.setStatus(GuiModel.SimulationStatus.OFF);
 

@@ -1,7 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.features;
 
-import kcl.teamIndexZero.traffic.simulator.data.GeoSegment;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +18,8 @@ public class RoadTest {
 
     @Before
     public void setUp() throws Exception {
-        r1 = new Road(new ID("RoadTest"), 3, 5, 12000, mock(GeoSegment.class));
-        r2 = new Road(new ID("RoadTest"), 10, 0, 10000, mock(GeoSegment.class));
+        r1 = new Road(new ID("RoadTest"), 3, 5, 12000, mock(GeoPolyline.class), "Road1");
+        r2 = new Road(new ID("RoadTest"), 10, 0, 10000, mock(GeoPolyline.class), "Road2");
     }
 
     @After

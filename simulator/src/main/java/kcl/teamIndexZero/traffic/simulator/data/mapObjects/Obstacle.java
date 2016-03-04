@@ -4,8 +4,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
+import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 
 /**
  * An Obstacle is a non-moving map object. Think of it as of fallen tree or a stone or roadworks something.
@@ -17,8 +16,8 @@ public class Obstacle extends MapObject {
     /**
      * Constructor. See constructor in {@link MapObject}
      */
-    public Obstacle(String name, MapPosition position) {
-        super(name, position);
+    public Obstacle(String name, MapPosition position, Road road) {
+        super(name, position, road);
     }
 
 

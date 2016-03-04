@@ -2,8 +2,8 @@ package kcl.teamIndexZero.traffic.simulator.data.features;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
-import kcl.teamIndexZero.traffic.simulator.data.GeoSegment;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 
 /**
  * Created by Es on 28/02/2016.
@@ -14,7 +14,12 @@ public class Road extends Feature {
     private RoadSpecs roadSpecs = new RoadSpecs();
     public DirectedLanes rightSide;
     public DirectedLanes leftSide;
-    private GeoSegment segment;
+    private GeoPolyline polyline;
+    private final String name;
+
+    public String getName() {
+        return name;
+    }
 
     /**
      * Constructor
@@ -25,13 +30,15 @@ public class Road extends Feature {
      * @param roadLength      Length of the road
      * @throws IllegalArgumentException when the number of lanes given is less than 1 or the road length is < 0.5
      */
-    public Road(ID id, int leftLanesCount, int rightLanesCount, int roadLength, GeoSegment segment) throws IllegalArgumentException {
+    public Road(ID id, int leftLanesCount, int rightLanesCount, int roadLength, GeoPolyline polyline, String name) throws IllegalArgumentException {
         super(id);
-        this.segment = segment;
+        this.polyline = polyline;
+        this.name = name;
         if (leftLanesCount < 1 && rightLanesCount < 1) {
             LOG.log_Error("Total number of lanes given is ", leftLanesCount + rightLanesCount, ".");
             throw new IllegalArgumentException("Number of lanes on road is 0! A road must have at least 1 lane.");
         }
+
         if (roadLength < 1) {
             LOG.log_Error("Length of the road is too small ('", roadLength, "'m).");
             throw new IllegalArgumentException("Length of the road is too small.");
@@ -77,7 +84,7 @@ public class Road extends Feature {
         return rightSide;
     }
 
-    public GeoSegment getSegment() {
-        return segment;
+    public GeoPolyline getPolyline() {
+        return polyline;
     }
 }

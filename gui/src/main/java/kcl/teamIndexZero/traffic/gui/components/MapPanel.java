@@ -4,19 +4,20 @@ import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.function.Consumer;
 
 /**
  * Main panel of the application - simulation map display. This is where the actual drawing happens. It is a 'view'
  * interface of the application, when compared with {@link MainToolbar} which controls things, that's why controller is
  * not used.
  */
-public class MapPanel extends JComponent {
+public class MapPanel extends JComponent implements Consumer<BufferedImage> {
     private final GuiModel model;
+    private BufferedImage image;
 
     public MapPanel(GuiModel model) {
         this.model = model;
-        // following line of code says: when the model changes, repaint!
-        model.addChangeListener(this::repaint);
     }
 
     /**
@@ -34,17 +35,23 @@ public class MapPanel extends JComponent {
      */
     @Override
     public void paint(Graphics g) {
-        if (model.getLastImage() == null) {
+        if (image == null) {
             String messageNotRunning = "Simulation not running.";
             g.drawChars(messageNotRunning.toCharArray(), 0, messageNotRunning.length() - 1, 30, 30);
             return;
         }
         g.drawImage(
-                model.getLastImage(),
+                image,
                 0,
                 0,
-                model.getLastImage().getWidth(),
-                model.getLastImage().getHeight(),
+                image.getWidth(),
+                image.getHeight(),
                 null);
+    }
+
+    @Override
+    public void accept(BufferedImage bufferedImage) {
+        this.image = bufferedImage;
+        this.repaint();
     }
 }

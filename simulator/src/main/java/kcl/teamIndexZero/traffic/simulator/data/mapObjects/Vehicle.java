@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
 
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 
 /**
  * An active object on a map - a vehicle. Can be a car, or truck, or a bike (should check these subtypes later - if
@@ -16,8 +17,8 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
  */
 public class Vehicle extends MapObject {
 
-    private float speedMetersPerSecond;
-    private float accelerationMetersPerSecondSecond;
+    private double speedMetersPerSecond;
+    private double accelerationMetersPerSecondSecond;
 
 
     /**
@@ -30,9 +31,10 @@ public class Vehicle extends MapObject {
      */
     public Vehicle(String name,
                    MapPosition position,
-                   float speedMetersPerSecond,
-                   float accelerationMetersPerSecondSecond) {
-        super(name, position);
+                   Road road,
+                   double speedMetersPerSecond,
+                   double accelerationMetersPerSecondSecond) {
+        super(name, position, road);
         this.speedMetersPerSecond = speedMetersPerSecond;
         this.accelerationMetersPerSecondSecond = accelerationMetersPerSecondSecond;
     }
@@ -43,13 +45,7 @@ public class Vehicle extends MapObject {
     @Override
     public void tick(SimulationTick tick) {
         speedMetersPerSecond = speedMetersPerSecond + accelerationMetersPerSecondSecond * tick.getTickDurationSeconds();
-        map.moveObject(
-                this,
-                new MapPosition(
-                        Math.round(position.x + speedMetersPerSecond * tick.getTickDurationSeconds()),
-                        position.y,
-                        position.width,
-                        position.height));
+        positionOnRoad += speedMetersPerSecond + accelerationMetersPerSecondSecond * tick.getTickDurationSeconds();
         LOG.log(this);
     }
 
@@ -63,5 +59,13 @@ public class Vehicle extends MapObject {
                 position.toString(),
                 speedMetersPerSecond,
                 accelerationMetersPerSecondSecond);
+    }
+
+    public double getAccelerationMetersPerSecondSecond() {
+        return accelerationMetersPerSecondSecond;
+    }
+
+    public double getSpeedMetersPerSecond() {
+        return speedMetersPerSecond;
     }
 }

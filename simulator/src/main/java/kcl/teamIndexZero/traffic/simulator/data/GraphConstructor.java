@@ -63,7 +63,12 @@ public class GraphConstructor {
 
     private void createFeatures(List<RoadDescription> roadDescriptions, List<Junction> junctions) {
         roadDescriptions.forEach(rd -> {
-            Road r = new Road(rd.getId(), rd.getLaneCountA(), rd.getLaneCountA(), rd.getLength(), rd.getGeoSegment());
+            Road r = new Road(rd.getId(),
+                    rd.getLaneCountA(),
+                    rd.getLaneCountA(),
+                    rd.getLength(),
+                    rd.getGeoPolyline(),
+                    rd.getRoadName());
             mapFeatures.put(r.getID(), r);
             r.getRightSide().getLanes().forEach(lane -> {
                 mapFeatures.put(lane.getID(), lane);

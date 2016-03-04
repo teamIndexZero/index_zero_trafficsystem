@@ -73,15 +73,17 @@ public class SimulationMap implements ISimulationAware {
      */
     @Override
     public void tick(SimulationTick timeStep) {
-        mapFeatures.forEach(
-                (id, feature) -> feature.tick(timeStep)
-        );
-        mapLinks.forEach(
-                (id, link) -> link.tick(timeStep)
-        );
-        objectsOnSurface.forEach(
-                object -> object.tick(timeStep)
-        );
+        synchronized (this) {
+            mapFeatures.forEach(
+                    (id, feature) -> feature.tick(timeStep)
+            );
+            mapLinks.forEach(
+                    (id, link) -> link.tick(timeStep)
+            );
+            objectsOnSurface.forEach(
+                    object -> object.tick(timeStep)
+            );
+        }
     }
 
     /**

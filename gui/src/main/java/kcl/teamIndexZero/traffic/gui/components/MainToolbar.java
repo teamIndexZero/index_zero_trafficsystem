@@ -26,7 +26,6 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
     private JButton playButton;
     private JButton stopButton;
     private JButton pauseButton;
-    private JTextField tickDetailsField;
 
 
     /**
@@ -39,6 +38,7 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
         super("MainToolBar");
         this.model = model;
         this.controller = controller;
+        setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         setFloatable(false);
         addButtons();
 
@@ -58,12 +58,6 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
         playButton.setEnabled(model.getStatus() == GuiModel.SimulationStatus.OFF
                 || model.getStatus() == GuiModel.SimulationStatus.PAUSED);
 
-        // updating tick details
-        if (model.getTick() != null) {
-            tickDetailsField.setText(model.getTick().toString());
-        } else {
-            tickDetailsField.setText("<NONE>");
-        }
     }
 
     /*
@@ -91,9 +85,6 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
                 "Stop",
                 controller::stop);
         add(stopButton);
-
-        tickDetailsField = new JTextField(16);
-        add(tickDetailsField);
     }
 
 

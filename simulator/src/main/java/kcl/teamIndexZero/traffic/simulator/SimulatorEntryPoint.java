@@ -9,9 +9,6 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Obstacle;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 import kcl.teamIndexZero.traffic.simulator.exeptions.AlreadyExistsException;
 import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.mapSetup.MapFactory;
@@ -47,10 +44,10 @@ public class SimulatorEntryPoint {
             SimulationMap map = new SimulationMap(4, 400, graph);
 
 
-            map.addMapObject(new Obstacle("Fallen tree 1", new MapPosition(0, 0, 2, 4)));
-            map.addMapObject(new Obstacle("Stone 1", new MapPosition(230, 2, 1, 1)));
-            map.addMapObject(new Vehicle("Ferrari ES3 4FF", new MapPosition(0, 0, 1, 2), 0.05f, 0));
-            map.addMapObject(new Vehicle("Land Rover RRT 2YG", new MapPosition(0, 1, 1, 2), 0.01f, 0.00002f));
+//            map.addMapObject(new Obstacle("Fallen tree 1", new MapPosition(0, 0, 2, 4)));
+//            map.addMapObject(new Obstacle("Stone 1", new MapPosition(230, 2, 1, 1)));
+//            map.addMapObject(new Vehicle("Ferrari ES3 4FF", new MapPosition(0, 0, 1, 2), 0.05f, 0));
+//            map.addMapObject(new Vehicle("Land Rover RRT 2YG", new MapPosition(0, 1, 1, 2), 0.01f, 0.00002f));
 
             Simulator simulator = new Simulator(
                     new SimulationParams(LocalDateTime.now(), 20, 100),

@@ -1,7 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.osm;
 
-import kcl.teamIndexZero.traffic.simulator.data.GeoSegment;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
 
 import java.util.ArrayList;
 import java.util.List;

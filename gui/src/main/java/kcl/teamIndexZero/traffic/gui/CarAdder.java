@@ -1,10 +1,16 @@
 package kcl.teamIndexZero.traffic.gui;
 
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A traffic generator for adding cars into the map basing on some statistical approach.
@@ -12,8 +18,9 @@ import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 public class CarAdder implements ISimulationAware {
 
     int counter = 1;
-    boolean addedCarOnPrevStep = false;
     private final SimulationMap map;
+
+    private List<Road> roads = new ArrayList<>();
 
     /**
      * Constructor with map.
@@ -22,42 +29,39 @@ public class CarAdder implements ISimulationAware {
      */
     public CarAdder(SimulationMap map) {
         this.map = map;
+        map.getMapFeatures().values().forEach(feature -> {
+            if (feature instanceof Road) {
+                roads.add((Road) feature);
+            }
+        });
     }
 
-    private void addForwardCar() {
-        if (Math.random() < 0.5) {
-            map.addMapObject(new Vehicle("Forward TRUCK " + counter++, new MapPosition(300 - 4, 5, 4, 1), -0.1f, 0));
-        } else {
-            map.addMapObject(new Vehicle("Forward CAR " + counter++, new MapPosition(300 - 2, 4, 2, 1), -0.24f, 0));
-        }
+    private Road getRandomRoad() {
+        return roads.get((int) (Math.random() * roads.size() - 1));
     }
 
-    private void addBackwardCar() {
-        if (Math.random() < 0.5) {
-            map.addMapObject(new Vehicle("Backward TRUCK " + counter++, new MapPosition(2, 0, 4, 1), 0.05f, 0));
-        } else {
-            map.addMapObject(new Vehicle("Backward CAR " + counter++, new MapPosition(0, 1, 2, 1), 0.2f, 0));
-        }
-    }
-
-    /**
-     * Implements {@link ISimulationAware} tick method.
-     * <p>
-     * Here we just every ~1 of 5 times generate a car which happens to be either top to bottom or bottom to top car.
-     *
-     * @param tick tick we are working on. It has simulated time, sequence number at least
-     */
     @Override
     public void tick(SimulationTick tick) {
-        if (Math.random() < 0.2 && !addedCarOnPrevStep) {
-            addedCarOnPrevStep = true;
-            if (tick.getTickNumber() % 2 == 1) {
-                addForwardCar();
+        if (Math.random() > 0.7) {
+
+            // speed somehow varies between 0.5 and 1 m/s
+            double speed = Math.random() * 0.5 + 0.5;
+
+            // some cars should accelerate
+            double acceleration = Math.random() > 0.6 ? 0.04 : 0;
+            Color carColor = null;
+            String name = null;
+            if (acceleration == 0) {
+                carColor = MapObject.COLORS[0];
+                name = "SLOW";
             } else {
-                addBackwardCar();
+                carColor = MapObject.COLORS[1];
+                name = "FAST";
             }
-        } else {
-            addedCarOnPrevStep = false;
+
+            Vehicle v = new Vehicle(name + counter++, new MapPosition(0, 1, 2, 1), getRandomRoad(), speed, acceleration);
+            v.setColor(carColor);
+            map.addMapObject(v);
         }
     }
 }

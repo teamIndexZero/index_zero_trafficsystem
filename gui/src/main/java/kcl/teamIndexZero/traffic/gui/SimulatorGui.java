@@ -1,7 +1,7 @@
 package kcl.teamIndexZero.traffic.gui;
 
+import kcl.teamIndexZero.traffic.gui.components.ChooserDialog;
 import kcl.teamIndexZero.traffic.gui.components.MainWindow;
-import kcl.teamIndexZero.traffic.gui.components.simulationChooserDialog.ChooserDialog;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiController;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.log.Logger;
@@ -15,8 +15,6 @@ import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
 
@@ -57,7 +55,7 @@ public class SimulatorGui {
             java.util.List<LinkDescription> links = new ArrayList<>();
             java.util.List<RoadDescription> roads = result.descriptionList;
 
-            links.add(new LinkDescription(roads.get(0).getId(), roads.get(1).getId(), LinkType.SYNC_TL, new ID("Link1")));
+            links.add(new LinkDescription(roads.get(0).getId(), roads.get(0).getId(), LinkType.SYNC_TL, new ID("Link1")));
             junctions.add(new Junction(new ID("Junction1")));
 
             GraphConstructor graph = new GraphConstructor(junctions, roads, links); //TODO temp stuff. need to take care of the exceptions too
@@ -68,27 +66,24 @@ public class SimulatorGui {
             map.lonStart = result.boundingBox.start.longitude;
             map.lonEnd = result.boundingBox.end.longitude;
 
-            model = new GuiModel();
+            model = new GuiModel(map);
 
             SimulationImageProducer imageProducer = new SimulationImageProducer(map, model);
 
             GuiController controller = new GuiController(model, () -> {
 
-                SimulationDelay delay = new SimulationDelay(50);
+                SimulationDelay delay = new SimulationDelay(model);
                 CarAdder adder = new CarAdder(map);
                 CarRemover remover = new CarRemover(map);
 
-                map.addMapObject(new Vehicle("Ferrari ES3 4FF", new MapPosition(0, 0, 2, 1), 0.05f, 0));
-                map.addMapObject(new Vehicle("Taxi TT1", new MapPosition(400, 5, 2, 1), -0.1f, 0));
-
                 return new Simulator(
-                        new SimulationParams(LocalDateTime.now(), 10, 1000),
+                        new SimulationParams(LocalDateTime.now(), 1, 1000),
                         Arrays.asList(
                                 map,
-                                imageProducer,
                                 adder,
                                 remover,
-                                delay)
+                                delay,
+                                model)
                 );
             });
 
@@ -96,6 +91,7 @@ public class SimulatorGui {
 
             model.reset();
             MainWindow window = new MainWindow(model, controller);
+            imageProducer.setImageConsumer(window.getMapPanel());
             window.setVisible(true);
         } catch (MapIntegrityException e) {
             LOG.log_Fatal("Map integrity compromised.");

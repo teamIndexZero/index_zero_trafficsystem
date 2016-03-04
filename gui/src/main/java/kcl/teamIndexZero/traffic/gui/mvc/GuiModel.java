@@ -1,9 +1,12 @@
 package kcl.teamIndexZero.traffic.gui.mvc;
 
+import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 
-import java.awt.image.BufferedImage;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +17,45 @@ import java.util.List;
  * care about their position. More generally, we don't care about map either - we're good to have a new image to draw which
  * is derived from map.
  */
-public class GuiModel {
+public class GuiModel implements ISimulationAware {
+
+    public static final int DELAY_MINIMAL = 10;
+    public static final int DELAY_MAXIMAL = 100;
+
+    private boolean showSegmentEnds;
+    private final SimulationMap map;
+    private MapObject selectedMapObject;
+    private int delayBetweenTicks = 50;
+
+    public boolean isShowSegmentEnds() {
+        return this.showSegmentEnds;
+    }
+
+    public void setShowSegmentEnds(boolean showSegmentEnds) {
+        this.showSegmentEnds = showSegmentEnds;
+        fireChangeEvent();
+    }
+
+    public MapObject getSelectedMapObject() {
+        if (map.getObjectsOnSurface().contains(selectedMapObject)) {
+            return selectedMapObject;
+        }
+        return null;
+    }
+
+    @Override
+    public void tick(SimulationTick tick) {
+        this.tick = tick;
+        SwingUtilities.invokeLater(this::fireChangeEvent);
+    }
+
+    public int getDelayBetweenTicks() {
+        return delayBetweenTicks;
+    }
+
+    public void setDelayBetweenTicks(int delayBetweenTicks) {
+        this.delayBetweenTicks = delayBetweenTicks;
+    }
 
     /**
      * Model update interface. Other components want to implement it in order to receive updates from model when something
@@ -42,17 +83,24 @@ public class GuiModel {
     private SimulationTick tick;
     private SimulationStatus status;
     private SimulationParams params;
-    private BufferedImage lastImage;
 
     private int mapPanelWidthPixels;
     private int mapPanelHeightPixels;
 
 
+    public SimulationMap getMap() {
+        return map;
+    }
+
     /**
      * Default constructor.
+     *
+     * @param map
      */
-    public GuiModel() {
+    public GuiModel(SimulationMap map) {
+        this.map = map;
         reset();
+
     }
 
     /**
@@ -61,18 +109,7 @@ public class GuiModel {
     public void reset() {
         tick = null;
         status = SimulationStatus.OFF;
-        lastImage = null;
         params = null;
-        fireChangeEvent();
-    }
-
-    public BufferedImage getLastImage() {
-        return lastImage;
-    }
-
-    public void setLastSimulationImageAndTick(BufferedImage lastImage, SimulationTick tick) {
-        this.lastImage = lastImage;
-        this.tick = tick;
         fireChangeEvent();
     }
 
@@ -98,6 +135,11 @@ public class GuiModel {
         return status;
     }
 
+    public void setSelectedMapObject(MapObject selectedMapObject) {
+        this.selectedMapObject = selectedMapObject;
+        fireChangeEvent();
+    }
+
     public void setStatus(SimulationStatus status) {
         this.status = status;
         fireChangeEvent();
@@ -121,7 +163,9 @@ public class GuiModel {
     }
 
     private void fireChangeEvent() {
-        listeners.forEach(ChangeListener::onModelChanged);
+        synchronized (map) {
+            listeners.forEach(ChangeListener::onModelChanged);
+        }
     }
 
     @Override
@@ -131,19 +175,28 @@ public class GuiModel {
 
         GuiModel guiModel = (GuiModel) o;
 
+        if (showSegmentEnds != guiModel.showSegmentEnds) return false;
+        if (mapPanelWidthPixels != guiModel.mapPanelWidthPixels) return false;
+        if (mapPanelHeightPixels != guiModel.mapPanelHeightPixels) return false;
+        if (map != null ? !map.equals(guiModel.map) : guiModel.map != null) return false;
+        if (selectedMapObject != null ? !selectedMapObject.equals(guiModel.selectedMapObject) : guiModel.selectedMapObject != null)
+            return false;
         if (tick != null ? !tick.equals(guiModel.tick) : guiModel.tick != null) return false;
         if (status != guiModel.status) return false;
-        if (params != null ? !params.equals(guiModel.params) : guiModel.params != null) return false;
-        return lastImage != null ? lastImage.equals(guiModel.lastImage) : guiModel.lastImage == null;
+        return params != null ? params.equals(guiModel.params) : guiModel.params == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = tick != null ? tick.hashCode() : 0;
+        int result = (showSegmentEnds ? 1 : 0);
+        result = 31 * result + (map != null ? map.hashCode() : 0);
+        result = 31 * result + (selectedMapObject != null ? selectedMapObject.hashCode() : 0);
+        result = 31 * result + (tick != null ? tick.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (params != null ? params.hashCode() : 0);
-        result = 31 * result + (lastImage != null ? lastImage.hashCode() : 0);
+        result = 31 * result + mapPanelWidthPixels;
+        result = 31 * result + mapPanelHeightPixels;
         return result;
     }
 }
