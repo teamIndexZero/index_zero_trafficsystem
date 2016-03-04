@@ -4,22 +4,13 @@ package kcl.teamIndexZero.traffic.simulator.data.geo;
  * Created by lexaux on 02/03/2016.
  */
 public class GeoSegment {
-    public static double getDistance(GeoPoint point, GeoPoint point1) {
-
-        return Math.sqrt(
-                (point.latitude - point1.latitude) * (point.latitude - point1.latitude) +
-                        (point.longitude - point1.longitude) * (point.longitude - point1.longitude));
-    }
-
-    public GeoSegment(GeoPoint start, GeoPoint end, int pixelWidthTemporaryVariable) {
-        this.start = start;
-        this.end = end;
-        this.pixelWidthTemporaryVariable = pixelWidthTemporaryVariable;
-    }
-
     public GeoPoint start;
     public GeoPoint end;
-    public int pixelWidthTemporaryVariable;
+
+    public GeoSegment(GeoPoint start, GeoPoint end) {
+        this.start = start;
+        this.end = end;
+    }
 
     @Override
     public String toString() {
@@ -27,7 +18,7 @@ public class GeoSegment {
     }
 
     public double getLength() {
-        return getDistance(start, end);
+        return GeoPoint.getDistance(start, end);
     }
 
     @Override

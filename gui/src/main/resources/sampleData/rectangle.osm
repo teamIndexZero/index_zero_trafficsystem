@@ -3,8 +3,8 @@
   <bounds minlon="0" minlat="0" maxlon="0.01" maxlat="0.01" />
 
   <node id="1" version="12" timestamp="2016-03-02T22:12:24Z" uid="1" user="L&apos;le Tom" changeset="25414814" lat="0.001" lon="0.001"/>
-  <node id="2" version="4" timestamp="2016-03-02T22:12:24Z" uid="2" user="Metanautics fixes" changeset="13302035" lat="0.001" lon="0.009"/>
-  <node id="3" version="4" timestamp="2016-03-02T22:12:24Z" uid="3" user="Metanautics fixes" changeset="13302035" lat="0.009" lon="0.009"/>
+  <node id="2" version="4" timestamp="2016-03-02T22:12:24Z" uid="2" user="Metanautics fixes" changeset="13302035" lat="0.001" lon="0.004"/>
+  <node id="3" version="4" timestamp="2016-03-02T22:12:24Z" uid="3" user="Metanautics fixes" changeset="13302035" lat="0.009" lon="0.004"/>
   <node id="4" version="4" timestamp="2016-03-02T22:12:24Z" uid="4" user="Metanautics fixes" changeset="13302035" lat="0.009" lon="0.001"/>
 
   <way id="5" version="18" timestamp="2016-03-02T22:12:24Z" uid="2969887" user="eastender" changeset="34982240">

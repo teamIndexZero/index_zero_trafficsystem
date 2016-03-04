@@ -70,10 +70,10 @@ public class GraphConstructor {
                     rd.getGeoPolyline(),
                     rd.getRoadName());
             mapFeatures.put(r.getID(), r);
-            r.getRightSide().getLanes().forEach(lane -> {
+            r.getBackwardSide().getLanes().forEach(lane -> {
                 mapFeatures.put(lane.getID(), lane);
             });
-            r.getLeftSide().getLanes().forEach(lane -> {
+            r.getForwardSide().getLanes().forEach(lane -> {
                 mapFeatures.put(lane.getID(), lane);
             });
         });

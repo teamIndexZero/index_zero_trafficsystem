@@ -22,6 +22,7 @@ class SaxHandler extends DefaultHandler {
     public static final String WAY_ELEMENT = "way";
     public static final String NODE_WITHIN_WAY_ELEMENT = "nd";
     public static final String TAG = "tag";
+
     private Logger LOG = Logger.getLoggerInstance(SaxHandler.class.getName());
     private OsmParseResult result;
     private Set<String> interestingElements = new HashSet<>(Arrays.asList(BOUNDS_ELEMENT, NODE_ELEMENT, WAY_ELEMENT, NODE_WITHIN_WAY_ELEMENT, TAG));
@@ -162,8 +163,8 @@ class SaxHandler extends DefaultHandler {
         double lon = Double.parseDouble(attributes.getValue("lon"));
         points.put(attributes.getValue("id"),
                 new GeoPoint(
-                        getDistanceMeters(0, 0, lat - boundsMinLat, 0),
-                        getDistanceMeters(0, 0, 0, lon - boundsMinLon)));
+                        getDistanceMeters(this.boundsMinLat, this.boundsMinLon, this.boundsMinLat, lon),
+                        getDistanceMeters(this.boundsMinLat, this.boundsMinLon, lat, this.boundsMinLon)));
     }
 
     private void handleBounds(Attributes attributes) {
@@ -173,16 +174,15 @@ class SaxHandler extends DefaultHandler {
         this.boundsMinLat = Double.parseDouble(attributes.getValue("minlat"));
         this.boundsMinLon = Double.parseDouble(attributes.getValue("minlon"));
 
-        double latDiff = boundsMinLat - Double.parseDouble(attributes.getValue("maxlat"));
-        double lonDiff = boundsMinLon - Double.parseDouble(attributes.getValue("maxlon"));
+        double boundsMaxLat = Double.parseDouble(attributes.getValue("maxlat"));
+        double boundsMaxLon = Double.parseDouble(attributes.getValue("maxlon"));
 
         GeoSegment segment = new GeoSegment(
                 new GeoPoint(0, 0),
                 new GeoPoint(
-                        getDistanceMeters(0, 0, latDiff, 0),
-                        getDistanceMeters(0, 0, 0, lonDiff)),
-                2
-        );
+                        getDistanceMeters(this.boundsMinLat, this.boundsMinLon, this.boundsMinLat, boundsMaxLon),
+                        getDistanceMeters(this.boundsMinLat, this.boundsMinLon, boundsMaxLat, this.boundsMinLon)
+                ));
         LOG.log_Warning("Got bounds ", segment);
         result.boundingBox = segment;
     }

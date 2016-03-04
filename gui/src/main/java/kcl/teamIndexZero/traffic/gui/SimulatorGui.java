@@ -33,19 +33,19 @@ public class SimulatorGui {
     private GuiModel model;
 
     /**
+     * Default constructor.
+     */
+    public SimulatorGui() {
+        ChooserDialog.showForOSMLoadResult(this::startSimulatorWindow);
+    }
+
+    /**
      * Entry point.
      *
      * @param args CLI parameters
      */
     public static void main(String[] args) {
         new SimulatorGui();
-    }
-
-    /**
-     * Default constructor.
-     */
-    public SimulatorGui() {
-        ChooserDialog.showForOSMLoadResult(this::startSimulatorWindow);
     }
 
     private void startSimulatorWindow(OsmParseResult result) {
@@ -61,10 +61,8 @@ public class SimulatorGui {
             GraphConstructor graph = new GraphConstructor(junctions, roads, links); //TODO temp stuff. need to take care of the exceptions too
 
             SimulationMap map = new SimulationMap(4, 400, graph);
-            map.latStart = result.boundingBox.start.latitude;
-            map.latEnd = result.boundingBox.end.latitude;
-            map.lonStart = result.boundingBox.start.longitude;
-            map.lonEnd = result.boundingBox.end.longitude;
+            map.widthMeters = result.boundingBox.end.xMeters;
+            map.heightMeters = result.boundingBox.end.yMeters;
 
             model = new GuiModel(map);
 

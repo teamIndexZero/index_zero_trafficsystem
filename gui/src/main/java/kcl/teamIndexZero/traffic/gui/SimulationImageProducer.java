@@ -32,10 +32,6 @@ public class SimulationImageProducer {
     private BufferedImage image = null;
     private Graphics2D graphics;
 
-    public void setImageConsumer(Consumer<BufferedImage> imageConsumer) {
-        this.imageConsumer = imageConsumer;
-    }
-
     /**
      * Constructor
      *
@@ -51,18 +47,22 @@ public class SimulationImageProducer {
         });
     }
 
+    public void setImageConsumer(Consumer<BufferedImage> imageConsumer) {
+        this.imageConsumer = imageConsumer;
+    }
+
     private double getScale() {
-        double scaleX = pixelWidth / (map.lonEnd - map.lonStart);
-        double scaleY = pixelHeight / (map.latEnd - map.latStart);
+        double scaleX = pixelWidth / map.widthMeters;
+        double scaleY = pixelHeight / map.heightMeters;
         return Math.min(scaleX, scaleY);
     }
 
-    public int convertLatToY(double lat) {
-        return (int) Math.round(pixelHeight - (lat - map.latStart) * getScale());
+    public int convertYMetersToPixles(double yMeters) {
+        return (int) Math.round(pixelHeight - yMeters * getScale());
     }
 
-    public int convertLonToX(double lon) {
-        return (int) Math.round((lon - map.lonStart) * getScale());
+    public int convertXMetersToPixels(double xMeters) {
+        return (int) Math.round(xMeters * getScale());
     }
 
     private void setPixelSize(int width, int height) {
@@ -99,10 +99,10 @@ public class SimulationImageProducer {
 
                 road.getPolyline().getSegments().forEach(segment -> {
                     graphics.drawLine(
-                            convertLonToX(segment.start.longitude),
-                            convertLatToY(segment.start.latitude),
-                            convertLonToX(segment.end.longitude),
-                            convertLatToY(segment.end.latitude)
+                            convertXMetersToPixels(segment.start.xMeters),
+                            convertYMetersToPixles(segment.start.yMeters),
+                            convertXMetersToPixels(segment.end.xMeters),
+                            convertYMetersToPixles(segment.end.yMeters)
                     );
                 });
 
@@ -146,8 +146,8 @@ public class SimulationImageProducer {
         int size = 10;
         graphics.setColor(color);
         graphics.setStroke(stroke);
-        int x = convertLonToX(startPoint.longitude);
-        int y = convertLatToY(startPoint.latitude);
+        int x = convertXMetersToPixels(startPoint.xMeters);
+        int y = convertYMetersToPixles(startPoint.yMeters);
         graphics.drawLine(x - size / 2, y, x + size / 2, y);
         graphics.drawLine(x, y - size / 2, x, y + size / 2);
     }
@@ -156,8 +156,8 @@ public class SimulationImageProducer {
         graphics.setStroke(THIN_STROKE);
         graphics.setColor(color);
 
-        int x = convertLonToX(startPoint.longitude);
-        int y = convertLatToY(startPoint.latitude);
+        int x = convertXMetersToPixels(startPoint.xMeters);
+        int y = convertYMetersToPixles(startPoint.yMeters);
 
         graphics.drawOval(x - pixelRadius, y - pixelRadius, pixelRadius * 2, pixelRadius * 2);
     }
@@ -166,8 +166,8 @@ public class SimulationImageProducer {
         graphics.setStroke(THIN_STROKE);
         graphics.setColor(color);
 
-        int x = convertLonToX(startPoint.longitude);
-        int y = convertLatToY(startPoint.latitude);
+        int x = convertXMetersToPixels(startPoint.xMeters);
+        int y = convertYMetersToPixles(startPoint.yMeters);
         graphics.drawChars(text.toCharArray(), 0, text.length(), x + 15, y + 15);
     }
 }

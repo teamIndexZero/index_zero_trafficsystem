@@ -4,17 +4,25 @@ package kcl.teamIndexZero.traffic.simulator.data.geo;
  * Created by lexaux on 02/03/2016.
  */
 public class GeoPoint {
-    public GeoPoint(double latitude, double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+
+    public double xMeters;
+    public double yMeters;
+
+    public GeoPoint(double xMeters, double yMeters) {
+        this.xMeters = xMeters;
+        this.yMeters = yMeters;
     }
 
-    public double latitude;
-    public double longitude;
+    public static double getDistance(GeoPoint point, GeoPoint point1) {
+
+        return Math.sqrt(
+                (point.xMeters - point1.xMeters) * (point.xMeters - point1.xMeters) +
+                        (point.yMeters - point1.yMeters) * (point.yMeters - point1.yMeters));
+    }
 
     @Override
     public String toString() {
-        return String.format("{%.0f, %.0f}", latitude, longitude);
+        return String.format("{%.0f, %.0f}", xMeters, yMeters);
     }
 
     @Override
@@ -24,8 +32,8 @@ public class GeoPoint {
 
         GeoPoint geoPoint = (GeoPoint) o;
 
-        if (Double.compare(geoPoint.latitude, latitude) != 0) return false;
-        return Double.compare(geoPoint.longitude, longitude) == 0;
+        if (Double.compare(geoPoint.xMeters, xMeters) != 0) return false;
+        return Double.compare(geoPoint.yMeters, yMeters) == 0;
 
     }
 
@@ -33,9 +41,9 @@ public class GeoPoint {
     public int hashCode() {
         int result;
         long temp;
-        temp = Double.doubleToLongBits(latitude);
+        temp = Double.doubleToLongBits(xMeters);
         result = (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(longitude);
+        temp = Double.doubleToLongBits(yMeters);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }

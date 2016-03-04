@@ -16,7 +16,7 @@ public class GeoPolyline {
 
     public void addPoint(GeoPoint point) {
         if (lastPoint != null) {
-            GeoSegment segment = new GeoSegment(lastPoint, point, 2);
+            GeoSegment segment = new GeoSegment(lastPoint, point);
             polylineLength += segment.getLength();
             segments.add(segment);
         }
@@ -45,8 +45,8 @@ public class GeoPolyline {
         }
         double relation = distanceFromStart / distanceToEnd;
         return new GeoPoint(
-                (containingSegment.start.latitude + relation * containingSegment.end.latitude) / (1 + relation),
-                (containingSegment.start.longitude + relation * containingSegment.end.longitude) / (1 + relation));
+                (containingSegment.start.xMeters + relation * containingSegment.end.xMeters) / (1 + relation),
+                (containingSegment.start.yMeters + relation * containingSegment.end.yMeters) / (1 + relation));
     }
 
     public float getPolylineLength() {

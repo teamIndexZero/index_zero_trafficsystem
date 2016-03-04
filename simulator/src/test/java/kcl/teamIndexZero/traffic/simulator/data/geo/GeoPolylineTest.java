@@ -24,8 +24,8 @@ public class GeoPolylineTest {
         assertThat(segments).hasSize(2);
         assertThat(segments).containsAll(
                 Arrays.asList(
-                        new GeoSegment(new GeoPoint(0, 0), new GeoPoint(0, 1), 2),
-                        new GeoSegment(new GeoPoint(0, 1), new GeoPoint(1, 1), 2)));
+                        new GeoSegment(new GeoPoint(0, 0), new GeoPoint(0, 1)),
+                        new GeoSegment(new GeoPoint(0, 1), new GeoPoint(1, 1))));
     }
 
     @Test

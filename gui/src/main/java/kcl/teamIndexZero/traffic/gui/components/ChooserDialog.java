@@ -25,7 +25,7 @@ public class ChooserDialog extends JFrame {
                     {"Elephant and Castle strange roundabout", "/sampleData/elephant_and_castle.osm"},
                     {"Buckingham Palace area", "/sampleData/buckingham_area.osm"},
                     {"Paris, Arc de Trioumphe", "/sampleData/paris_arc_de_trioumphe_ways.osm"},
-                    {"Simple one-way square", "/sampleData/square.osm"},
+                    {"Simple one-way square", "/sampleData/rectangle.osm"},
             }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
 
 

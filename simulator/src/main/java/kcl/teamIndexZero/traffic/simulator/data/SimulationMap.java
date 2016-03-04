@@ -33,25 +33,14 @@ import java.util.Map;
  */
 public class SimulationMap implements ISimulationAware {
 
-    public double lonStart;
-    public double latStart;
-    public double lonEnd;
-    public double latEnd;
-
     private static Logger_Interface LOG = Logger.getLoggerInstance(SimulationMap.class.getSimpleName());
-    private Map<ID, Feature> mapFeatures;
-    private Map<ID, Link> mapLinks;
     private final int width;
     private final int height;
+    public double widthMeters;
+    public double heightMeters;
+    private Map<ID, Feature> mapFeatures;
+    private Map<ID, Link> mapLinks;
     private List<MapObject> objectsOnSurface = new ArrayList<>();
-
-    public Map<ID, Feature> getMapFeatures() {
-        return mapFeatures;
-    }
-
-    public Map<ID, Link> getMapLinks() {
-        return mapLinks;
-    }
 
     /**
      * Constructor.
@@ -66,6 +55,14 @@ public class SimulationMap implements ISimulationAware {
         this.height = height;
         this.mapFeatures = graph_constructor.getFeatures();
         this.mapLinks = graph_constructor.getLinks();
+    }
+
+    public Map<ID, Feature> getMapFeatures() {
+        return mapFeatures;
+    }
+
+    public Map<ID, Link> getMapLinks() {
+        return mapLinks;
     }
 
     /**
