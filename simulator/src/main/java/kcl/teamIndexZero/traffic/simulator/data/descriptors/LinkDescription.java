@@ -4,7 +4,7 @@ import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 
 /**
- * Created by Es on 01/03/2016.
+ * Class to contain the specifications of a link
  */
 public class LinkDescription {
     public ID fromID;
