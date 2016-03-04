@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This is the all information we can actually get from OSM.
+ * This is all information we can actually get from OSM.
  */
 public class JunctionDescription {
     private ID id;
@@ -27,6 +27,15 @@ public class JunctionDescription {
     }
 
     /**
+     * Gets the Junction's ID tag
+     *
+     * @return ID tag
+     */
+    public ID getID() {
+        return this.id;
+    }
+
+    /**
      * Gets the ID list of connected roads
      *
      * @return List of IDs
@@ -40,7 +49,7 @@ public class JunctionDescription {
      *
      * @return Traffic light flag
      */
-    public boolean asTrafficLight() {
+    public boolean hasTrafficLight() {
         return this.trafficLightFlag;
     }
 }
