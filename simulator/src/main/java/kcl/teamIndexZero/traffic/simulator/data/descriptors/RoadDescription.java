@@ -69,6 +69,11 @@ public class RoadDescription {
         return geoPolyline.getPolylineLength();
     }
 
+    /**
+     * Gets the name of the road
+     *
+     * @return Road's name
+     */
     public String getRoadName() {
         return roadName;
     }
