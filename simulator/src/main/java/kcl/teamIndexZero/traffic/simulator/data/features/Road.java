@@ -71,11 +71,10 @@ public class Road extends Feature {
 
     public DirectedLanes getLeftSide() {
         return leftSide;
-    }
-
+    } //FIXME Why when the road contructor creates the lanes automagically?
     public DirectedLanes getRightSide() {
         return rightSide;
-    }
+    } //FIXME Why when the road contructor creates the lanes automagically?
 
     public GeoSegment getSegment() {
         return segment;
