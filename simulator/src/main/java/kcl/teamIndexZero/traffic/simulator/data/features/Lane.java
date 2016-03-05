@@ -6,7 +6,7 @@ import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
 /**
- * Created by Es on 28/02/2016.
+ * Lane within a set of directed lanes within a road
  */
 public class Lane extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Lane.class.getSimpleName());
@@ -50,6 +50,24 @@ public class Lane extends Feature {
      */
     public ID getID() {
         return super.getID();
+    }
+
+    /**
+     * Gets the Road ID tag the lane belongs to
+     *
+     * @return Road's ID tag
+     */
+    public ID getRoadID() {
+        return this.lanes.getRoad().getID();
+    }
+
+    /**
+     * Gets the Parent road it belongs to
+     *
+     * @return Road
+     */
+    public Road getParentRoad() {
+        return this.lanes.getRoad();
     }
 
     /**
