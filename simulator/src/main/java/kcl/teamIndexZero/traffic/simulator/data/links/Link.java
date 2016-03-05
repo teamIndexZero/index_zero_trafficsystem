@@ -5,12 +5,12 @@ import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
-import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 
 public class Link implements ISimulationAware {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Link.class.getSimpleName());
-    public Feature one;
-    public Feature two;
+    public Lane in;
+    public Lane out;
     private ID id;
 
     /**
@@ -32,12 +32,12 @@ public class Link implements ISimulationAware {
     }
 
     /**
-     * Checks of the link is connected to only one feature
+     * Checks of the link is connected to only in feature
      *
      * @return Dead end state
      */
     public boolean isDeadEnd() {
-        return (one == null || two == null);
+        return (in == null || out == null);
     }
 
     /**

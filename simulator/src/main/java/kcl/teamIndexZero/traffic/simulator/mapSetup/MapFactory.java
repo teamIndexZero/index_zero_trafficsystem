@@ -5,7 +5,7 @@ import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
-import kcl.teamIndexZero.traffic.simulator.exeptions.AlreadyExistsException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.AlreadyExistsException;
 
 import java.util.HashMap;
 import java.util.Map;

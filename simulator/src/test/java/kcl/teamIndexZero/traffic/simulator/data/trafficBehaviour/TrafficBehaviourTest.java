@@ -2,7 +2,7 @@ package kcl.teamIndexZero.traffic.simulator.data.trafficBehaviour;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
-import kcl.teamIndexZero.traffic.simulator.exeptions.JunctionPathException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.JunctionPathException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

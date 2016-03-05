@@ -1,4 +1,4 @@
-package kcl.teamIndexZero.traffic.simulator.exeptions;
+package kcl.teamIndexZero.traffic.simulator.exceptions;
 
 /**
  * Created by Es on 02/03/2016.

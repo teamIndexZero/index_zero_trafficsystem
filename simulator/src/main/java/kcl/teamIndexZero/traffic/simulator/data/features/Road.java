@@ -11,8 +11,8 @@ import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 public class Road extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Road.class.getSimpleName());
     private final String name;
-    public DirectedLanes forwardSide;
-    public DirectedLanes backwardSide;
+    private DirectedLanes forwardSide;
+    private DirectedLanes backwardSide;
     private ID id;
     private RoadSpecs roadSpecs = new RoadSpecs();
     private GeoPolyline polyline;

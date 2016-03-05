@@ -7,9 +7,9 @@ import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
-import kcl.teamIndexZero.traffic.simulator.exeptions.EmptySimMapException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.OrphanFeatureException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.EmptySimMapException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.OrphanFeatureException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,8 +110,8 @@ public class SimulationMap implements ISimulationAware {
     }
 
     /**
-     * Try moving object from one position to another (it may be impossible - i.e. occupied). Old position will be freed
-     * while the new one will be occupied if it goes successfully.
+     * Try moving object from in position to another (it may be impossible - i.e. occupied). Old position will be freed
+     * while the new in will be occupied if it goes successfully.
      *
      * @param object an object to add
      * @param pos    position to move to.

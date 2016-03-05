@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by Es on 02/03/2016.
  * RoadLink class
- * <p>Class describing the relation between two macro-features such as roads and junctions.
+ * <p>Class describing the relation between out macro-features such as roads and junctions.
  * Holds the micro-feature (such as Lanes) links as directed inflow lists.</p>
  */
 public class RoadLink implements ISimulationAware {

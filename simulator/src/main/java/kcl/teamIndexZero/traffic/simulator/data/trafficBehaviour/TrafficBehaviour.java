@@ -4,7 +4,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
-import kcl.teamIndexZero.traffic.simulator.exeptions.JunctionPathException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.JunctionPathException;
 
 import java.util.HashMap;
 import java.util.LinkedList;
