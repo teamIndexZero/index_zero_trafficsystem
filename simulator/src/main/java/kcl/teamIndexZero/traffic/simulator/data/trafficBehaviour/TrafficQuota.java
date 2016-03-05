@@ -35,4 +35,13 @@ class TrafficQuota {
         else this.count++;
         return true;
     }
+
+    /**
+     * toString method
+     *
+     * @return TrafficQuota object description
+     */
+    public String toString() {
+        return "(" + count + "/" + weight + ")";
+    }
 }

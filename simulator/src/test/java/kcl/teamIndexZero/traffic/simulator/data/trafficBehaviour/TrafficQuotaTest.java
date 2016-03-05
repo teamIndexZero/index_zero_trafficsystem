@@ -2,6 +2,7 @@ package kcl.teamIndexZero.traffic.simulator.data.trafficBehaviour;
 
 import org.junit.Test;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -32,5 +33,18 @@ public class TrafficQuotaTest {
             assertTrue(q.incrementCounter());
         }
         assertFalse(q.incrementCounter());
+    }
+
+    @Test
+    public void testToString() throws Exception {
+        TrafficQuota q = new TrafficQuota(10);
+        assertEquals("(0/10)", q.toString());
+        for (int i = 0; i < 10; i++) {
+            assertTrue(q.incrementCounter());
+            assertEquals("(" + (i + 1) + "/10)", q.toString());
+        }
+        assertFalse(q.incrementCounter());
+        q.reset();
+        assertEquals("(0/10)", q.toString());
     }
 }
