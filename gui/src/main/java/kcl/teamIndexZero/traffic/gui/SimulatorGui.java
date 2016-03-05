@@ -15,7 +15,7 @@ import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
-import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
 
 import java.time.LocalDateTime;
@@ -56,7 +56,7 @@ public class SimulatorGui {
             java.util.List<RoadDescription> roads = result.descriptionList;
 
             links.add(new LinkDescription(roads.get(0).getId(), roads.get(0).getId(), LinkType.SYNC_TL, new ID("Link1")));
-            junctions.add(new Junction(new ID("Junction1")));
+            junctions.add(new Junction(new ID("Junction1"), false));
 
             GraphConstructor graph = new GraphConstructor(junctions, roads, links); //TODO temp stuff. need to take care of the exceptions too
 

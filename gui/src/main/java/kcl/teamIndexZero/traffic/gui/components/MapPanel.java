@@ -21,8 +21,8 @@ public class MapPanel extends JComponent implements Consumer<BufferedImage> {
     }
 
     /**
-     * Overriding component's paint method. This is one of the two official ways to create own components - to override
-     * paint method. The other one is to work with composite components, layout managers, etc - all we don't need.
+     * Overriding component's paint method. This is in of the out official ways to create own components - to override
+     * paint method. The other in is to work with composite components, layout managers, etc - all we don't need.
      * <p>
      * This is where the actual map contents is drawn. By this moment, we already have a {@link java.awt.image.BufferedImage}
      * produced for us by {@link kcl.teamIndexZero.traffic.gui.SimulationImageProducer} and thoroughly put into the

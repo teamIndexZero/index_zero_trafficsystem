@@ -25,7 +25,7 @@ public class ChooserDialog extends JFrame {
                     {"Elephant and Castle strange roundabout", "/sampleData/elephant_and_castle.osm"},
                     {"Buckingham Palace area", "/sampleData/buckingham_area.osm"},
                     {"Paris, Arc de Trioumphe", "/sampleData/paris_arc_de_trioumphe_ways.osm"},
-                    {"Simple one-way square", "/sampleData/rectangle.osm"},
+                    {"Simple in-way square", "/sampleData/rectangle.osm"},
             }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
 
 
@@ -41,7 +41,7 @@ public class ChooserDialog extends JFrame {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
         ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        add(new JLabel("Please choose one of the available presets for simulation area:"));
+        add(new JLabel("Please choose in of the available presets for simulation area:"));
 
         filesAvailable.forEach((caption, file) -> {
             JButton button = new JButton(caption);
