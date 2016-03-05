@@ -1,10 +1,12 @@
 package kcl.teamIndexZero.traffic.simulator.data.features;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by Es on 01/03/2016.
@@ -36,7 +38,22 @@ public class LaneTest {
     }
 
     @Test
-    public void testTick() throws Exception {
-        //TODO
+    public void testGetRoadID() throws Exception {
+        RoadSpecs rs = new RoadSpecs();
+        DirectedLanes mocked_dl = mock(DirectedLanes.class);
+        Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl);
+        when(mocked_dl.getRoad()).thenReturn(new Road(new ID("TestRoad"), 2, 2, 2000, new GeoPolyline(), "Awesome Rd."));
+        assertEquals("TestRoad", l.getRoadID().toString());
     }
+
+    @Test
+    public void testGetParentRoad() throws Exception {
+        RoadSpecs rs = new RoadSpecs();
+        DirectedLanes mocked_dl = mock(DirectedLanes.class);
+        Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl);
+        when(mocked_dl.getRoad()).thenReturn(new Road(new ID("TestRoad"), 2, 2, 2000, new GeoPolyline(), "Awesome Rd."));
+        assertEquals("Awesome Rd.", l.getParentRoad().getName());
+    }
+
+
 }
