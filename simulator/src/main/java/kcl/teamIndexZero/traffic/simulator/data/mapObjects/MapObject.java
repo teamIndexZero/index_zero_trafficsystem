@@ -14,7 +14,7 @@ import java.awt.*;
  * subclasses needs to implement actual {@link ISimulationAware} interface).
  * <p>
  * Map object is an abstraction over more complex entities (like vehicles and obstacles etc). {@link SimulationMap}
- * inserts itself into the {@link MapObject} when that one gets added to the map, so that
+ * inserts itself into the {@link MapObject} when that in gets added to the map, so that
  */
 public abstract class MapObject implements ISimulationAware {
 
@@ -59,7 +59,7 @@ public abstract class MapObject implements ISimulationAware {
     /**
      * Getting random color from the list.
      *
-     * @return one of the {@link Color} instances to draw
+     * @return in of the {@link Color} instances to draw
      */
     public static Color getRandomColor() {
         return COLORS[Math.min(

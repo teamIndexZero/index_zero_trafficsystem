@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
 
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 
 /**
@@ -20,12 +21,12 @@ public class Vehicle extends MapObject {
     private double speedMetersPerSecond;
     private double accelerationMetersPerSecondSecond;
 
-
     /**
-     * Vehicle Constructor.
+     * Vehicle Constructor. //FIXME Depreciated! Delete that once we don't need it!!
      *
      * @param name                              used for identification in logs for example
      * @param position                          initial {@link MapPosition} of the vehicle
+     * @param road                              Lane the vehicle is on
      * @param speedMetersPerSecond              initial speed m/s
      * @param accelerationMetersPerSecondSecond initial acceleration m/s/s
      */
@@ -39,6 +40,26 @@ public class Vehicle extends MapObject {
         this.accelerationMetersPerSecondSecond = accelerationMetersPerSecondSecond;
     }
 
+
+    /**
+     * Vehicle Constructor.
+     *
+     * @param name                              used for identification in logs for example
+     * @param position                          initial {@link MapPosition} of the vehicle
+     * @param lane                              Lane the vehicle is on
+     * @param speedMetersPerSecond              initial speed m/s
+     * @param accelerationMetersPerSecondSecond initial acceleration m/s/s
+     */
+    public Vehicle(String name,
+                   MapPosition position,
+                   Lane lane,
+                   double speedMetersPerSecond,
+                   double accelerationMetersPerSecondSecond) {
+        super(name, position, lane.getParentRoad());
+        this.speedMetersPerSecond = speedMetersPerSecond;
+        this.accelerationMetersPerSecondSecond = accelerationMetersPerSecondSecond;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -46,6 +67,9 @@ public class Vehicle extends MapObject {
     public void tick(SimulationTick tick) {
         speedMetersPerSecond = speedMetersPerSecond + accelerationMetersPerSecondSecond * tick.getTickDurationSeconds();
         positionOnRoad += speedMetersPerSecond + accelerationMetersPerSecondSecond * tick.getTickDurationSeconds();
+        //TODO if end of road is reached then pass to next feature with the remaining travel length??
+        //TODO maybe addapt behavior for the looking ahead distance based on projected stopping time at current speed?
+        //TODO if looking ahead distance goes out of scope of the current feature then query link
         LOG.log(this);
     }
 
