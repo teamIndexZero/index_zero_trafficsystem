@@ -8,6 +8,10 @@ public class OrphanFeatureException extends Exception {
     public OrphanFeatureException() {
     }
 
+    public OrphanFeatureException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public OrphanFeatureException(String message) {
         super(message);
     }

@@ -8,6 +8,10 @@ public class UnrecognisedLinkException extends Exception {
     public UnrecognisedLinkException() {
     }
 
+    public UnrecognisedLinkException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public UnrecognisedLinkException(String message) {
         super(message);
     }

@@ -8,6 +8,10 @@ public class MissingImplementationException extends Exception {
     public MissingImplementationException() {
     }
 
+    public MissingImplementationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public MissingImplementationException(String message) {
         super(message);
     }

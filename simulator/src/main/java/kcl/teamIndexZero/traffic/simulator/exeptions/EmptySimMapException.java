@@ -8,6 +8,10 @@ public class EmptySimMapException extends Exception {
     public EmptySimMapException() {
     }
 
+    public EmptySimMapException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public EmptySimMapException(String message) {
         super(message);
     }
