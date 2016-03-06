@@ -103,6 +103,25 @@ public class TrafficBehaviour {
     }
 
     /**
+     * Gets all possible exit Link IDs for a entry link
+     *
+     * @param from Inflow link's IF tag
+     * @return List of exit Link ID tag
+     * @throws JunctionPathException when the inflow link doesn't exist or there are no exit paths available for an inflow link
+     */
+    public List<ID> getAllPossibleExitPoints(ID from) throws JunctionPathException {
+        if (!this.outflowPaths.containsKey(from)) {
+            LOG.log_Error("Inflow Link ID '", from, "' does not exist in the TrafficBehaviour's path map.");
+            throw new JunctionPathException("Inflow Link ID does not exist in the TrafficBehaviour's path map.");
+        }
+        if (this.outflowPaths.get(from).isEmpty()) {
+            LOG.log_Error("There are no exit path available for '", from, "'.");
+            throw new JunctionPathException("No exit path(s) available for inflow link.");
+        }
+        return this.outflowPaths.get(from);
+    }
+
+    /**
      * Gets the ID of the junction TrafficBehaviour is associated with
      *
      * @return Junction ID tag

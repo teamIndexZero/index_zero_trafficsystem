@@ -121,4 +121,20 @@ public class TrafficBehaviourTest {
         String expected = "TrafficBehaviour for <MockJunctionID> { Paths:[In2=[Out2], In1=[Out1, Out2]], Quotas:[Out2=(0/3), Out1=(1/2)] }";
         assertEquals(expected, tb.toString());
     }
+
+    @Test
+    public void testGetAllPossibleExitPoints() throws Exception {
+        ID in1 = new ID("In1");
+        ID in2 = new ID("In2");
+        ID out1 = new ID("Out1");
+        ID out2 = new ID("Out2");
+        this.tb.addPath(in1, out1);
+        this.tb.addPath(in1, out2);
+        this.tb.addPath(in2, out2);
+        assertTrue(this.tb.getAllPossibleExitPoints(in1).contains(out1));
+        assertTrue(this.tb.getAllPossibleExitPoints(in1).contains(out2));
+        assertEquals(2, this.tb.getAllPossibleExitPoints(in1).size());
+        assertTrue(this.tb.getAllPossibleExitPoints(in2).contains(out2));
+        assertEquals(1, this.tb.getAllPossibleExitPoints(in2).size());
+    }
 }
