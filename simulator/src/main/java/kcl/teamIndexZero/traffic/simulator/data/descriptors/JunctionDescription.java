@@ -3,7 +3,6 @@ package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,6 +53,9 @@ public class JunctionDescription {
         return this.trafficLightFlag;
     }
 
+    /**
+     * Enum for the direction of the road to be connected to the junciton
+     */
     public enum RoadDirection {
         INCOMING,
         OUTGOING
