@@ -20,13 +20,13 @@ public class Road extends Feature {
     /**
      * Constructor
      *
-     * @param id                 Feature ID tag
-     * @param outgoingLanesCount Number of ongoing lanes from the start viewpoint of the road
+     * @param id                 Feature ID tag*
      * @param incomingLanesCount Number of incoming lanes from the start viewpoint of the road
+     * @param outgoingLanesCount Number of ongoing lanes from the start viewpoint of the road
      * @param roadLength         Length of the road
      * @throws IllegalArgumentException when the number of lanes given is less than 1 or the road length is < 0.5
      */
-    public Road(ID id, int outgoingLanesCount, int incomingLanesCount, double roadLength, GeoPolyline polyline, String name) throws IllegalArgumentException {
+    public Road(ID id, int incomingLanesCount, int outgoingLanesCount, double roadLength, GeoPolyline polyline, String name) throws IllegalArgumentException {
         super(id);
         this.polyline = polyline;
         this.name = name;
@@ -82,7 +82,7 @@ public class Road extends Feature {
      *
      * @return Incoming lanes
      */
-    public DirectedLanes getBackwardSide() {
+    public DirectedLanes getIncomingSide() {
         return backwardSide;
     }
 
@@ -91,7 +91,7 @@ public class Road extends Feature {
      *
      * @return Outgoing lanes
      */
-    public DirectedLanes getForwardSide() {
+    public DirectedLanes getOutgoingSide() {
         return forwardSide;
     }
 
