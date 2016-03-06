@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Created by Es on 27/01/2016.
  * Log_TimeStamp class
  */
 public class Log_TimeStamp {

@@ -3,7 +3,6 @@ package kcl.teamIndexZero.traffic.log.outputs;
 import kcl.teamIndexZero.traffic.log.Log_TimeStamp;
 
 /**
- * Created by Es on 29/01/2016.
  * Output to the console
  */
 public class Output_TERM extends Output {
@@ -11,6 +10,8 @@ public class Output_TERM extends Output {
 
     /**
      * Constructor
+     *
+     * @param name Output name;
      */
     public Output_TERM(String name) {
         super(name, GlobalOutputTypes.TERMINAL);

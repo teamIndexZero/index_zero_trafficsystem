@@ -1,7 +1,7 @@
 package kcl.teamIndexZero.traffic.log.outputs;
 
 /**
- * Created by Es on 27/01/2016.
+ * List of Available Output types for the Log
  */
 public enum GlobalOutputTypes {
     TERMINAL,   //Console

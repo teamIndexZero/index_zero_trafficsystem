@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * Created by Es on 29/01/2016.
+ * Generic Output
  */
 public class Output {
     private String output_name;
@@ -16,8 +16,8 @@ public class Output {
     /**
      * Constructor
      *
-     * @param output_name
-     * @param output_type
+     * @param output_name Output name
+     * @param output_type Output type
      */
     protected Output(String output_name, GlobalOutputTypes output_type) {
         this.output_name = output_name;
@@ -69,6 +69,7 @@ public class Output {
      *
      * @param origin_name Origin name of the call
      * @param time_stamp  Time stamp of the message
+     * @param log_number  Message number in session
      * @param e           Exception raised
      */
     public void output(String origin_name, Log_TimeStamp time_stamp, Long log_number, Exception e) {

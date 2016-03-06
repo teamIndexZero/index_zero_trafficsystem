@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * Created by Es on 29/01/2016.
  * Formatter for console output
  */
 public class Formatter_TERM implements Formatter_Interface {

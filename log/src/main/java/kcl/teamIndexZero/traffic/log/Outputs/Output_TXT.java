@@ -7,7 +7,6 @@ import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
 import java.io.IOException;
 
 /**
- * Created by Es on 06/02/2016.
  * Output to '.txt' file
  */
 public class Output_TXT extends Output {

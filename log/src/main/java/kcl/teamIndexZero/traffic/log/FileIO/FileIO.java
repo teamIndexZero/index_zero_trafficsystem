@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.file.*;
 
 /**
- * Created by Es on 02/02/2016.
+ * Common IO functionality for Input and Outputs
  */
 public class FileIO {
     private String file_name;
@@ -57,8 +57,8 @@ public class FileIO {
 
     /**
      * Deletes the file if it exists
-     * return Success
      *
+     * @return Success
      * @throws InvalidPathException when the path description is invalid
      * @throws IOException          when the file cannot be accessed
      */

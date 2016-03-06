@@ -10,7 +10,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.StandardOpenOption;
 
 /**
- * Created by Es on 04/02/2016.
+ * File Output
  */
 public class FileOutput extends FileIO {
     private BufferedWriter writer = null;
@@ -70,7 +70,6 @@ public class FileOutput extends FileIO {
     /**
      * Closes the Writer
      *
-     * @return Success
      * @throws IOException when trying to close the opened file and fails
      */
     public synchronized void closeWriter() throws IOException {
@@ -123,6 +122,8 @@ public class FileOutput extends FileIO {
      * Deletes file
      *
      * @return Success
+     * @throws IOException          when the file deleter could not access the file
+     * @throws InvalidPathException when the file path is invalid
      */
     public synchronized boolean deleteFile() throws InvalidPathException, IOException {
         try {
