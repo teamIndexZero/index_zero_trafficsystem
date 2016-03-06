@@ -3,7 +3,7 @@ package kcl.teamIndexZero.traffic.simulator.data.features;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
-import kcl.teamIndexZero.traffic.simulator.data.links.RoadLink;
+import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
@@ -14,8 +14,9 @@ import java.awt.*;
  * Traffic Generator Feature that can be linked to dead-ends on the map to make traffic
  */
 public class TrafficGenerator extends Feature {
-    private RoadLink roadLink;
     private int counter = 1;
+    private java.util.List<Link> incoming;
+    private java.util.List<Link> outgoing;
     private static SimulationMap map = null;
     //TODO make some sort of traffic receptor to draw up statistic??
 
@@ -30,17 +31,17 @@ public class TrafficGenerator extends Feature {
         if (map == null) TrafficGenerator.map = map;
     }
 
+    public void linkRoad(Road road) {
+        //TODO check which end is dead ended then attach links to the free end
+    }
+
     /**
      * Gets a random lane to place a vehicle onto
      *
      * @return Random Lane
      */
     private Lane getRandomLane() {
-        if (roadLink.a.equals(this)) {
-            return roadLink.a_inflow.get((int) (Math.random() * roadLink.a_inflow.size() - 1)).out;
-        } else {
-            return roadLink.b_inflow.get((int) (Math.random() * roadLink.b_inflow.size() - 1)).out;
-        }
+        return (Lane) outgoing.get((int) (Math.random() * outgoing.size() - 1)).out;
     }
 
     /**
