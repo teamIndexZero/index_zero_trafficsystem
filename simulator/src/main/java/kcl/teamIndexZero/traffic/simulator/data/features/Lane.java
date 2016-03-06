@@ -66,7 +66,7 @@ public class Lane extends Feature {
      *
      * @return Road
      */
-    public Road getParentRoad() {
+    public Road getRoad() {
         return this.lanes.getRoad();
     }
 

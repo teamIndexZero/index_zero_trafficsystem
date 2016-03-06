@@ -47,13 +47,11 @@ public class LaneTest {
     }
 
     @Test
-    public void testGetParentRoad() throws Exception {
+    public void testGetRoad() throws Exception {
         RoadSpecs rs = new RoadSpecs();
         DirectedLanes mocked_dl = mock(DirectedLanes.class);
         Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl);
         when(mocked_dl.getRoad()).thenReturn(new Road(new ID("TestRoad"), 2, 2, 2000, new GeoPolyline(), "Awesome Rd."));
-        assertEquals("Awesome Rd.", l.getParentRoad().getName());
+        assertEquals("Awesome Rd.", l.getRoad().getName());
     }
-
-
 }

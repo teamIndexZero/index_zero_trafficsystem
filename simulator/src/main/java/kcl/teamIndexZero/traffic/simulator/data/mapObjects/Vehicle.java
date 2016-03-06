@@ -55,7 +55,7 @@ public class Vehicle extends MapObject {
                    Lane lane,
                    double speedMetersPerSecond,
                    double accelerationMetersPerSecondSecond) {
-        super(name, position, lane.getParentRoad());
+        super(name, position, lane.getRoad());
         this.speedMetersPerSecond = speedMetersPerSecond;
         this.accelerationMetersPerSecondSecond = accelerationMetersPerSecondSecond;
     }
