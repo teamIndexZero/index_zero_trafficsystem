@@ -1,16 +1,22 @@
 package kcl.teamIndexZero.traffic.simulator.data.links;
 
+import kcl.teamIndexZero.traffic.log.Logger;
+import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.exceptions.JunctionPathException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Special Lane level link for Junction enabling access to Junction's behaviour
  */
 public class JunctionLink extends Link {
+    private static Logger_Interface LOG = Logger.getLoggerInstance(JunctionLink.class.getSimpleName());
     private Junction junction;
     private Road road;
 
@@ -32,7 +38,12 @@ public class JunctionLink extends Link {
      * @return exit links
      */
     public List<Link> getLinks() {
-        return junction.getLinks();
+        try {
+            return junction.getNextLinks(super.getID());
+        } catch (JunctionPathException e) {
+            LOG.log_Fatal("No exit link from the junction were found! i.e.: Car is stuck!");
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -42,6 +53,14 @@ public class JunctionLink extends Link {
      */
     public ID getRoadID() {
         return this.road.getID();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Feature getNextFeature() {
+        return super.out;
     }
 
     /**
