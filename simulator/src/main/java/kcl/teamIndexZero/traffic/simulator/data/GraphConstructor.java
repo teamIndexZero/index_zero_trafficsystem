@@ -11,10 +11,10 @@ import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
-import kcl.teamIndexZero.traffic.simulator.exeptions.MapIntegrityException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.MissingImplementationException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.OrphanFeatureException;
-import kcl.teamIndexZero.traffic.simulator.exeptions.UnrecognisedLinkException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.MissingImplementationException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.OrphanFeatureException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.UnrecognisedLinkException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -112,7 +112,9 @@ public class GraphConstructor {
                 LOG.log_Error("IDs '", l.fromID.toString(), "' and '", l.toID, "' not in loaded features.");
                 throw new UnrecognisedLinkException("ID pointing to a Feature that is not loaded.");
             }
-            try {
+            //TODO @Es this seems a bit incomplete refactoring - we have .one and .two replaced with .in and .out,
+            // and I am not entirely sure I get the order right, so I comment this for now for the branch to build.
+            /* try {
                 Link link = createLink(l.type, l.linkID);
                 if (feature_one != null) {
                     feature_one.addLink(link);
@@ -133,6 +135,8 @@ public class GraphConstructor {
                 LOG.log_Exception(e);
                 throw e;
             }
+            */
+
         }
     }
 

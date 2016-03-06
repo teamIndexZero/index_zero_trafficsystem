@@ -21,11 +21,29 @@ public class GuiModel implements ISimulationAware {
 
     public static final int DELAY_MINIMAL = 10;
     public static final int DELAY_MAXIMAL = 100;
+    private static final int DELAY_INITIAL = 50;
 
-    private boolean showSegmentEnds;
     private final SimulationMap map;
+    private boolean showSegmentEnds;
     private MapObject selectedMapObject;
-    private int delayBetweenTicks = 50;
+    private int delayBetweenTicks = DELAY_INITIAL;
+    private List<ChangeListener> listeners = new ArrayList<>();
+    private SimulationTick tick;
+    private SimulationStatus status;
+    private SimulationParams params;
+    private int mapPanelWidthPixels;
+    private int mapPanelHeightPixels;
+
+    /**
+     * Default constructor.
+     *
+     * @param map
+     */
+    public GuiModel(SimulationMap map) {
+        this.map = map;
+        reset();
+
+    }
 
     public boolean isShowSegmentEnds() {
         return this.showSegmentEnds;
@@ -43,6 +61,11 @@ public class GuiModel implements ISimulationAware {
         return null;
     }
 
+    public void setSelectedMapObject(MapObject selectedMapObject) {
+        this.selectedMapObject = selectedMapObject;
+        fireChangeEvent();
+    }
+
     @Override
     public void tick(SimulationTick tick) {
         this.tick = tick;
@@ -57,50 +80,8 @@ public class GuiModel implements ISimulationAware {
         this.delayBetweenTicks = delayBetweenTicks;
     }
 
-    /**
-     * Model update interface. Other components want to implement it in order to receive updates from model when something
-     * important changes.
-     */
-    @FunctionalInterface
-    public interface ChangeListener {
-        /**
-         * Callback interface, invoked by model when its internals change.
-         */
-        void onModelChanged();
-    }
-
-    /**
-     * Status of the simulation process.
-     */
-    public enum SimulationStatus {
-        OFF,
-        PAUSED,
-        INPROGRESS
-    }
-
-    private List<ChangeListener> listeners = new ArrayList<>();
-
-    private SimulationTick tick;
-    private SimulationStatus status;
-    private SimulationParams params;
-
-    private int mapPanelWidthPixels;
-    private int mapPanelHeightPixels;
-
-
     public SimulationMap getMap() {
         return map;
-    }
-
-    /**
-     * Default constructor.
-     *
-     * @param map
-     */
-    public GuiModel(SimulationMap map) {
-        this.map = map;
-        reset();
-
     }
 
     /**
@@ -110,6 +91,7 @@ public class GuiModel implements ISimulationAware {
         tick = null;
         status = SimulationStatus.OFF;
         params = null;
+
         fireChangeEvent();
     }
 
@@ -133,11 +115,6 @@ public class GuiModel implements ISimulationAware {
 
     public SimulationStatus getStatus() {
         return status;
-    }
-
-    public void setSelectedMapObject(MapObject selectedMapObject) {
-        this.selectedMapObject = selectedMapObject;
-        fireChangeEvent();
     }
 
     public void setStatus(SimulationStatus status) {
@@ -176,9 +153,9 @@ public class GuiModel implements ISimulationAware {
         GuiModel guiModel = (GuiModel) o;
 
         if (showSegmentEnds != guiModel.showSegmentEnds) return false;
+        if (delayBetweenTicks != guiModel.delayBetweenTicks) return false;
         if (mapPanelWidthPixels != guiModel.mapPanelWidthPixels) return false;
         if (mapPanelHeightPixels != guiModel.mapPanelHeightPixels) return false;
-        if (map != null ? !map.equals(guiModel.map) : guiModel.map != null) return false;
         if (selectedMapObject != null ? !selectedMapObject.equals(guiModel.selectedMapObject) : guiModel.selectedMapObject != null)
             return false;
         if (tick != null ? !tick.equals(guiModel.tick) : guiModel.tick != null) return false;
@@ -190,13 +167,34 @@ public class GuiModel implements ISimulationAware {
     @Override
     public int hashCode() {
         int result = (showSegmentEnds ? 1 : 0);
-        result = 31 * result + (map != null ? map.hashCode() : 0);
         result = 31 * result + (selectedMapObject != null ? selectedMapObject.hashCode() : 0);
+        result = 31 * result + delayBetweenTicks;
         result = 31 * result + (tick != null ? tick.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (params != null ? params.hashCode() : 0);
         result = 31 * result + mapPanelWidthPixels;
         result = 31 * result + mapPanelHeightPixels;
         return result;
+    }
+
+    /**
+     * Status of the simulation process.
+     */
+    public enum SimulationStatus {
+        OFF,
+        PAUSED,
+        INPROGRESS
+    }
+
+    /**
+     * Model update interface. Other components want to implement it in order to receive updates from model when something
+     * important changes.
+     */
+    @FunctionalInterface
+    public interface ChangeListener {
+        /**
+         * Callback interface, invoked by model when its internals change.
+         */
+        void onModelChanged();
     }
 }
