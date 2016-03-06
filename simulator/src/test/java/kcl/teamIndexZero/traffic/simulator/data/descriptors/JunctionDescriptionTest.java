@@ -1,12 +1,15 @@
 package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -16,17 +19,17 @@ import static org.junit.Assert.assertTrue;
  */
 public class JunctionDescriptionTest {
     private ID id;
-    private List<ID> list;
+    private Map<ID, JunctionDescription.RoadDirection> list;
     private boolean flag;
     private JunctionDescription jd;
 
     @Before
     public void setUp() throws Exception {
         this.id = new ID("JunctionDescriptionTest");
-        this.list = new ArrayList<ID>();
-        this.list.add(new ID("road1"));
-        this.list.add(new ID("road2"));
-        this.list.add(new ID("road3"));
+        this.list = new HashMap<>();
+        this.list.put(new ID("road1"), JunctionDescription.RoadDirection.INCOMING);
+        this.list.put(new ID("road2"), JunctionDescription.RoadDirection.INCOMING);
+        this.list.put(new ID("road3"), JunctionDescription.RoadDirection.OUTGOING);
         this.flag = true;
         this.jd = new JunctionDescription(this.id, this.list, this.flag);
     }

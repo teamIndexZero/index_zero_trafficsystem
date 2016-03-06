@@ -2,15 +2,16 @@ package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is all information we can actually get from OSM.
  */
 public class JunctionDescription {
     private ID id;
-    private List<ID> connectedRoadIDs = new ArrayList<>();
+    private Map<ID, RoadDirection> connectedRoadIDs = new HashMap<>();
     private boolean trafficLightFlag;
 
     /**
@@ -20,7 +21,7 @@ public class JunctionDescription {
      * @param connectedRoadIDs  Connected road IDs
      * @param trafficLight_flag Traffic light on the junction flag
      */
-    public JunctionDescription(ID id, List<ID> connectedRoadIDs, boolean trafficLight_flag) {
+    public JunctionDescription(ID id, Map<ID, RoadDirection> connectedRoadIDs, boolean trafficLight_flag) {
         this.id = id;
         this.connectedRoadIDs = connectedRoadIDs;
         this.trafficLightFlag = trafficLight_flag;
@@ -40,7 +41,7 @@ public class JunctionDescription {
      *
      * @return List of IDs
      */
-    public List<ID> getConnectedIDs() {
+    public Map<ID, RoadDirection> getConnectedIDs() {
         return this.connectedRoadIDs;
     }
 
@@ -51,5 +52,10 @@ public class JunctionDescription {
      */
     public boolean hasTrafficLight() {
         return this.trafficLightFlag;
+    }
+
+    public enum RoadDirection {
+        INCOMING,
+        OUTGOING
     }
 }
