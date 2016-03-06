@@ -40,9 +40,30 @@ public class Link implements ISimulationAware {
         return (in == null || out == null);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Link)) return false;
+
+        Link link = (Link) o;
+
+        if (in != null ? !in.equals(link.in) : link.in != null) return false;
+        if (out != null ? !out.equals(link.out) : link.out != null) return false;
+        return id != null ? id.equals(link.id) : link.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = in != null ? in.hashCode() : 0;
+        result = 31 * result + (out != null ? out.hashCode() : 0);
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        return result;
+    }
+
     /**
      * {@inheritDoc}
      */
+
     @Override
     public void tick(SimulationTick tick) {
     }
