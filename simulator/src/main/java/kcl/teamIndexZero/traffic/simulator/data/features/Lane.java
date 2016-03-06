@@ -4,6 +4,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 
 /**
  * Lane within a set of directed lanes within a road
@@ -12,6 +13,7 @@ public class Lane extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Lane.class.getSimpleName());
     private RoadSpecs roadSpecs;
     private final DirectedLanes lanes;
+    private Link nextLink;
 
     /**
      * Constructor
@@ -68,6 +70,24 @@ public class Lane extends Feature {
      */
     public Road getRoad() {
         return this.lanes.getRoad();
+    }
+
+    /**
+     * Gets the next link in the direction of the lane
+     *
+     * @return Next link
+     */
+    public Link getNextLink() {
+        return this.nextLink;
+    }
+
+    /**
+     * Connects the directed end of the lane to a link
+     *
+     * @param link Link to connect to
+     */
+    public void connect(Link link) {
+        this.nextLink = link;
     }
 
     /**
