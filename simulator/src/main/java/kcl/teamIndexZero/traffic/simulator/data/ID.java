@@ -4,7 +4,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 
 /**
- * Created by Es on 25/02/2016.
+ * ID class for simulation entities
  */
 public class ID {
     private static Logger_Interface LOG = Logger.getLoggerInstance(ID.class.getSimpleName());
@@ -14,10 +14,20 @@ public class ID {
      * Constructor
      *
      * @param id           ID tag to copy
-     * @param discriminant Discriminant to add to the copied tag
+     * @param discriminant Discriminant to append at the end of the copied tag
      */
     public ID(ID id, String discriminant) {
         this.id = id.getId() + ":" + discriminant;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id           ID tag to copy
+     * @param discriminant Discriminant to add in from of the copied tag
+     */
+    public ID(String discriminant, ID id) {
+        this.id = discriminant + ":" + id.getId();
     }
 
     /**
