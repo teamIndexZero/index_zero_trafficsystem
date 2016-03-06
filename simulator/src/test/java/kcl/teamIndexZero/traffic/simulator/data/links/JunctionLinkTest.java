@@ -36,9 +36,9 @@ public class JunctionLinkTest {
 
     @Test
     public void testGetLinks() throws Exception {
-        when(mockedJunction.getLinks()).thenReturn(new ArrayList<Link>());
+        when(mockedJunction.getNextLinks(jl.getID())).thenReturn(new ArrayList<Link>());
         jl.getLinks();
-        verify(mockedJunction).getLinks();
+        verify(mockedJunction).getNextLinks(jl.getID());
     }
 
     @Test

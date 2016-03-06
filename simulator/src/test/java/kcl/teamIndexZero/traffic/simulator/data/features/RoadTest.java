@@ -37,26 +37,26 @@ public class RoadTest {
 
     @Test
     public void testGetIncomingLaneCount() throws Exception {
-        assertEquals(5, r1.getIncomingLaneCount());
-        assertEquals(0, r2.getIncomingLaneCount());
+        assertEquals(5, r1.getForwardLaneCount());
+        assertEquals(0, r2.getForwardLaneCount());
     }
 
     @Test
     public void testGetOutgoingLaneCount() throws Exception {
-        assertEquals(3, r1.getOutgoingLaneCount());
-        assertEquals(10, r2.getOutgoingLaneCount());
+        assertEquals(3, r1.getBackwardLaneCount());
+        assertEquals(10, r2.getBackwardLaneCount());
     }
 
     @Test
-    public void testGetIncomingSide() throws Exception {
-        assertEquals(5, r1.getIncomingSide().getLanes().size());
-        assertEquals(0, r2.getIncomingSide().getLanes().size());
+    public void testGetBackwardSide() throws Exception {
+        assertEquals(5, r1.getBackwardSide().getLanes().size());
+        assertEquals(0, r2.getBackwardSide().getLanes().size());
     }
 
     @Test
-    public void testGetOutgoingSide() throws Exception {
-        assertEquals(3, r1.getOutgoingSide().getLanes().size());
-        assertEquals(10, r2.getOutgoingSide().getLanes().size());
+    public void testGetForwardSide() throws Exception {
+        assertEquals(3, r1.getForwardSide().getLanes().size());
+        assertEquals(10, r2.getForwardSide().getLanes().size());
     }
 
     @Test
