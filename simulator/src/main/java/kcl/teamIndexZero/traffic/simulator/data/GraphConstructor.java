@@ -5,10 +5,7 @@ import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
-import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
-import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
-import kcl.teamIndexZero.traffic.simulator.data.features.Road;
-import kcl.teamIndexZero.traffic.simulator.data.features.TrafficGenerator;
+import kcl.teamIndexZero.traffic.simulator.data.features.*;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
@@ -39,6 +36,8 @@ public class GraphConstructor {
      * @param road_descriptions     List of road description
      * @param link_descriptions     List of link description
      * @throws MapIntegrityException when map integrity is compromised
+     *                               <p>
+     *                               //TODO doc update
      */
     public GraphConstructor(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException {
         //TODO make it so that a lone single feature can be passed to the sim
@@ -48,18 +47,9 @@ public class GraphConstructor {
         }
         try {
             createGraph(junction_descriptions, road_descriptions, link_descriptions);
-            checkGraphIntegrity();
-        } catch (UnrecognisedLinkException e) {
-            LOG.log_Error("A LinkDescription describes in or more features that do not appear in the loaded collection.");
-            LOG.log_Exception(e);
-            throw new MapIntegrityException("Description of map doesn't match reality!", e);
         } catch (MissingImplementationException e) {
             LOG.log_Error("Implementation for a case is missing in the code base!");
             throw new MapIntegrityException("Implementation for a case is missing!", e);
-        } catch (OrphanFeatureException e) {
-            LOG.log_Error("A feature with no links to anything has been found.");
-            LOG.log_Exception(e);
-            throw new MapIntegrityException("Orphan feature", e);
         } catch (MapIntegrityException e) {
             LOG.log_Error("Integrity of the map created from the features and link descriptions given is inconsistent.");
             LOG.log_Exception(e);
@@ -91,34 +81,25 @@ public class GraphConstructor {
      * @param junction_descriptions Descriptions of the junctions
      * @param road_descriptions     Descriptions of the roads
      * @param link_descriptions     Description of the links
-     * @throws UnrecognisedLinkException      when a link description points to a feature not loaded into the featureMap
+     * @throws MapIntegrityException          when issues have come up during construction
      * @throws MissingImplementationException when a LinkType has not been implemented in the code
      */
-    private void createGraph(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws UnrecognisedLinkException, MissingImplementationException {
-        createRoadFeatures(road_descriptions);
-        createJunctionsFeatures(junction_descriptions);
-        for (LinkDescription l : link_descriptions) {
-            Feature feature_one = mapFeatures.get(l.fromID);
-            Feature feature_two = mapFeatures.get(l.toID);
-            if (feature_one == null) {
-                LOG.log_Error("ID '", l.fromID, "' not in loaded features.");
-                throw new UnrecognisedLinkException("ID pointing to a Feature that is not loaded.");
-            }
-            if (feature_two == null) {
-                LOG.log_Error("ID '", l.toID, "' not in loaded features.");
-                throw new UnrecognisedLinkException("ID pointing to a Feature that is not loaded.");
-            }
-            //TODO check that the features one/two are of Road type! otherwise throw exception
-            //TODO work out which ends of the feature to connect based on their properties
-            //TODO > if other end(s) of road(s) already connected check the remaining ends match (for lanes)
-            //TODO > if both ends are free then match correct ends to each other
-            //TODO create the needed numbers of links matching lanes getting connected (of correct LinkTypes)
-            //TODO > if LinkType is traffic light in set then add to set too
-            //TODO -----> Perhaps pass a t.light description with the the two feature being linked for ref later?? Let's see.
-            //TODO connect all lanes
+    private void createGraph(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException, MissingImplementationException {
+        try {
+            createRoadFeatures(road_descriptions); //DONE
+            createJunctionsFeatures(junction_descriptions); //DONE
+            linkFeatures(link_descriptions); //DONE - CHECK
+            addTrafficGenerators(); //TODO addTrafficGenerators() method implementation
+            checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
+        } catch (MapIntegrityException e) { //TODO sort out the exceptions with log calls and forwarding them as appropriate
+
+        } catch (BadLinkException e) {
+
+        } catch (OrphanFeatureException e) {
+
+        } catch (MissingImplementationException e) {
 
         }
-        addTrafficGenerators();
     }
 
     /**
@@ -163,8 +144,10 @@ public class GraphConstructor {
             case GENERIC:
                 return new Link(linkID);
             case AUTONOMOUS_TL:
+                //TODO maybe add the TrafficLight to the tfcontroller?
                 return new TrafficLight(linkID);
             case SYNC_TL:
+                //TODO definitly add the TrafficLight to the TFcontroller!
                 return new TrafficLightInSet(linkID);
             default:
                 LOG.log_Error("LinkType not implemented in .createLink(..)!");
@@ -184,8 +167,7 @@ public class GraphConstructor {
                 try {
                     junction.addRoad((Road) this.mapFeatures.get(id), roadDirection);
                 } catch (AlreadyExistsException e) {
-                    LOG.log_Error("Trying to add Road '", id, "' to Junction '", junction.getID(), "' failed as it's already connected.");
-                    LOG.log_Exception(e);
+                    LOG.log_Warning("Trying to add Road '", id, "' to Junction '", junction.getID(), "' failed as it's already connected.");
                 }
             });
             this.mapFeatures.put(junction.getID(), junction);
@@ -193,10 +175,106 @@ public class GraphConstructor {
     }
 
     /**
+     * Creates Links from descriptions
+     *
+     * @param linkDescriptions List of LinkDescriptions
+     * @throws BadLinkException               when a link description is erroneous or something bad happens with a link
+     * @throws MissingImplementationException when the implementation for a LinkType has not been done
+     */
+    private void linkFeatures(List<LinkDescription> linkDescriptions) throws BadLinkException, MissingImplementationException {
+        for (LinkDescription desc : linkDescriptions) {
+            Feature feature_from = mapFeatures.get(desc.fromID);
+            Feature feature_to = mapFeatures.get(desc.toID);
+            if (feature_from == null) {
+                LOG.log_Error("ID '", desc.fromID, "' not in loaded features.");
+                throw new BadLinkException("ID in LinkDescription points to a Feature that is not loaded.");
+            }
+            if (feature_to == null) {
+                LOG.log_Error("ID '", desc.toID, "' not in loaded features.");
+                throw new BadLinkException("ID in LinkDescription points to a Feature that is not loaded.");
+            }
+            if (!(feature_from instanceof Road)) {
+                LOG.log_Error("Trying to link a Feature ('", feature_from.getID(), "') that is not an instance of Road.");
+                throw new BadLinkException("LinkDescription points to something other than a Road object.");
+            }
+            if (!(feature_to instanceof Road)) {
+                LOG.log_Error("Trying to link a Feature ('", feature_to.getID(), "') that is not an instance of Road.");
+                throw new BadLinkException("LinkDescription points to something other than a Road object.");
+            }
+            int f1_F = ((Road) feature_from).getForwardLaneCount();
+            int f1_B = ((Road) feature_from).getBackwardLaneCount();
+            int f2_F = ((Road) feature_to).getForwardLaneCount();
+            int f2_B = ((Road) feature_to).getBackwardLaneCount();
+            if (f1_F != f2_F || f1_B != f2_B) {
+                LOG.log_Error("Directed linking '", feature_from.getID(), "' to '", feature_to.getID(), "' is not possible as the number of lanes do not match (FWD: ", f1_F, "->", f2_F, ", BCK: ", f1_B, "->", f2_B, " ).");
+                throw new BadLinkException("Mismatch in the lanes of the directed Roads to be linked.");
+            }
+            if (checkForwardLinks(((Road) feature_from).getForwardSide())) {
+                LOG.log_Error("Road '", feature_from.getID(), "' to link is already linked on the forward side.");
+                throw new BadLinkException("Road is already linked on the forward side.");
+            }
+            if (checkForwardLinks(((Road) feature_from).getBackwardSide())) {
+                LOG.log_Error("Road '", feature_from.getID(), "' to link is already linked on the backward side.");
+                throw new BadLinkException("Road is already linked on the backward side.");
+            }
+            //Linking time for the LaneS inside the Road!
+            for (int i = 0; i < ((Road) feature_from).getForwardLaneCount(); i++) {
+                try {
+                    ID id = new ID(desc.linkID + "F:" + Integer.toString(i));
+                    Link link = createLink(desc.type, id);
+                    Lane from = ((Road) feature_from).getForwardSide().getLanes().get(i);
+                    Lane to = ((Road) feature_to).getForwardSide().getLanes().get(i);
+                    link.in = from;
+                    link.out = to;
+                    from.connect(link);
+                    this.mapLinks.put(link.getID(), link);
+                } catch (MissingImplementationException e) {
+                    LOG.log_Fatal("Link type for LinkDescription '", desc.linkID, "' has not been implemented in createLink().");
+                    throw e;
+                }
+            }
+            for (int i = 0; i < ((Road) feature_to).getBackwardLaneCount(); i++) {
+                try {
+                    ID id = new ID(desc.linkID + "B:" + Integer.toString(i));
+                    Link link = createLink(desc.type, id);
+                    Lane from = ((Road) feature_to).getBackwardSide().getLanes().get(i);
+                    Lane to = ((Road) feature_from).getBackwardSide().getLanes().get(i);
+                    link.in = from;
+                    link.out = to;
+                    from.connect(link);
+                    this.mapLinks.put(link.getID(), link);
+                } catch (MissingImplementationException e) {
+                    LOG.log_Fatal("Link type for LinkDescription '", desc.linkID, "' has not been implemented in createLink().");
+                    throw e;
+                }
+            }
+        }
+    }
+
+    /**
      * Adds TrafficGenerator features to all dead-ends in the map.
      */
     private void addTrafficGenerators() {
         //TODO go through a completed graph and find dead ends to add the TrafficGenerators to.
+    }
+
+    /**
+     * Checks of all or none of the lanes in a directed group within a Road are connected to links
+     *
+     * @param lanes DirectedLanes group
+     * @return Full connection state
+     */
+    private boolean checkForwardLinks(DirectedLanes lanes) {
+        int link_count = 0;
+        for (Lane l : lanes.getLanes()) {
+            if (l.getNextLink() != null)
+                link_count++;
+        }
+        if (link_count == lanes.getNumberOfLanes())
+            return true;
+        if (link_count != 0)
+            LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links. ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");
+        return false;
     }
 
     /**

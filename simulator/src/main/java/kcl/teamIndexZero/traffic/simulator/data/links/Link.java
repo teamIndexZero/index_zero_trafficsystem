@@ -49,6 +49,21 @@ public class Link implements ISimulationAware {
         return this.out;
     }
 
+    /**
+     * Gets the previous feature in the direction
+     *
+     * @return Previous feature
+     */
+    public Feature getPreviousFeature() {
+        return this.in;
+    }
+
+    /**
+     * Checks if two Link objects are the same
+     *
+     * @param o Object to compare to
+     * @return Equality
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -62,6 +77,11 @@ public class Link implements ISimulationAware {
 
     }
 
+    /**
+     * Hashcode function for the Link object
+     *
+     * @return Hashcode
+     */
     @Override
     public int hashCode() {
         int result = in != null ? in.hashCode() : 0;
