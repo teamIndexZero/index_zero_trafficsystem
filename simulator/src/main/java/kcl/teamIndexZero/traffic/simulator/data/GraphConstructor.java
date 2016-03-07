@@ -2,19 +2,18 @@ package kcl.teamIndexZero.traffic.simulator.data;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.features.TrafficGenerator;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
-import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
-import kcl.teamIndexZero.traffic.simulator.exceptions.MissingImplementationException;
-import kcl.teamIndexZero.traffic.simulator.exceptions.OrphanFeatureException;
-import kcl.teamIndexZero.traffic.simulator.exceptions.UnrecognisedLinkException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.*;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,22 +28,29 @@ import java.util.Map;
  */
 public class GraphConstructor {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Link.class.getSimpleName());
+    private Map<ID, TrafficGenerator> trafficGenerator = new HashMap<>();
     private Map<ID, Feature> mapFeatures = new HashMap<>();
     private Map<ID, Link> mapLinks = new HashMap<>();
 
-    public GraphConstructor(List<Junction> junction_list, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException {
+    /**
+     * Constructor
+     *
+     * @param junction_descriptions List of junction description
+     * @param road_descriptions     List of road description
+     * @param link_descriptions     List of link description
+     * @throws MapIntegrityException when map integrity is compromised
+     */
+    public GraphConstructor(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException {
         //TODO make it so that a lone single feature can be passed to the sim
-        if (checkEmpty(junction_list, road_descriptions, link_descriptions)) {
+        if (checkEmpty(junction_descriptions, road_descriptions, link_descriptions)) {
             LOG.log_Error("Nothing was passed to the GraphConstructor.");
             throw new MapIntegrityException("Nothing was passed to the GraphConstructor.");
         }
-
         try {
-            createFeatures(road_descriptions, junction_list);
-            createGraph(link_descriptions);
+            createGraph(junction_descriptions, road_descriptions, link_descriptions);
             checkGraphIntegrity();
         } catch (UnrecognisedLinkException e) {
-            LOG.log_Error("A LinkDescription describes one or more features that do not appear in the loaded collection.");
+            LOG.log_Error("A LinkDescription describes in or more features that do not appear in the loaded collection.");
             LOG.log_Exception(e);
             throw new MapIntegrityException("Description of map doesn't match reality!", e);
         } catch (MissingImplementationException e) {
@@ -59,24 +65,6 @@ public class GraphConstructor {
             LOG.log_Exception(e);
             throw e;
         }
-    }
-
-    private void createFeatures(List<RoadDescription> roadDescriptions, List<Junction> junctions) {
-        roadDescriptions.forEach(rd -> {
-            Road r = new Road(rd.getId(),
-                    rd.getLaneCountForward(),
-                    rd.getLaneCountForward(),
-                    rd.getLength(),
-                    rd.getGeoPolyline(),
-                    rd.getRoadName());
-            mapFeatures.put(r.getID(), r);
-            r.getBackwardSide().getLanes().forEach(lane -> {
-                mapFeatures.put(lane.getID(), lane);
-            });
-            r.getForwardSide().getLanes().forEach(lane -> {
-                mapFeatures.put(lane.getID(), lane);
-            });
-        });
     }
 
     /**
@@ -98,46 +86,39 @@ public class GraphConstructor {
     }
 
     /**
-     * Creates the map graph by making links and connecting the relevant features to them
+     * Creates the map graph by making the features and linking them
      *
-     * @param node_vertices Description of the map links
-     * @throws UnrecognisedLinkException when a link description points to a feature not loaded into the featureMap
+     * @param junction_descriptions Descriptions of the junctions
+     * @param road_descriptions     Descriptions of the roads
+     * @param link_descriptions     Description of the links
+     * @throws UnrecognisedLinkException      when a link description points to a feature not loaded into the featureMap
+     * @throws MissingImplementationException when a LinkType has not been implemented in the code
      */
-
-    private void createGraph(List<LinkDescription> node_vertices) throws UnrecognisedLinkException, MissingImplementationException {
-        for (LinkDescription l : node_vertices) {
+    private void createGraph(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws UnrecognisedLinkException, MissingImplementationException {
+        createRoadFeatures(road_descriptions);
+        createJunctionsFeatures(junction_descriptions);
+        for (LinkDescription l : link_descriptions) {
             Feature feature_one = mapFeatures.get(l.fromID);
             Feature feature_two = mapFeatures.get(l.toID);
-            if (feature_one == null && feature_two == null) {
-                LOG.log_Error("IDs '", l.fromID.toString(), "' and '", l.toID, "' not in loaded features.");
+            if (feature_one == null) {
+                LOG.log_Error("ID '", l.fromID, "' not in loaded features.");
                 throw new UnrecognisedLinkException("ID pointing to a Feature that is not loaded.");
             }
-            //TODO @Es this seems a bit incomplete refactoring - we have .one and .two replaced with .in and .out,
-            // and I am not entirely sure I get the order right, so I comment this for now for the branch to build.
-            /* try {
-                Link link = createLink(l.type, l.linkID);
-                if (feature_one != null) {
-                    feature_one.addLink(link);
-                    link.one = feature_one;
-                } else {
-                    LOG.log_Warning("Link description's fromID '", l.fromID, "' is null. Must be a one-way path.");
-                    //TODO maybe put traffic generators on the null ends of links ?
-                }
-                if (feature_two != null) {
-                    feature_two.addLink(link);
-                    link.two = feature_two;
-                } else {
-                    LOG.log_Warning("link description's toID '", l.toID, "' is null. Must be a one-way path.");
-                    //TODO maybe put traffic generators on the null ends of links ?
-                }
-            } catch (MissingImplementationException e) {
-                LOG.log_Fatal("Creating Link failed.");
-                LOG.log_Exception(e);
-                throw e;
+            if (feature_two == null) {
+                LOG.log_Error("ID '", l.toID, "' not in loaded features.");
+                throw new UnrecognisedLinkException("ID pointing to a Feature that is not loaded.");
             }
-            */
+            //TODO check that the features one/two are of Road type! otherwise throw exception
+            //TODO work out which ends of the feature to connect based on their properties
+            //TODO > if other end(s) of road(s) already connected check the remaining ends match (for lanes)
+            //TODO > if both ends are free then match correct ends to each other
+            //TODO create the needed numbers of links matching lanes getting connected (of correct LinkTypes)
+            //TODO > if LinkType is traffic light in set then add to set too
+            //TODO -----> Perhaps pass a t.light description with the the two feature being linked for ref later?? Let's see.
+            //TODO connect all lanes
 
         }
+        addTrafficGenerators();
     }
 
     /**
@@ -146,11 +127,28 @@ public class GraphConstructor {
      * @throws OrphanFeatureException when a feature with no connection to anything is found
      * @throws MapIntegrityException  when the graph integrity is compromised
      */
-
     private void checkGraphIntegrity() throws OrphanFeatureException, MapIntegrityException {
         //TODO count dead-ends
         //TODO count infinite loops
         //TODO check the integrity of the graph (no orphan features and no infinite directed loops with no exit  -o)
+    }
+
+    /**
+     * Creates the Road Features
+     *
+     * @param roadDescriptions RoadDescription object
+     */
+    private void createRoadFeatures(List<RoadDescription> roadDescriptions) {
+        roadDescriptions.forEach(rd -> {
+            Road r = new Road(rd.getId(), rd.getLaneCountForward(), rd.getLaneCountBackward(), rd.getLength(), rd.getGeoPolyline(), rd.getRoadName());
+            mapFeatures.put(r.getID(), r);
+            r.getForwardSide().getLanes().forEach(lane -> {
+                mapFeatures.put(lane.getID(), lane);
+            });
+            r.getBackwardSide().getLanes().forEach(lane -> {
+                mapFeatures.put(lane.getID(), lane);
+            });
+        });
     }
 
     /**
@@ -174,6 +172,32 @@ public class GraphConstructor {
         }
     }
 
+    /**
+     * Creates a Junction from a description
+     *
+     * @param junction_descriptions Description of the all the Junctions to create
+     */
+    private void createJunctionsFeatures(List<JunctionDescription> junction_descriptions) {
+        junction_descriptions.forEach(junctionDescription -> {
+            Junction junction = new Junction(junctionDescription.getID(), junctionDescription.hasTrafficLight());
+            junctionDescription.getConnectedIDs().forEach((id, roadDirection) -> {
+                try {
+                    junction.addRoad((Road) this.mapFeatures.get(id), roadDirection);
+                } catch (AlreadyExistsException e) {
+                    LOG.log_Error("Trying to add Road '", id, "' to Junction '", junction.getID(), "' failed as it's already connected.");
+                    LOG.log_Exception(e);
+                }
+            });
+            this.mapFeatures.put(junction.getID(), junction);
+        });
+    }
+
+    /**
+     * Adds TrafficGenerator features to all dead-ends in the map.
+     */
+    private void addTrafficGenerators() {
+        //TODO go through a completed graph and find dead ends to add the TrafficGenerators to.
+    }
 
     /**
      * Checks if collections is/are empty

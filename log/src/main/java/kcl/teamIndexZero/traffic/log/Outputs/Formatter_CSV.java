@@ -4,7 +4,6 @@ import kcl.teamIndexZero.traffic.log.Log_Levels;
 import kcl.teamIndexZero.traffic.log.Log_TimeStamp;
 
 /**
- * Created by Es on 29/01/2016.
  * Formatter for '.csv' file export
  */
 public class Formatter_CSV implements Formatter_Interface {
@@ -53,13 +52,12 @@ public class Formatter_CSV implements Formatter_Interface {
     @Override
     public String format(String origin_name, Log_TimeStamp time_stamp, Long log_number, Exception e) {
         String cleaned_e = e.toString().replaceAll(";", "¬");
-        String s = String.format("%d;%s;%s;EXCEPTION;%s;%s",
+        return String.format("%d;%s;%s;EXCEPTION;%s;%s",
                 log_number,
                 time_stamp.getDate(),
                 time_stamp.getTime(),
                 origin_name,
                 cleaned_e
         );
-        return s;
     }
 }

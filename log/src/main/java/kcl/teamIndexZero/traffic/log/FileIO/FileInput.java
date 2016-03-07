@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Es on 04/02/2016.
+ * File Input
  */
 public class FileInput extends FileIO {
     private BufferedReader reader = null;
@@ -20,8 +20,8 @@ public class FileInput extends FileIO {
      *
      * @param folder_path Directory path
      * @param file_name   File name
-     * @throws InvalidPathException
-     * @throws IOException
+     * @throws InvalidPathException when creating a new BufferedReader fails
+     * @throws IOException          when the BufferedReader can't access the file
      */
     public FileInput(String folder_path, String file_name) throws InvalidPathException, IOException {
         super(folder_path, file_name);
@@ -48,7 +48,7 @@ public class FileInput extends FileIO {
     public synchronized List<String> read() throws InvalidPathException, IOException {
         try {
             List<String> file_content = new ArrayList<>();
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 file_content.add(line);
             }
@@ -75,8 +75,7 @@ public class FileInput extends FileIO {
     /**
      * Closes the reader
      *
-     * @return Success
-     * @throw IOException when trying to close the opened file and fails
+     * @throws IOException when trying to close the opened file and fails
      */
     public synchronized void closeReader() throws IOException {
         if (this.reader != null) {

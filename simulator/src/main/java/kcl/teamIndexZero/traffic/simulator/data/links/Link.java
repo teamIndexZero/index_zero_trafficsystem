@@ -73,7 +73,6 @@ public class Link implements ISimulationAware {
     /**
      * {@inheritDoc}
      */
-
     @Override
     public void tick(SimulationTick tick) {
     }

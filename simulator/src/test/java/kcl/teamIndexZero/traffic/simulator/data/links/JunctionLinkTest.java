@@ -47,11 +47,4 @@ public class JunctionLinkTest {
         assertEquals("Awesome Rd.", jl.getRoadID().toString());
         verify(mockedRoad).getID();
     }
-
-    @Test
-    public void testGetNextFeature() throws Exception {
-        assertEquals(mockedJunction, jl.getNextFeature());
-
-
-    }
 }

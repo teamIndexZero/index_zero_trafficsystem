@@ -6,9 +6,9 @@ import kcl.teamIndexZero.traffic.simulator.data.GraphConstructor;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
-import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.exceptions.AlreadyExistsException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.mapSetup.MapFactory;
@@ -37,10 +37,10 @@ public class SimulatorEntryPoint {
             MapFactory ezFactory = new MapFactory();
             ezFactory.newFeature(mapFeatureType.SIMPLE_TWO_WAY_ROAD, new ID("road1"));
             //TODO do some map entity creation
-            List<Junction> junctions = new LinkedList<>();
+            List<JunctionDescription> junctionDescriptions = new LinkedList<>();
             List<LinkDescription> links = new LinkedList<LinkDescription>();
             List<RoadDescription> roads = new LinkedList<>();
-            GraphConstructor graph = new GraphConstructor(junctions, roads, links); //TODO temp stuff. need to take care of the exceptions too
+            GraphConstructor graph = new GraphConstructor(junctionDescriptions, roads, links); //TODO temp stuff. need to take care of the exceptions too
             SimulationMap map = new SimulationMap(4, 400, graph);
 
 

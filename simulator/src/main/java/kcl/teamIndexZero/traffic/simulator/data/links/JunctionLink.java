@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * Special Lane level link for Junction enabling access to Junction's behaviour
+ * Note: use *only* for Junctions!
  */
 public class JunctionLink extends Link {
     private static Logger_Interface LOG = Logger.getLoggerInstance(JunctionLink.class.getSimpleName());

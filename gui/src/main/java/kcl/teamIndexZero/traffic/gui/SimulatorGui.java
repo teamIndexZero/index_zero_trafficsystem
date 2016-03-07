@@ -11,9 +11,9 @@ import kcl.teamIndexZero.traffic.simulator.data.GraphConstructor;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
-import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
@@ -51,14 +51,13 @@ public class SimulatorGui {
     private void startSimulatorWindow(OsmParseResult result) {
         try {
             //TODO factory then pass the stuff below to graph constructor
-            java.util.List<Junction> junctions = new ArrayList<>();
+            java.util.List<JunctionDescription> junctionDescriptions = new ArrayList<>();
             java.util.List<LinkDescription> links = new ArrayList<>();
             java.util.List<RoadDescription> roads = result.descriptionList;
 
             links.add(new LinkDescription(roads.get(0).getId(), roads.get(0).getId(), LinkType.SYNC_TL, new ID("Link1")));
-            junctions.add(new Junction(new ID("Junction1"), false));
 
-            GraphConstructor graph = new GraphConstructor(junctions, roads, links); //TODO temp stuff. need to take care of the exceptions too
+            GraphConstructor graph = new GraphConstructor(junctionDescriptions, roads, links); //TODO temp stuff. need to take care of the exceptions too
 
             SimulationMap map = new SimulationMap(4, 400, graph);
             map.widthMeters = result.boundingBox.end.xMeters;
