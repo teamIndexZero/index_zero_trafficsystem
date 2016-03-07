@@ -39,4 +39,18 @@ public class DirectedLanesTest {
             assertEquals(expected.toString(), dl.getLaneID(i).toString());
         }
     }
+
+    @Test
+    public void testGetRoad() throws Exception {
+        Road mocked_road = mock(Road.class);
+        DirectedLanes dl = new DirectedLanes(new ID("LaneGroup"), 5, this.rs, mocked_road);
+        assertEquals(mocked_road, dl.getRoad());
+    }
+
+    @Test
+    public void testGetLanes() throws Exception {
+        Road mocked_road = mock(Road.class);
+        DirectedLanes dl = new DirectedLanes(new ID("LaneGroup"), 5, this.rs, mocked_road);
+        assertEquals(5, dl.getLanes().size());
+    }
 }
