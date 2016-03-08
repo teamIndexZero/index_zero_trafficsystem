@@ -12,7 +12,6 @@ import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
 import kcl.teamIndexZero.traffic.simulator.exceptions.*;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,10 +23,11 @@ import java.util.Map;
  * descriptions pointing to features to link via their IDs and the features themselves.</p>
  */
 public class GraphConstructor {
-    private static Logger_Interface LOG = Logger.getLoggerInstance(Link.class.getSimpleName());
+    private static Logger_Interface LOG = Logger.getLoggerInstance(GraphConstructor.class.getSimpleName());
     private Map<ID, TrafficGenerator> trafficGenerator = new HashMap<>();
     private Map<ID, Feature> mapFeatures = new HashMap<>();
     private Map<ID, Link> mapLinks = new HashMap<>();
+    private GraphTools tools = new GraphTools();
 
     /**
      * Constructor
@@ -41,7 +41,7 @@ public class GraphConstructor {
      */
     public GraphConstructor(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException {
         //TODO make it so that a lone single feature can be passed to the sim
-        if (checkEmpty(junction_descriptions, road_descriptions, link_descriptions)) {
+        if (tools.checkEmpty(junction_descriptions, road_descriptions, link_descriptions)) {
             LOG.log_Error("Nothing was passed to the GraphConstructor.");
             throw new MapIntegrityException("Nothing was passed to the GraphConstructor.");
         }
@@ -109,7 +109,7 @@ public class GraphConstructor {
      * @throws MapIntegrityException  when the graph integrity is compromised
      */
     private void checkGraphIntegrity() throws OrphanFeatureException, MapIntegrityException {
-        //TODO count dead-ends
+        //check for infinite loop
         //TODO count infinite loops
         //TODO check the integrity of the graph (no orphan features and no infinite directed loops with no exit  -o)
     }
@@ -129,6 +129,7 @@ public class GraphConstructor {
             r.getBackwardSide().getLanes().forEach(lane -> {
                 mapFeatures.put(lane.getID(), lane);
             });
+            LOG.log("<GRAPH> Created Road '", rd.getId(), "' [Lanes{F:", rd.getLaneCountForward(), ", B:", rd.getLaneCountBackward(), "}.");
         });
     }
 
@@ -147,7 +148,7 @@ public class GraphConstructor {
                 //TODO maybe add the TrafficLight to the tfcontroller?
                 return new TrafficLight(linkID);
             case SYNC_TL:
-                //TODO definitly add the TrafficLight to the TFcontroller!
+                //TODO definitely add the TrafficLight to the TFcontroller!
                 return new TrafficLightInSet(linkID);
             default:
                 LOG.log_Error("LinkType not implemented in .createLink(..)!");
@@ -166,8 +167,9 @@ public class GraphConstructor {
             junctionDescription.getConnectedIDs().forEach((id, roadDirection) -> {
                 try {
                     junction.addRoad((Road) this.mapFeatures.get(id), roadDirection);
+                    LOG.log("<GRAPH> Added Road '", id, "' to Junction '", junction.getID(), "'.");
                 } catch (AlreadyExistsException e) {
-                    LOG.log_Warning("Trying to add Road '", id, "' to Junction '", junction.getID(), "' failed as it's already connected.");
+                    LOG.log_Warning("<GRAPH> Trying to add Road '", id, "' to Junction '", junction.getID(), "' failed as it's already connected.");
                 }
             });
             this.mapFeatures.put(junction.getID(), junction);
@@ -209,11 +211,11 @@ public class GraphConstructor {
                 LOG.log_Error("Directed linking '", feature_from.getID(), "' to '", feature_to.getID(), "' is not possible as the number of lanes do not match (FWD: ", f1_F, "->", f2_F, ", BCK: ", f1_B, "->", f2_B, " ).");
                 throw new BadLinkException("Mismatch in the lanes of the directed Roads to be linked.");
             }
-            if (checkForwardLinks(((Road) feature_from).getForwardSide())) {
+            if (tools.checkForwardLinks(((Road) feature_from).getForwardSide())) {
                 LOG.log_Error("Road '", feature_from.getID(), "' to link is already linked on the forward side.");
                 throw new BadLinkException("Road is already linked on the forward side.");
             }
-            if (checkForwardLinks(((Road) feature_from).getBackwardSide())) {
+            if (tools.checkForwardLinks(((Road) feature_from).getBackwardSide())) {
                 LOG.log_Error("Road '", feature_from.getID(), "' to link is already linked on the backward side.");
                 throw new BadLinkException("Road is already linked on the backward side.");
             }
@@ -228,6 +230,7 @@ public class GraphConstructor {
                     link.out = to;
                     from.connect(link);
                     this.mapLinks.put(link.getID(), link);
+                    LOG.log("<GRAPH> Linking Lane '", from.getID(), "' to '", to.getID(), "'");
                 } catch (MissingImplementationException e) {
                     LOG.log_Fatal("Link type for LinkDescription '", desc.linkID, "' has not been implemented in createLink().");
                     throw e;
@@ -243,6 +246,7 @@ public class GraphConstructor {
                     link.out = to;
                     from.connect(link);
                     this.mapLinks.put(link.getID(), link);
+                    LOG.log("<GRAPH> Linking Lane '", from.getID(), "' to '", to.getID(), "'");
                 } catch (MissingImplementationException e) {
                     LOG.log_Fatal("Link type for LinkDescription '", desc.linkID, "' has not been implemented in createLink().");
                     throw e;
@@ -252,44 +256,29 @@ public class GraphConstructor {
     }
 
     /**
-     * Adds TrafficGenerator features to all dead-ends in the map.
+     * Adds TrafficGenerator features to all dead-ends in the map
      */
     private void addTrafficGenerators() {
-        //TODO go through a completed graph and find dead ends to add the TrafficGenerators to.
-    }
-
-    /**
-     * Checks of all or none of the lanes in a directed group within a Road are connected to links
-     *
-     * @param lanes DirectedLanes group
-     * @return Full connection state
-     */
-    private boolean checkForwardLinks(DirectedLanes lanes) {
-        int link_count = 0;
-        for (Lane l : lanes.getLanes()) {
-            if (l.getNextLink() != null)
-                link_count++;
-        }
-        if (link_count == lanes.getNumberOfLanes())
-            return true;
-        if (link_count != 0)
-            LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links. ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");
-        return false;
-    }
-
-    /**
-     * Checks if collections is/are empty
-     *
-     * @param collections Collections to check
-     * @return Status: 1+ Collections is empty
-     */
-    private boolean checkEmpty(Collection<?>... collections) {
-        boolean empty_flag = false;
-        for (Collection<?> c : collections) {
-            if (c.isEmpty()) {
-                empty_flag = true;
+        this.mapFeatures.forEach((id, feature) -> {
+            if (feature instanceof Junction) {
+                //check linkage leads to outer features
+                //then mark as visited
+            } else if (feature instanceof Road) {
+                //check all the lanes are in the mapFeatures
+                //then mark as visited
+            } else if (feature instanceof Lane) {
+                //go check the end
+                //if null then get the road, check the other lanes and connect traffic generator
             }
-        }
-        return empty_flag;
+        }); //Maybe recursion might be better?
+        /*
+        Map<ID, Boolean> visitedFeatures = new HashMap<>();
+        this.mapFeatures.keySet().forEach(id -> {
+            visitedFeatures.put(id, Boolean.FALSE);
+        });
+        ID firstKey = (ID) this.mapFeatures.keySet().toArray()[0];
+        traverseGraph(firstKey, visitedFeatures);
+        //TODO go through a completed graph and find dead ends to add the TrafficGenerators to.
+        */
     }
 }
