@@ -32,11 +32,14 @@ public class GraphTools {
             if (l.getNextLink() != null)
                 link_count++;
         }
-        if (link_count > 0 || link_count < lanes.getNumberOfLanes()) {
+        if (link_count == 0)
+            return false;
+        else if (link_count == lanes.getNumberOfLanes())
+            return true;
+        else {
             LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links. ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");
             throw new MapIntegrityException("Road has a group of directed lanes with partly implemented links.");
         }
-        return link_count == lanes.getNumberOfLanes();
     }
 
     /**
