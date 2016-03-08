@@ -68,7 +68,7 @@ public class TrafficBehaviour {
     }
 
     /**
-     * Gets the ID of the next outflow link for a inflow link
+     * [DEPRECIATED] Gets the ID of the next outflow link for a inflow link based on a weighted round-robin distribution
      *
      * @param from Inflow link's ID tag
      * @return Outflow ID
