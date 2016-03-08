@@ -1,24 +1,36 @@
 package kcl.teamIndexZero.traffic.simulator.data.geo;
 
 /**
- * Created by lexaux on 02/03/2016.
+ * Segment (line) between two points in the simulation coordinate system (metersX, metersY).
  */
 public class GeoSegment {
+
     public GeoPoint start;
     public GeoPoint end;
 
+    /**
+     * Constructor from two points
+     *
+     * @param start start of segment
+     * @param end   end of segment
+     */
     public GeoSegment(GeoPoint start, GeoPoint end) {
         this.start = start;
         this.end = end;
     }
 
+    /**
+     * Get metric length of the segment.
+     *
+     * @return lenght of segment in meters.
+     */
+    public double getLength() {
+        return GeoPoint.getDistance(start, end);
+    }
+
     @Override
     public String toString() {
         return String.format("{Segment:%s-%s}", start.toString(), end.toString());
-    }
-
-    public double getLength() {
-        return GeoPoint.getDistance(start, end);
     }
 
     @Override

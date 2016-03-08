@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by Es on 01/03/2016.
@@ -306,10 +308,15 @@ public class GraphConstructor {
                     TrafficGenerator tg = new TrafficGenerator(new ID("TrafficGenerator:" + this.trafficGenerators.size()));
                     tg.linkRoad((Road) road);
                     this.trafficGenerators.add(tg);
-                    this.mapFeatures.put(tg.getID(), tg);
                     LOG.log("<GRAPH> Created a TrafficGenerator ('", tg.getID(), "').");
                 }
             }
         }
+
+        this.mapFeatures.putAll(trafficGenerators.stream().collect(
+                Collectors.toMap(
+                        TrafficGenerator::getID,
+                        Function.identity()))
+        );
     }
 }

@@ -10,6 +10,7 @@ import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MissingImplementationException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,8 +19,8 @@ import java.util.List;
 public class TrafficGenerator extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(TrafficGenerator.class.getSimpleName());
     private int counter = 1;
-    private java.util.List<Link> incoming;
-    private java.util.List<Link> outgoing;
+    private java.util.List<Link> incoming = new ArrayList<>();
+    private java.util.List<Link> outgoing = new ArrayList<>();
 
     /**
      * Constructor
@@ -51,6 +52,7 @@ public class TrafficGenerator extends Feature {
             LOG.log_Warning("Detected attempt to link a fully linked road ('", road.getID(), "') to a traffic generator ('", this.getID(), "'). Nothing done.");
             return;
         }
+
         //Linking time!
         for (Lane lane : incoming.getLanes()) { //entering the generator
             ID id = new ID(lane.getID() + "->" + this.getID());
@@ -103,7 +105,12 @@ public class TrafficGenerator extends Feature {
      */
     @Override
     public void tick(SimulationTick tick) {
-        /* //TODO move that to sim map
+        /*
+        //TODO Es: move that to sim map
+        //TODO Alex: not so sure, I'd rather leave it here and figure out how to get rid of map link/ChickenEgg problem.
+         // this code feels like it belongs here - traffic generator is a thing which creates new car and injects them
+         // into the network...
+
         if (Math.random() > 0.7) {
             // speed somehow varies between 0.5 and 1 m/s
             double speed = Math.random() * 0.5 + 0.5;

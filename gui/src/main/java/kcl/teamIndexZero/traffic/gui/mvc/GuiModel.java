@@ -22,38 +22,83 @@ public class GuiModel implements ISimulationAware {
     public static final int DELAY_MINIMAL = 10;
     public static final int DELAY_MAXIMAL = 100;
     private static final int DELAY_INITIAL = 50;
-
+    private final ViewportModel viewport;
     private final SimulationMap map;
+    private int delayBetweenTicks = DELAY_INITIAL;
     private boolean showSegmentEnds;
     private MapObject selectedMapObject;
-    private int delayBetweenTicks = DELAY_INITIAL;
-    private List<ChangeListener> listeners = new ArrayList<>();
     private SimulationTick tick;
     private SimulationStatus status;
     private SimulationParams params;
-    private int mapPanelWidthPixels;
-    private int mapPanelHeightPixels;
+    private List<ChangeListener> listeners = new ArrayList<>();
+
 
     /**
      * Default constructor.
      *
-     * @param map
+     * @param map simulation map factory; can provide/create a map on demand.
      */
     public GuiModel(SimulationMap map) {
         this.map = map;
+        this.viewport = new ViewportModel(this);
         reset();
 
     }
 
+    /**
+     * Get a Viewport related to current simulation. Viewport is a part of the model basically related to the coordinates,
+     * their conversion, window size, proportions, zoom in/out etc.
+     * <p>
+     * It could have been placed here, but due to the extensive amount of specific logic looks like it deserves a
+     * special class.
+     *
+     * @return current viewport model.
+     */
+    public ViewportModel getViewport() {
+        return viewport;
+    }
+
+    @Override
+    public void tick(SimulationTick tick) {
+        this.tick = tick;
+        SwingUtilities.invokeLater(this::fireChangeEvent);
+    }
+
+    /**
+     * Reset method gets model to the default state (same as it was right after running constructor.
+     */
+    public void reset() {
+        tick = null;
+        status = SimulationStatus.OFF;
+        params = null;
+        fireChangeEvent();
+    }
+
+    /**
+     * Whether to display little crossings at segment ends - green at start and red at end
+     *
+     * @return current setting.
+     */
     public boolean isShowSegmentEnds() {
         return this.showSegmentEnds;
     }
 
+    /**
+     * Setter for showSegmentEnds
+     *
+     * @param showSegmentEnds set
+     */
     public void setShowSegmentEnds(boolean showSegmentEnds) {
         this.showSegmentEnds = showSegmentEnds;
         fireChangeEvent();
     }
 
+    /**
+     * Returns an object which is currently selected (either on map, or in the list). On map this object should be drawn
+     * with the special symbol to designate it as selected.
+     *
+     * @return selected object
+     */
     public MapObject getSelectedMapObject() {
         if (map.getObjectsOnSurface().contains(selectedMapObject)) {
             return selectedMapObject;
@@ -66,12 +111,6 @@ public class GuiModel implements ISimulationAware {
         fireChangeEvent();
     }
 
-    @Override
-    public void tick(SimulationTick tick) {
-        this.tick = tick;
-        SwingUtilities.invokeLater(this::fireChangeEvent);
-    }
-
     public int getDelayBetweenTicks() {
         return delayBetweenTicks;
     }
@@ -82,31 +121,6 @@ public class GuiModel implements ISimulationAware {
 
     public SimulationMap getMap() {
         return map;
-    }
-
-    /**
-     * Reset method gets model to the default state (same as it was right after running constructor.
-     */
-    public void reset() {
-        tick = null;
-        status = SimulationStatus.OFF;
-        params = null;
-
-        fireChangeEvent();
-    }
-
-    public void setMapPanelSize(int width, int height) {
-        this.mapPanelWidthPixels = width;
-        this.mapPanelHeightPixels = height;
-        fireChangeEvent();
-    }
-
-    public int getMapPanelWidthPixels() {
-        return mapPanelWidthPixels;
-    }
-
-    public int getMapPanelHeightPixels() {
-        return mapPanelHeightPixels;
     }
 
     public SimulationTick getTick() {
@@ -122,24 +136,24 @@ public class GuiModel implements ISimulationAware {
         fireChangeEvent();
     }
 
-    public SimulationParams getParams() {
-        return params;
-    }
-
     public void setParams(SimulationParams params) {
         this.params = params;
         fireChangeEvent();
     }
 
+    /**
+     * Listeners will get notified as soon as there is a change in model to report to outside world.
+     *
+     * @param listener an instance of listeren to add.
+     */
     public void addChangeListener(ChangeListener listener) {
         listeners.add(listener);
     }
 
-    public void removeChangeListener(ChangeListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireChangeEvent() {
+    /*
+    Notify all listeners: something has changed.
+     */
+    void fireChangeEvent() {
         synchronized (map) {
             listeners.forEach(ChangeListener::onModelChanged);
         }
@@ -154,8 +168,6 @@ public class GuiModel implements ISimulationAware {
 
         if (showSegmentEnds != guiModel.showSegmentEnds) return false;
         if (delayBetweenTicks != guiModel.delayBetweenTicks) return false;
-        if (mapPanelWidthPixels != guiModel.mapPanelWidthPixels) return false;
-        if (mapPanelHeightPixels != guiModel.mapPanelHeightPixels) return false;
         if (selectedMapObject != null ? !selectedMapObject.equals(guiModel.selectedMapObject) : guiModel.selectedMapObject != null)
             return false;
         if (tick != null ? !tick.equals(guiModel.tick) : guiModel.tick != null) return false;
@@ -172,8 +184,6 @@ public class GuiModel implements ISimulationAware {
         result = 31 * result + (tick != null ? tick.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (params != null ? params.hashCode() : 0);
-        result = 31 * result + mapPanelWidthPixels;
-        result = 31 * result + mapPanelHeightPixels;
         return result;
     }
 

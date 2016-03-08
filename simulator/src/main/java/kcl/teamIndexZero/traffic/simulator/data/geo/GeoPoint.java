@@ -1,7 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.geo;
 
 /**
- * Created by lexaux on 02/03/2016.
+ * Represents a geographical point (in our synthetic coordinate system (offset to north and east from 0,0).
  */
 public class GeoPoint {
 
@@ -13,8 +13,14 @@ public class GeoPoint {
         this.yMeters = yMeters;
     }
 
+    /**
+     * Get distance in meters between two points (linear)
+     *
+     * @param point  first point
+     * @param point1 second point
+     * @return distance in meters.
+     */
     public static double getDistance(GeoPoint point, GeoPoint point1) {
-
         return Math.sqrt(
                 (point.xMeters - point1.xMeters) * (point.xMeters - point1.xMeters) +
                         (point.yMeters - point1.yMeters) * (point.yMeters - point1.yMeters));

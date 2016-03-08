@@ -65,14 +65,14 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
      */
     protected void addButtons() {
         playButton = makeButton(
-                "play",
+                "media-play-3x",
                 "Start the simulation",
                 "Start",
                 controller::start);
         add(playButton);
 
         pauseButton = makeButton(
-                "pause",
+                "media-pause-3x",
                 "Temporarily pause the simulation",
                 "Pause",
                 controller::pause
@@ -80,11 +80,19 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
         add(pauseButton);
 
         stopButton = makeButton(
-                "stop",
-                "Stop the simulation",
-                "Stop",
-                controller::stop);
+                "reload-3x",
+                "Restart from chooser",
+                "Restart",
+                controller::restart);
         add(stopButton);
+        addSeparator();
+
+        JButton resetZoomButton = makeButton(
+                "compass-3x",
+                "Reset Zoom to Original",
+                "Reset Zoom",
+                model.getViewport()::resetZoom);
+        add(resetZoomButton);
     }
 
 

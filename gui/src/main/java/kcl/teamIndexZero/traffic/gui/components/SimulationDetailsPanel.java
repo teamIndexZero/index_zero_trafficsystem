@@ -15,57 +15,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Settings and details panel.
+ * <p>
+ * It has several panels inside:
+ * <p>
+ * - Cars panel: list of all vehicles currently in operation
+ * - Settings panel: allows to alter simulation/display settings
+ * - Info panel: shows generic stats about simulation
  */
 public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeListener {
 
-    private JList<MapObject> carList;
-    private JLabel detailsLabel;
-
-    private class MapObjectListModel extends AbstractListModel<MapObject> implements GuiModel.ChangeListener {
-        private List<MapObject> mapObjects = new ArrayList<>();
-
-        public MapObjectListModel() {
-            model.addChangeListener(this);
-        }
-
-        @Override
-        public int getSize() {
-            return mapObjects.size();
-        }
-
-        @Override
-        public MapObject getElementAt(int index) {
-            return mapObjects.get(index);
-        }
-
-        @Override
-        public void onModelChanged() {
-            mapObjects.clear();
-            mapObjects.addAll(model.getMap().getObjectsOnSurface());
-            fireContentsChanged(this, 0, getSize() - 1);
-        }
-    }
-
-    private class OverridingListModelRenderer implements ListCellRenderer<MapObject> {
-        private DefaultListCellRenderer defaultOne = new DefaultListCellRenderer();
-
-        @Override
-        public Component getListCellRendererComponent(JList<? extends MapObject> list, MapObject value, int index, boolean isSelected, boolean cellHasFocus) {
-            return defaultOne.getListCellRendererComponent(list, value.getNameAndRoad(), index, isSelected, cellHasFocus);
-        }
-    }
-
     private final GuiModel model;
     private final GuiController controller;
-
+    private JList<MapObject> carList;
+    private JLabel detailsLabel;
     private JLabel tickDetailsField = new JLabel();
     private JLabel carsCurrentlyOnScreenLabel = new JLabel();
-
     private JPanel infoPanel = new JPanel();
     private JPanel settingsPanel = new JPanel();
     private JPanel carsPanel = new JPanel();
 
-
+    /**
+     * Constructor.
+     *
+     * @param model      model
+     * @param controller controller
+     */
     public SimulationDetailsPanel(GuiModel model, GuiController controller) {
         this.model = model;
         this.controller = controller;
@@ -123,12 +98,12 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         extraDelayBetweenTicksSlider.setPaintTicks(true);
         extraDelayBetweenTicksSlider.setPaintLabels(true);
 
-        JToggleButton drawCrossings = new JCheckBox("Show segment ends", model.isShowSegmentEnds());
+        JToggleButton drawSegmentEnds = new JCheckBox("Show segment ends", model.isShowSegmentEnds());
 
-        drawCrossings.addActionListener(new ActionListener() {
+        drawSegmentEnds.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                model.setShowSegmentEnds(drawCrossings.isSelected());
+                model.setShowSegmentEnds(drawSegmentEnds.isSelected());
             }
         });
 
@@ -136,11 +111,11 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         settingsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JLabel delayLabel = new JLabel("Extra delay between simulation ticks");
 
-        drawCrossings.setAlignmentX(Component.LEFT_ALIGNMENT);
+        drawSegmentEnds.setAlignmentX(Component.LEFT_ALIGNMENT);
         delayLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         extraDelayBetweenTicksSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        settingsPanel.add(drawCrossings);
+        settingsPanel.add(drawSegmentEnds);
         settingsPanel.add(delayLabel);
         settingsPanel.add(extraDelayBetweenTicksSlider);
     }
@@ -154,6 +129,9 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         infoPanel.add(carsCurrentlyOnScreenLabel);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onModelChanged() {
         // updating tick details
@@ -186,5 +164,45 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
 
     private String createTableRow(String label, String value) {
         return String.format("<tr><td>%s</td><td><b>%s</b></td></tr>", label, value);
+    }
+
+    /**
+     * List model for an object observing our model.
+     */
+    private class MapObjectListModel extends AbstractListModel<MapObject> implements GuiModel.ChangeListener {
+        private List<MapObject> mapObjects = new ArrayList<>();
+
+        public MapObjectListModel() {
+            model.addChangeListener(this);
+        }
+
+        @Override
+        public int getSize() {
+            return mapObjects.size();
+        }
+
+        @Override
+        public MapObject getElementAt(int index) {
+            return mapObjects.get(index);
+        }
+
+        @Override
+        public void onModelChanged() {
+            mapObjects.clear();
+            mapObjects.addAll(model.getMap().getObjectsOnSurface());
+            fireContentsChanged(this, 0, getSize() - 1);
+        }
+    }
+
+    /**
+     * A specific renderer for list which allows us to show something other than toString.
+     */
+    private class OverridingListModelRenderer implements ListCellRenderer<MapObject> {
+        private DefaultListCellRenderer defaultOne = new DefaultListCellRenderer();
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends MapObject> list, MapObject value, int index, boolean isSelected, boolean cellHasFocus) {
+            return defaultOne.getListCellRendererComponent(list, value.getNameAndRoad(), index, isSelected, cellHasFocus);
+        }
     }
 }

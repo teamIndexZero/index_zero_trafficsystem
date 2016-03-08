@@ -1,5 +1,7 @@
 package kcl.teamIndexZero.traffic.gui.mvc;
 
+import kcl.teamIndexZero.traffic.gui.SimulatorGui;
+import kcl.teamIndexZero.traffic.gui.components.SimulationWindow;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
 import kcl.teamIndexZero.traffic.simulator.SimulatorFactory;
 
@@ -33,7 +35,7 @@ public class GuiController {
     }
 
     /**
-     * Pause method - temporarily pause the execution until further commands. We can go to 'stop' or to 'continue' then.
+     * Pause method - temporarily pause the execution until further commands. We can go to 'restart' or to 'continue' then.
      */
     public void pause() {
         model.setStatus(GuiModel.SimulationStatus.PAUSED);
@@ -44,7 +46,7 @@ public class GuiController {
      * Finish the simulation with erasing all the immediately visible results.
      * It then resets the model into initial state.
      */
-    public void stop() {
+    public void restart() {
         assert (simulator != null);
 
         if (model.getStatus() == GuiModel.SimulationStatus.PAUSED) {
@@ -52,6 +54,8 @@ public class GuiController {
         }
         simulator.stop();
         model.reset();
+        SimulatorGui.startOver();
+        SimulationWindow.close();
     }
 
     /**

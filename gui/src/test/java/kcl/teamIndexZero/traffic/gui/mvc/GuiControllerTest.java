@@ -33,9 +33,9 @@ public class GuiControllerTest {
             controller = new GuiController(mock(GuiModel.class), () -> simulatorMock);
             controller.start();
         } finally {
-            // stop simulation if any
+            // restart simulation if any
             if (controller != null) {
-                controller.stop();
+                controller.restart();
 
                 // wait for the bg thread to terminate.
                 if (controller.getSimulatorThread() != null) {

@@ -14,18 +14,23 @@ import java.util.*;
 
 /**
  * SAX Xml handler to read elements from OpenStreetMap.
+ * <p>
+ * Java SAX parser will invoke certain methods (overridden from {@link DefaultHandler}) of this class when it encounters
+ * certain elements, attributes or other XML events. Different handle* methods of this class are actually handling different
+ * XML parse events (bounds element found, tag element found, etc.)
  */
-class SaxHandler extends DefaultHandler {
+class OsmSaxHandler extends DefaultHandler {
 
     public static final String BOUNDS_ELEMENT = "bounds";
     public static final String NODE_ELEMENT = "node";
     public static final String WAY_ELEMENT = "way";
     public static final String NODE_WITHIN_WAY_ELEMENT = "nd";
-    public static final String TAG = "tag";
+    public static final String TAG_ELEMENT = "tag";
 
-    private Logger LOG = Logger.getLoggerInstance(SaxHandler.class.getName());
+    private static final Logger LOG = Logger.getLoggerInstance(OsmSaxHandler.class.getName());
+
     private OsmParseResult result;
-    private Set<String> interestingElements = new HashSet<>(Arrays.asList(BOUNDS_ELEMENT, NODE_ELEMENT, WAY_ELEMENT, NODE_WITHIN_WAY_ELEMENT, TAG));
+    private Set<String> interestingElements = new HashSet<>(Arrays.asList(BOUNDS_ELEMENT, NODE_ELEMENT, WAY_ELEMENT, NODE_WITHIN_WAY_ELEMENT, TAG_ELEMENT));
     private Map<String, GeoPoint> points = new HashMap<>();
 
     private GeoPolyline currentRoadPolyline = null;
@@ -36,10 +41,25 @@ class SaxHandler extends DefaultHandler {
     private double boundsMinLat;
     private boolean boundsHandled = false;
 
-    public SaxHandler(OsmParseResult result) {
+    /**
+     * Constructor, we pass in the result which is to be filled by this class methods.
+     *
+     * @param result result object to fill.
+     */
+    public OsmSaxHandler(OsmParseResult result) {
         this.result = result;
     }
 
+    /**
+     * Gets a distance in meters between two arbitrary points in WGS-84. Spherical abstraciton is used with no further
+     * detailization of geoid.
+     *
+     * @param lat1 point 1 latitude
+     * @param lon1 point 1 longitude
+     * @param lat2 point 2 latitude
+     * @param lon2 point 2 longitude
+     * @return distance in meters.
+     */
     private static double getDistanceMeters(double lat1, double lon1, double lat2, double lon2) {
         double R = 6371000;
 
@@ -55,6 +75,9 @@ class SaxHandler extends DefaultHandler {
         return R * c;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void startElement(String uri, String localName, String qName,
                              Attributes attributes) throws SAXException {
 
@@ -62,33 +85,43 @@ class SaxHandler extends DefaultHandler {
             return;
         }
 
-        // if we are in bounds?
-        if (BOUNDS_ELEMENT.equals(qName)) {
-            handleBounds(attributes);
-        }
-
-        if (NODE_ELEMENT.equals(qName)) {
-            handleNode(attributes);
-        }
-
-        if (WAY_ELEMENT.equals(qName)) {
-            handleWayOpen(attributes);
-        }
-
-        if (NODE_WITHIN_WAY_ELEMENT.equals(qName)) {
-            handleNodeWithinWay(attributes);
-        }
-
-        if (TAG.equals(qName)) {
-            handleTag(attributes);
+        switch (qName) {
+            case BOUNDS_ELEMENT:
+                handleBounds(attributes);
+                break;
+            case NODE_ELEMENT:
+                handleNode(attributes);
+                break;
+            case WAY_ELEMENT:
+                handleWayOpen(attributes);
+                break;
+            case NODE_WITHIN_WAY_ELEMENT:
+                handleNodeWithinWay(attributes);
+                break;
+            case TAG_ELEMENT:
+                handleTag(attributes);
+                break;
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void endElement(String uri, String localName,
+                           String qName) throws SAXException {
+        if (!interestingElements.contains(qName)) {
+            return;
+        }
+        if (WAY_ELEMENT.equals(qName)) {
+            handleWayClose();
+        }
+    }
+
+    //        <tag k="name" v="Pall Mall"/>
+    //        <tag k="oneway" v="yes"/>
+    //        <tag k="maxspeed" v="30 mph"/>
+    //        <tag k="lanes" v="1"/>
     private void handleTag(Attributes attributes) {
-//        <tag k="name" v="Pall Mall"/>
-//        <tag k="oneway" v="yes"/>
-//        <tag k="maxspeed" v="30 mph"/>
-//        <tag k="lanes" v="1"/>
         if (currentRoadId == null) {
             return;
         }
@@ -100,21 +133,13 @@ class SaxHandler extends DefaultHandler {
         }
     }
 
-    public void endElement(String uri, String localName,
-                           String qName) throws SAXException {
-        if (!interestingElements.contains(qName)) {
-            return;
-        }
-        if (WAY_ELEMENT.equals(qName)) {
-            handleWayClose();
-        }
-    }
 
-
+    // <way id="8032768" version="20" timestamp="2016-03-02T22:08:00Z" uid="352985" user="ecatmur"
+    //          changeset="32783057">
+    //  <nd ref="108192"/>
+    //  ...
+    // </way>
     private void handleNodeWithinWay(Attributes attributes) {
-        // <way id="8032768" version="20" timestamp="2016-03-02T22:08:00Z" uid="352985" user="ecatmur"
-        //          changeset="32783057">
-        // <nd ref="108192"/>
 
         String nodeId = attributes.getValue("ref");
 
@@ -126,13 +151,13 @@ class SaxHandler extends DefaultHandler {
         }
     }
 
+    //        <way id="8032768" version="20" timestamp="2016-03-02T22:08:00Z"
+    //              uid="352985" user="ecatmur" changeset="32783057">
+    //        <nd ref="108192"/>
+    //        <nd ref="108193"/>
+    //        <tag k="lit" v="yes"/>
+    //        </way>
     private void handleWayOpen(Attributes attributes) {
-        //        <way id="8032768" version="20" timestamp="2016-03-02T22:08:00Z"
-        //              uid="352985" user="ecatmur" changeset="32783057">
-        //        <nd ref="108192"/>
-        //        <nd ref="108193"/>
-        //        <tag k="lit" v="yes"/>
-        //        </way>
         currentRoadId = attributes.getValue("id");
         currentRoadPolyline = new GeoPolyline();
     }
@@ -146,16 +171,15 @@ class SaxHandler extends DefaultHandler {
                 1
         );
 
-        result.descriptionList.add(description);
+        result.roadDescriptions.add(description);
         currentRoadPolyline = null;
         currentRoadId = null;
         currentRoadName = null;
     }
 
-
+    // <node id="2684347240" version="1" timestamp="2016-03-02T22:08:00Z" uid="1016290"
+    // user="Amaroussi" changeset="20704202" lat="51.4971865" lon="-0.1002579"/>
     private void handleNode(Attributes attributes) {
-        // <node id="2684347240" version="1" timestamp="2016-03-02T22:08:00Z" uid="1016290"
-        // user="Amaroussi" changeset="20704202" lat="51.4971865" lon="-0.1002579"/>
         if (!boundsHandled) {
             throw new IllegalStateException("Can not handle node as bounds are not loaded yet = no conversion to meters.");
         }
@@ -167,9 +191,9 @@ class SaxHandler extends DefaultHandler {
                         getDistanceMeters(this.boundsMinLat, this.boundsMinLon, lat, this.boundsMinLon)));
     }
 
+    // <bounds minlon="-0.10625" minlat="51.49189" maxlon="-0.09609"
+    //                          maxlat="51.49982" origin="osmconvert 0.7T"/>
     private void handleBounds(Attributes attributes) {
-        // <bounds minlon="-0.10625" minlat="51.49189" maxlon="-0.09609"
-        //                          maxlat="51.49982" origin="osmconvert 0.7T"/>
         boundsHandled = true;
         this.boundsMinLat = Double.parseDouble(attributes.getValue("minlat"));
         this.boundsMinLon = Double.parseDouble(attributes.getValue("minlon"));

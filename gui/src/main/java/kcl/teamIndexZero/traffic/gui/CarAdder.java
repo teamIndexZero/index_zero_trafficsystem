@@ -17,9 +17,8 @@ import java.util.List;
  */
 public class CarAdder implements ISimulationAware {
 
-    int counter = 1;
     private final SimulationMap map;
-
+    int counter = 1;
     private List<Road> roads = new ArrayList<>();
 
     /**
@@ -61,7 +60,9 @@ public class CarAdder implements ISimulationAware {
 
             Vehicle v = new Vehicle(name + counter++, new MapPosition(0, 1, 2, 1), getRandomRoad(), speed, acceleration);
             v.setColor(carColor);
-            map.addMapObject(v);
+            synchronized (map) {
+                map.addMapObject(v);
+            }
         }
     }
 }

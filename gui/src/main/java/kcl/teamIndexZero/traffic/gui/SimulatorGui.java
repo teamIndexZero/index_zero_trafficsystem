@@ -1,7 +1,7 @@
 package kcl.teamIndexZero.traffic.gui;
 
 import kcl.teamIndexZero.traffic.gui.components.ChooserDialog;
-import kcl.teamIndexZero.traffic.gui.components.MainWindow;
+import kcl.teamIndexZero.traffic.gui.components.SimulationWindow;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiController;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.log.Logger;
@@ -21,6 +21,7 @@ import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -33,31 +34,32 @@ public class SimulatorGui {
     private GuiModel model;
 
     /**
-     * Default constructor.
-     */
-    public SimulatorGui() {
-        ChooserDialog.showForOSMLoadResult(this::startSimulatorWindow);
-    }
-
-    /**
      * Entry point.
      *
      * @param args CLI parameters
      */
     public static void main(String[] args) {
-        new SimulatorGui();
+        startOver();
+    }
+
+    /**
+     * Start from the beginning - with the chooser, etc.
+     */
+    public static void startOver() {
+        ChooserDialog.showForOSMLoadResult(new SimulatorGui()::startSimulatorWindow);
     }
 
     private void startSimulatorWindow(OsmParseResult result) {
         try {
             //TODO factory then pass the stuff below to graph constructor
             java.util.List<JunctionDescription> junctionDescriptions = new ArrayList<>();
-            java.util.List<LinkDescription> links = new ArrayList<>();
-            java.util.List<RoadDescription> roads = result.descriptionList;
+            junctionDescriptions.add(new JunctionDescription(new ID("Junc1"), Collections.emptyMap(), false));
+            java.util.List<LinkDescription> linkDescriptions = new ArrayList<>();
+            java.util.List<RoadDescription> roadDescriptions = result.roadDescriptions;
 
-            links.add(new LinkDescription(roads.get(0).getId(), roads.get(0).getId(), LinkType.SYNC_TL, new ID("Link1")));
+            linkDescriptions.add(new LinkDescription(roadDescriptions.get(0).getId(), roadDescriptions.get(0).getId(), LinkType.SYNC_TL, new ID("Link1")));
 
-            GraphConstructor graph = new GraphConstructor(junctionDescriptions, roads, links); //TODO temp stuff. need to take care of the exceptions too
+            GraphConstructor graph = new GraphConstructor(junctionDescriptions, roadDescriptions, linkDescriptions); //TODO temp stuff. need to take care of the exceptions too
 
             SimulationMap map = new SimulationMap(4, 400, graph);
             map.widthMeters = result.boundingBox.end.xMeters;
@@ -85,9 +87,9 @@ public class SimulatorGui {
             });
 
             // that's where we reset model into default state - before the simulation is started.
-
             model.reset();
-            MainWindow window = new MainWindow(model, controller);
+
+            SimulationWindow window = new SimulationWindow(model, controller);
             imageProducer.setImageConsumer(window.getMapPanel());
             window.setVisible(true);
         } catch (MapIntegrityException e) {
