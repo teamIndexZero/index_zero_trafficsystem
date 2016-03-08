@@ -10,6 +10,8 @@ import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MissingImplementationException;
 
+import java.util.List;
+
 /**
  * Traffic Generator Feature that can be linked to dead-ends on the map to make traffic
  */
@@ -70,11 +72,29 @@ public class TrafficGenerator extends Feature {
     }
 
     /**
+     * Gets the list of all incoming links from the TrafficGenerator
+     *
+     * @return List of incoming links
+     */
+    public List<Link> getIncomingLinks() {
+        return this.incoming;
+    }
+
+    /**
+     * Gets the list of all outgoing links from the TrafficGenerator
+     *
+     * @return List of outgoing links
+     */
+    public List<Link> getOutgoingLinks() {
+        return this.outgoing;
+    }
+
+    /**
      * Gets a random lane to place a vehicle onto
      *
      * @return Random Lane
      */
-    private Lane getRandomLane() {
+    public Lane getRandomLane() {
         return (Lane) outgoing.get((int) (Math.random() * outgoing.size() - 1)).out;
     }
 

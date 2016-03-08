@@ -37,7 +37,7 @@ public class GraphConstructor {
      *                               <p>
      *                               //TODO doc update
      */
-    public GraphConstructor(SimulationMap map, List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException {
+    public GraphConstructor(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException {
         //TODO make it so that a lone single feature can be passed to the sim
         if (tools.checkEmpty(junction_descriptions, road_descriptions, link_descriptions)) {
             LOG.log_Error("Nothing was passed to the GraphConstructor.");
@@ -87,16 +87,20 @@ public class GraphConstructor {
             createRoadFeatures(road_descriptions); //DONE
             createJunctionsFeatures(junction_descriptions); //DONE
             linkFeatures(link_descriptions); //DONE - CHECK
-            addTrafficGenerators(); //TODO addTrafficGenerators() method implementation
+            addTrafficGenerators(); //DONE - CHECK
             checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
-        } catch (MapIntegrityException e) { //TODO sort out the exceptions with log calls and forwarding them as appropriate
-
+        } catch (MapIntegrityException e) {
+            LOG.log_Error("Graph integrity is compromised. Aborting construction...");
+            throw e;
         } catch (BadLinkException e) {
-
+            LOG.log_Error("The graph has a bad link.");
+            throw new MapIntegrityException("Bad link detected in the graph..", e);
         } catch (OrphanFeatureException e) {
-
+            LOG.log_Error("An orphan feature has been detected in the graph.");
+            throw new MapIntegrityException("An orphan feature has been found in the graph.", e);
         } catch (MissingImplementationException e) {
-
+            LOG.log_Fatal("An implementation is missing for a case.");
+            throw e;
         }
     }
 
@@ -107,9 +111,62 @@ public class GraphConstructor {
      * @throws MapIntegrityException  when the graph integrity is compromised
      */
     private void checkGraphIntegrity() throws OrphanFeatureException, MapIntegrityException {
-        //check for infinite loop
-        //TODO count infinite loops
+        Map<ID, Boolean> visitedFeatures = new HashMap<>();
+        this.mapFeatures.keySet().forEach(id -> {
+            visitedFeatures.put(id, Boolean.FALSE);
+        });
+        Map<ID, Boolean> visitedLinks = new HashMap<>();
+        this.mapLinks.keySet().forEach(id -> {
+            visitedLinks.put(id, Boolean.FALSE);
+        });
+        return;
+        /*
+        this.trafficGenerators.forEach(trafficGenerator -> {
+            trafficGenerator.getOutgoingLinks().forEach(link -> {
+                try {
+                    if (_checkGraphIntegrity(visitedFeatures, visitedLinks, link)) {
+
+                    } else {
+
+                    }
+                } catch (BadLinkException e) {
+                    e.printStackTrace();
+                } catch (DeadEndFeatureException e) {
+                    e.printStackTrace();
+                }
+            });
+        });
+        */
+
+        //TODO check and count infinite loops
         //TODO check the integrity of the graph (no orphan features and no infinite directed loops with no exit  -o)
+    }
+
+    private boolean _checkGraphIntegrity(Map<ID, Boolean> visitedFeatures, Map<ID, Boolean> visitedLinks, Link nextLink) throws BadLinkException, DeadEndFeatureException {
+        visitedLinks.put(nextLink.getID(), Boolean.TRUE);
+        if (nextLink.isDeadEnd()) {
+            LOG.log_Error("Link '", nextLink.getID(), "' is a dead-end.");
+            throw new BadLinkException("Dead end link found.");
+        }
+        if (visitedFeatures.get(nextLink.getNextFeature().getID()) == Boolean.TRUE) {
+            return true;
+        } else {
+            if (nextLink.getNextFeature() instanceof Junction) {
+
+            } else if (nextLink.getNextFeature() instanceof Lane) {
+                //get the road it belongs to and check the other lanes belonging to it have been visited
+                //> if not then check it, switch to visited and recurse to the next link
+                //> else check it, switch lane to visited and the road as visited too. recurse to next link
+            } else if (nextLink.getNextFeature() instanceof TrafficGenerator) {
+                //check if traffic generator has been visited.
+                //> if not switch to visited and return true;
+            } else {
+                //NOT Supported!
+                //LOG fatal
+                //throw exception
+            }
+        }
+        return false;
     }
 
     /**
