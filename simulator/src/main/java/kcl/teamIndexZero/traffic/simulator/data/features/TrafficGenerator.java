@@ -1,38 +1,72 @@
 package kcl.teamIndexZero.traffic.simulator.data.features;
 
+import kcl.teamIndexZero.traffic.log.Logger;
+import kcl.teamIndexZero.traffic.log.Logger_Interface;
+import kcl.teamIndexZero.traffic.simulator.data.GraphTools;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
-import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
-
-import java.awt.*;
+import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
+import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.MissingImplementationException;
 
 /**
  * Traffic Generator Feature that can be linked to dead-ends on the map to make traffic
  */
 public class TrafficGenerator extends Feature {
+    private static Logger_Interface LOG = Logger.getLoggerInstance(TrafficGenerator.class.getSimpleName());
     private int counter = 1;
     private java.util.List<Link> incoming;
     private java.util.List<Link> outgoing;
-    private static SimulationMap map = null;
-    //TODO make some sort of traffic receptor to draw up statistic??
 
     /**
      * Constructor
      *
-     * @param id  Feature ID tag
-     * @param map SimulationMap
+     * @param id Feature ID tag
      */
-    public TrafficGenerator(ID id, SimulationMap map) {
+    public TrafficGenerator(ID id) {
         super(id);
-        if (map == null) TrafficGenerator.map = map;
     }
 
-    public void linkRoad(Road road) {
-        //TODO check which end is dead ended then attach links to the free end
+    /**
+     * Links a Road to the TrafficGenerator
+     *
+     * @param road Road to link
+     * @throws MapIntegrityException          when the lanes in DirectedLanes group have partly implemented links
+     * @throws MissingImplementationException when a LinkType construction is not implemented in the GraphTools.createLink(..) method
+     */
+    public void linkRoad(Road road) throws MapIntegrityException, MissingImplementationException {
+        GraphTools tools = new GraphTools();
+        DirectedLanes incoming;
+        DirectedLanes outgoing;
+        if (!tools.checkForwardLinks(road.getForwardSide())) {
+            incoming = road.getForwardSide();
+            outgoing = road.getBackwardSide();
+        } else if (!tools.checkForwardLinks(road.getBackwardSide())) {
+            incoming = road.getBackwardSide();
+            outgoing = road.getForwardSide();
+        } else {
+            LOG.log_Warning("Detected attempt to link a fully linked road ('", road.getID(), "') to a traffic generator ('", this.getID(), "'). Nothing done.");
+            return;
+        }
+        //Linking time!
+        for (Lane lane : incoming.getLanes()) { //entering the generator
+            ID id = new ID(lane.getID() + "->" + this.getID());
+            Link link = tools.createLink(LinkType.GENERIC, id);
+            link.in = lane;
+            link.out = this;
+            lane.connect(link);
+            this.incoming.add(link);
+            LOG.log("Linked: '", link.getID(), "'.");
+        }
+        for (Lane lane : outgoing.getLanes()) { //leaving the generator
+            ID id = new ID(lane.getID() + "<-" + this.getID());
+            Link link = tools.createLink(LinkType.GENERIC, id);
+            link.in = this;
+            link.out = lane;
+            this.outgoing.add(link);
+            LOG.log("Linked: '", link.getID(), "'.");
+        }
     }
 
     /**
@@ -49,6 +83,7 @@ public class TrafficGenerator extends Feature {
      */
     @Override
     public void tick(SimulationTick tick) {
+        /* //TODO move that to sim map
         if (Math.random() > 0.7) {
             // speed somehow varies between 0.5 and 1 m/s
             double speed = Math.random() * 0.5 + 0.5;
@@ -69,5 +104,6 @@ public class TrafficGenerator extends Feature {
             v.setColor(carColor);
             map.addMapObject(v);
         }
+        */
     }
 }
