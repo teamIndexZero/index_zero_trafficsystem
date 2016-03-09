@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Es on 27/01/2016.
+ * Logger
+ * Entry point for all logging calls
  */
 public class Logger implements Logger_Interface {
     private static Map<String, Logger> loggers;

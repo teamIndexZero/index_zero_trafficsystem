@@ -60,3 +60,10 @@ There are a couple of easy things in use for testing, namely:
 Obviously we not need use 2) and 3), but they come handy as we get into the longer run.
 
 Created by KCL students as part of a group project
+
+
+# Acknowledgements
+
+1. Icons taken from open-iconic icon set (https://github.com/iconic/open-iconic), MIT license.
+2. Open Street Map excellent wiki resource on how to load the XML data file, and how to work with it to obtian specific
+ features and bounding box https://wiki.openstreetmap.org/wiki/Main_Page

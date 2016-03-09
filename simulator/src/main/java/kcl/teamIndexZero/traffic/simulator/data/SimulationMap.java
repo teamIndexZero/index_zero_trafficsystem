@@ -1,12 +1,22 @@
 package kcl.teamIndexZero.traffic.simulator.data;
 
+import kcl.teamIndexZero.traffic.log.Logger;
+import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.links.Link;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
+import kcl.teamIndexZero.traffic.simulator.exceptions.EmptySimMapException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.OrphanFeatureException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * An umbrella object containing map deails for the simulation. Its responsibilities are clearly divided with Simulator:
+ * An umbrella object containing map details for the simulation. Its responsibilities are clearly divided with Simulator:
  * {@link kcl.teamIndexZero.traffic.simulator.Simulator} is a control interface whilst the {@link SimulationMap} is a
  * collection of objects relating to the map
  * <p>
@@ -23,19 +33,36 @@ import java.util.List;
  */
 public class SimulationMap implements ISimulationAware {
 
+    private static Logger_Interface LOG = Logger.getLoggerInstance(SimulationMap.class.getSimpleName());
     private final int width;
     private final int height;
-    private List<MapObject> objectsOnMap = new ArrayList<>();
+    public double widthMeters;
+    public double heightMeters;
+    private Map<ID, Feature> mapFeatures;
+    private Map<ID, Link> mapLinks;
+    private List<MapObject> objectsOnSurface = new ArrayList<>();
 
     /**
      * Constructor.
      *
      * @param width  map width
      * @param height map height
+     * @throws EmptySimMapException   when there are no features
+     * @throws OrphanFeatureException when there is 1+ unconnected features
      */
-    public SimulationMap(int width, int height) {
+    public SimulationMap(int width, int height, GraphConstructor graph_constructor) throws MapIntegrityException {
         this.width = width;
         this.height = height;
+        this.mapFeatures = graph_constructor.getFeatures();
+        this.mapLinks = graph_constructor.getLinks();
+    }
+
+    public Map<ID, Feature> getMapFeatures() {
+        return mapFeatures;
+    }
+
+    public Map<ID, Link> getMapLinks() {
+        return mapLinks;
     }
 
     /**
@@ -43,11 +70,17 @@ public class SimulationMap implements ISimulationAware {
      */
     @Override
     public void tick(SimulationTick timeStep) {
-        objectsOnMap.forEach(
-                object -> {
-                    object.tick(timeStep);
-                }
-        );
+        synchronized (this) {
+            mapFeatures.forEach(
+                    (id, feature) -> feature.tick(timeStep)
+            );
+            mapLinks.forEach(
+                    (id, link) -> link.tick(timeStep)
+            );
+            objectsOnSurface.forEach(
+                    object -> object.tick(timeStep)
+            );
+        }
     }
 
     /**
@@ -72,13 +105,13 @@ public class SimulationMap implements ISimulationAware {
      */
     public void addMapObject(MapObject mapObject) {
         //todo check if this really does not occupy some other object's space on map
-        objectsOnMap.add(mapObject);
+        objectsOnSurface.add(mapObject);
         mapObject.setMap(this);
     }
 
     /**
-     * Try moving object from one position to another (it may be impossible - i.e. occupied). Old position will be freed
-     * while the new one will be occupied if it goes successfully.
+     * Try moving object from in position to another (it may be impossible - i.e. occupied). Old position will be freed
+     * while the new in will be occupied if it goes successfully.
      *
      * @param object an object to add
      * @param pos    position to move to.
@@ -95,7 +128,7 @@ public class SimulationMap implements ISimulationAware {
      *
      * @return objects on map.
      */
-    public List<MapObject> getObjectsOnMap() {
-        return objectsOnMap;
+    public List<MapObject> getObjectsOnSurface() {
+        return objectsOnSurface;
     }
 }

@@ -1,21 +1,27 @@
 package kcl.teamIndexZero.traffic.gui;
 
-import kcl.teamIndexZero.traffic.gui.components.MainToolbar;
-import kcl.teamIndexZero.traffic.gui.components.MapPanel;
+import kcl.teamIndexZero.traffic.gui.components.ChooserDialog;
+import kcl.teamIndexZero.traffic.gui.components.SimulationWindow;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiController;
 import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
-import kcl.teamIndexZero.traffic.simulator.data.MapPosition;
+import kcl.teamIndexZero.traffic.simulator.data.GraphConstructor;
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
-import kcl.teamIndexZero.traffic.simulator.data.Vehicle;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
+import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
+import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
+import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
 
-import javax.swing.*;
-import java.awt.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -25,11 +31,7 @@ public class SimulatorGui {
 
     protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulatorGui.class.getSimpleName());
 
-    private final JFrame frame;
-    private final MainToolbar mainToolBar;
-    private final GuiController controller;
-    private final GuiModel model;
-    private final MapPanel mapPanel;
+    private GuiModel model;
 
     /**
      * Entry point.
@@ -37,60 +39,63 @@ public class SimulatorGui {
      * @param args CLI parameters
      */
     public static void main(String[] args) {
-        new SimulatorGui();
+        startOver();
     }
 
     /**
-     * Default constructor.
+     * Start from the beginning - with the chooser, etc.
      */
-    public SimulatorGui() {
-        model = new GuiModel();
-        controller = new GuiController(model, () -> {
-            SimulationMap map = new SimulationMap(300, 6);
-            SimulationImageProducer imageProducer = new SimulationImageProducer(
-                    map,
-                    (image, tick) -> {
-                        // here, careful! We are working in another thread, but we want to update UI. In this case, we
-                        // need a carfeul message passing mechanism to update UI thread. We'd rather invoke model
-                        // update in UI thread, since it will then natively fire the UI redraw.
-                        SwingUtilities.invokeLater(() -> {
-                            model.setLastSimulationTickAndImage(image, tick);
-                        });
-                    }
-            );
+    public static void startOver() {
+        ChooserDialog.showForOSMLoadResult(new SimulatorGui()::startSimulatorWindow);
+    }
 
-            SimulationDelay delay = new SimulationDelay(50);
-            CarAdder adder = new CarAdder(map);
-            CarRemover remover = new CarRemover(map);
+    private void startSimulatorWindow(OsmParseResult result) {
+        try {
+            //TODO factory then pass the stuff below to graph constructor
+            java.util.List<JunctionDescription> junctionDescriptions = new ArrayList<>();
+            junctionDescriptions.add(new JunctionDescription(new ID("Junc1"), Collections.emptyMap(), false));
+            java.util.List<LinkDescription> linkDescriptions = new ArrayList<>();
+            java.util.List<RoadDescription> roadDescriptions = result.roadDescriptions;
 
-            map.addMapObject(new Vehicle("Ferrari ES3 4FF", new MapPosition(0, 0, 2, 1), 0.05f, 0));
-            map.addMapObject(new Vehicle("Taxi TT1", new MapPosition(400, 5, 2, 1), -0.1f, 0));
+            linkDescriptions.add(new LinkDescription(roadDescriptions.get(0).getId(), roadDescriptions.get(0).getId(), LinkType.SYNC_TL, new ID("Link1")));
 
-            return new Simulator(
-                    new SimulationParams(LocalDateTime.now(), 10, 1000),
-                    Arrays.asList(
-                            map,
-                            imageProducer,
-                            adder,
-                            remover,
-                            delay)
-            );
-        });
-        mainToolBar = new MainToolbar(model, controller);
+            GraphConstructor graph = new GraphConstructor(junctionDescriptions, roadDescriptions, linkDescriptions); //TODO temp stuff. need to take care of the exceptions too
 
-        mapPanel = new MapPanel(model);
+            SimulationMap map = new SimulationMap(4, 400, graph);
+            map.widthMeters = result.boundingBox.end.xMeters;
+            map.heightMeters = result.boundingBox.end.yMeters;
 
-        frame = new JFrame("Simulation - One Road 2 Lanes Each Way");
-        frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.getContentPane().setLayout(new BorderLayout());
-        frame.add(mainToolBar, BorderLayout.PAGE_START);
-        frame.add(mapPanel, BorderLayout.CENTER);
-        frame.pack();
-        frame.setVisible(true);
+            model = new GuiModel(map);
 
-        // that's where we reset model into default state - before the simulation is started.
-        model.reset();
+            SimulationImageProducer imageProducer = new SimulationImageProducer(map, model);
+
+            GuiController controller = new GuiController(model, () -> {
+
+                SimulationDelay delay = new SimulationDelay(model);
+                CarAdder adder = new CarAdder(map);
+                CarRemover remover = new CarRemover(map);
+
+                return new Simulator(
+                        new SimulationParams(LocalDateTime.now(), 1, 1000),
+                        Arrays.asList(
+                                map,
+                                adder,
+                                remover,
+                                delay,
+                                model)
+                );
+            });
+
+            // that's where we reset model into default state - before the simulation is started.
+            model.reset();
+
+            SimulationWindow window = new SimulationWindow(model, controller);
+            imageProducer.setImageConsumer(window.getMapPanel());
+            window.setVisible(true);
+        } catch (MapIntegrityException e) {
+            LOG.log_Fatal("Map integrity compromised.");
+            LOG.log_Exception(e);
+        }
     }
 
 }

@@ -1,62 +1,226 @@
 package kcl.teamIndexZero.traffic.gui;
 
+import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
-import kcl.teamIndexZero.traffic.simulator.data.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
-import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * An implementation of {@link ISimulationAware} which outputs a buffered image of the map size in respose to every
  * tick. This image can then be either packed into the video stream or directly shown on the window frame to show
  * live representation.
  */
-public class SimulationImageProducer implements ISimulationAware {
+public class SimulationImageProducer {
 
     protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulationImageProducer.class.getSimpleName());
-    private SimulationMap map;
-    private BiConsumer<BufferedImage, SimulationTick> imageConsumer;
-    private final BufferedImage image;
-    private final Graphics2D graphics;
+    private final SimulationMap map;
+    private final GuiModel model;
+    private final Primitives primitives;
+    private Consumer<BufferedImage> imageConsumer;
+
+
+    private BufferedImage image = null;
+    private Graphics2D graphics;
 
     /**
      * Constructor
      *
-     * @param map           map to draw
-     * @param imageConsumer consumer which is actually going to consume the image to use.
+     * @param map map to draw
      */
-    public SimulationImageProducer(SimulationMap map, BiConsumer<BufferedImage, SimulationTick> imageConsumer) {
+    public SimulationImageProducer(SimulationMap map, GuiModel model) {
         this.map = map;
-        this.imageConsumer = imageConsumer;
-        image = new BufferedImage(map.getWidth(), map.getHeight(), BufferedImage.TYPE_INT_RGB);
-        graphics = (Graphics2D) image.getGraphics();
+        this.model = model;
+        this.primitives = new Primitives();
 
+        model.addChangeListener(() -> {
+            setPixelSize(model.getViewport().getMapPanelWidthPixels(), model.getViewport().getMapPanelHeightPixels());
+            redraw();
+        });
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void tick(SimulationTick tick) {
+    public void setImageConsumer(Consumer<BufferedImage> imageConsumer) {
+        this.imageConsumer = imageConsumer;
+    }
+
+    private void setPixelSize(int width, int height) {
+        if (width == 0 && height == 0) {
+            return;
+        }
+
+        if (image != null && width == image.getWidth() && height == image.getHeight()) {
+            return;
+        }
+
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        graphics = (Graphics2D) image.getGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    }
+
+    public void redraw() {
+        if (image == null) {
+            return;
+        }
+
         graphics.setBackground(Color.WHITE);
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
+        primitives.drawMapBounds();
 
-        map.getObjectsOnMap().forEach(object -> {
-            graphics.setColor(object.getColor());
-            MapPosition pos = object.getPosition();
-            graphics.fillRect(
-                    pos.x,
-                    pos.y,
-                    pos.width,
-                    pos.height
-            );
+        map.getMapFeatures().values().forEach(feature -> {
+            if (feature instanceof Road) {
+                Road road = ((Road) feature);
+                road.getPolyline().getSegments().forEach(segment -> {
+                    primitives.drawSegment(segment, getColorForLayer(road.getLayer()));
+                });
+
+                if (model.isShowSegmentEnds()) {
+                    // for debug purposes, we want to draw road segment start/ends.
+                    if (road.getPolyline().getSegments().size() > 0) {
+                        GeoPoint startPoint = road.getPolyline().getSegments().get(0).start;
+                        GeoPoint endPoint = road.getPolyline().getSegments().get(road.getPolyline().getSegments().size() - 1).end;
+                        primitives.drawCross(startPoint, Color.GREEN);
+                        primitives.drawCross(endPoint, Color.RED);
+                    }
+                }
+            }
         });
 
-        imageConsumer.accept(image, tick);
+        map.getObjectsOnSurface().forEach(object -> {
+            GeoPoint point = object.getPositionOnMap();
+            if (point == null) {
+                return;
+            }
+
+            primitives.drawCross(point, object.getColor(), primitives.CAR_STROKE);
+
+            if (object.equals(model.getSelectedMapObject())) {
+                primitives.drawCircle(point, 15, object.getColor());
+                primitives.drawText(point, object.getNameAndRoad(), object.getColor());
+            }
+        });
+
+        if (imageConsumer == null) {
+            LOG.log_Fatal("Image consumer not present. Can not draw.");
+        } else {
+            imageConsumer.accept(image);
+        }
+    }
+
+    private Color getColorForLayer(int layer) {
+        return Feature.COLORS[Math.abs(layer + 3) % Feature.COLORS.length];
+    }
+
+
+    /**
+     * Inner class for primitive drawing.
+     * Should expand it with deeper semantics later.
+     */
+    private class Primitives {
+        public final BasicStroke THIN_STROKE = new BasicStroke(1);
+        public final BasicStroke CAR_STROKE = new BasicStroke(3);
+
+        /**
+         * Segment, draws a geo segment - line between two points.
+         *
+         * @param segment segment to draw
+         * @param color   color to draw with
+         */
+        public void drawSegment(GeoSegment segment, Color color) {
+            graphics.setStroke(THIN_STROKE);
+            graphics.setColor(color);
+            graphics.drawLine(
+                    model.getViewport().convertXMetersToPixels(segment.start.xMeters),
+                    model.getViewport().convertYMetersToPixels(segment.start.yMeters),
+                    model.getViewport().convertXMetersToPixels(segment.end.xMeters),
+                    model.getViewport().convertYMetersToPixels(segment.end.yMeters)
+            );
+        }
+
+        /**
+         * Draw a little cross. Defaults to thin stroke.
+         *
+         * @param startPoint where
+         * @param color      in which color
+         */
+        public void drawCross(GeoPoint startPoint, Color color) {
+            drawCross(startPoint, color, THIN_STROKE);
+        }
+
+        /**
+         * Draw a little cross with a stroke provided.
+         *
+         * @param startPoint where
+         * @param color      in which color
+         * @param stroke     what stroke
+         */
+        public void drawCross(GeoPoint startPoint, Color color, Stroke stroke) {
+            int size = 10;
+            graphics.setColor(color);
+            graphics.setStroke(stroke);
+            int x = model.getViewport().convertXMetersToPixels(startPoint.xMeters);
+            int y = model.getViewport().convertYMetersToPixels(startPoint.yMeters);
+            graphics.drawLine(x - size / 2, y, x + size / 2, y);
+            graphics.drawLine(x, y - size / 2, x, y + size / 2);
+        }
+
+        /**
+         * Draw a little circle around a point.
+         *
+         * @param startPoint  center
+         * @param pixelRadius radius
+         * @param color       color
+         */
+        public void drawCircle(GeoPoint startPoint, int pixelRadius, Color color) {
+            graphics.setStroke(THIN_STROKE);
+            graphics.setColor(color);
+
+            int x = model.getViewport().convertXMetersToPixels(startPoint.xMeters);
+            int y = model.getViewport().convertYMetersToPixels(startPoint.yMeters);
+
+            graphics.drawOval(x - pixelRadius, y - pixelRadius, pixelRadius * 2, pixelRadius * 2);
+        }
+
+        /**
+         * Draw a text to the bottom-right of a given point
+         *
+         * @param startPoint anchor point
+         * @param text       string to draw
+         * @param color      color
+         */
+        public void drawText(GeoPoint startPoint, String text, Color color) {
+            graphics.setStroke(THIN_STROKE);
+            graphics.setColor(color);
+
+            int x = model.getViewport().convertXMetersToPixels(startPoint.xMeters);
+            int y = model.getViewport().convertYMetersToPixels(startPoint.yMeters);
+            graphics.drawChars(text.toCharArray(), 0, text.length(), x + 15, y + 15);
+        }
+
+        /**
+         * Knowing a map bounds and current coordinate transformation (check out {@link kcl.teamIndexZero.traffic.gui.mvc.ViewportModel}),
+         * draw a green rectangle bounding the map area (for ease of identification).
+         */
+        private void drawMapBounds() {
+            graphics.setStroke(THIN_STROKE);
+            graphics.setColor(Color.GREEN);
+            int xStart = model.getViewport().convertXMetersToPixels(0);
+            int yStart = model.getViewport().convertYMetersToPixels(0);
+            int xEnd = model.getViewport().convertXMetersToPixels(map.widthMeters);
+            int yEnd = model.getViewport().convertYMetersToPixels(map.heightMeters);
+
+            graphics.drawLine(xStart, yStart, xStart, yEnd);
+            graphics.drawLine(xStart, yStart, xEnd, yStart);
+            graphics.drawLine(xEnd, yEnd, xStart, yEnd);
+            graphics.drawLine(xEnd, yEnd, xEnd, yStart);
+
+        }
     }
 }

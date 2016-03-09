@@ -26,7 +26,6 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
     private JButton playButton;
     private JButton stopButton;
     private JButton pauseButton;
-    private JTextField tickDetailsField;
 
 
     /**
@@ -39,6 +38,7 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
         super("MainToolBar");
         this.model = model;
         this.controller = controller;
+        setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         setFloatable(false);
         addButtons();
 
@@ -58,12 +58,6 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
         playButton.setEnabled(model.getStatus() == GuiModel.SimulationStatus.OFF
                 || model.getStatus() == GuiModel.SimulationStatus.PAUSED);
 
-        // updating tick details
-        if (model.getTick() != null) {
-            tickDetailsField.setText(model.getTick().toString());
-        } else {
-            tickDetailsField.setText("<NONE>");
-        }
     }
 
     /*
@@ -71,14 +65,14 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
      */
     protected void addButtons() {
         playButton = makeButton(
-                "play",
+                "media-play-3x",
                 "Start the simulation",
                 "Start",
                 controller::start);
         add(playButton);
 
         pauseButton = makeButton(
-                "pause",
+                "media-pause-3x",
                 "Temporarily pause the simulation",
                 "Pause",
                 controller::pause
@@ -86,14 +80,19 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
         add(pauseButton);
 
         stopButton = makeButton(
-                "stop",
-                "Stop the simulation",
-                "Stop",
-                controller::stop);
+                "reload-3x",
+                "Restart from chooser",
+                "Restart",
+                controller::restart);
         add(stopButton);
+        addSeparator();
 
-        tickDetailsField = new JTextField(16);
-        add(tickDetailsField);
+        JButton resetZoomButton = makeButton(
+                "compass-3x",
+                "Reset Zoom to Original",
+                "Reset Zoom",
+                model.getViewport()::resetZoom);
+        add(resetZoomButton);
     }
 
 
