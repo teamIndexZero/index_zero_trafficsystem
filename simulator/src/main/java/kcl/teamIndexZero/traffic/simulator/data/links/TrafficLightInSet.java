@@ -29,8 +29,11 @@ public /*abstract*/ class TrafficLightInSet extends TrafficLight implements ISim
         CurrentDate = (new Date().getTime()) / 1000;
 
         if (CurrentDate - lastChange > timer) {
-            modelSet.changeColour(model, model.currentState);
-            lastChange = CurrentDate;
+            if (modelSet != null) {
+                modelSet.changeColour(model, model.currentState);
+                lastChange = CurrentDate;
+            }
         }
     }
 }
+ª

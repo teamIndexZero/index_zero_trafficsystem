@@ -5,6 +5,8 @@ import kcl.teamIndexZero.traffic.gui.components.SimulationWindow;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
 import kcl.teamIndexZero.traffic.simulator.SimulatorFactory;
 
+import javax.swing.*;
+
 /**
  * Controller of our MVC model. Controller is generally responsible for 'business logic' - that is, actually doing the
  * heavy lifting of the task. For us, controller controls simulator and then updates model based on new events from
@@ -67,7 +69,17 @@ public class GuiController {
         } else {
             simulator = factory.createSimulator();
             simulatorThread = new Thread(() -> {
-                simulator.start();
+                try {
+                    simulator.start();
+                } catch (Exception e) {
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Error in simualtion - please see logs for details.\n" + e.getClass().getCanonicalName() + "\n" + e.getMessage(),
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    });
+                }
             }, "SimulatorThread");
 
             simulatorThread.start();
