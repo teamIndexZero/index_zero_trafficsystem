@@ -36,4 +36,3 @@ public /*abstract*/ class TrafficLightInSet extends TrafficLight implements ISim
         }
     }
 }
-ª
