@@ -178,7 +178,13 @@ public class GraphConstructor {
      */
     private void createRoadFeatures(List<RoadDescription> roadDescriptions) {
         roadDescriptions.forEach(rd -> {
-            Road r = new Road(rd.getId(), rd.getLaneCountForward(), rd.getLaneCountBackward(), rd.getLength(), rd.getGeoPolyline(), rd.getRoadName());
+            Road r = new Road(rd.getId(),
+                    rd.getLaneCountForward(),
+                    rd.getLaneCountBackward(),
+                    rd.getLength(),
+                    rd.getGeoPolyline(),
+                    rd.getRoadName(),
+                    rd.getLayer());
             mapFeatures.put(r.getID(), r);
             r.getForwardSide().getLanes().forEach(lane -> {
                 mapFeatures.put(lane.getID(), lane);

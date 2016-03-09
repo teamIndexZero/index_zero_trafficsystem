@@ -34,6 +34,7 @@ class OsmSaxHandler extends DefaultHandler {
     private Map<String, GeoPoint> points = new HashMap<>();
 
     private GeoPolyline currentRoadPolyline = null;
+    private int currentRoadLayer = 0;
     private String currentRoadId;
     private String currentRoadName;
 
@@ -131,6 +132,9 @@ class OsmSaxHandler extends DefaultHandler {
         if ("name".equals(key)) {
             this.currentRoadName = value;
         }
+        if ("layer".equals(key)) {
+            this.currentRoadLayer = Integer.valueOf(value);
+        }
     }
 
 
@@ -160,6 +164,7 @@ class OsmSaxHandler extends DefaultHandler {
     private void handleWayOpen(Attributes attributes) {
         currentRoadId = attributes.getValue("id");
         currentRoadPolyline = new GeoPolyline();
+        currentRoadLayer = 0;
     }
 
     private void handleWayClose() {
@@ -168,7 +173,8 @@ class OsmSaxHandler extends DefaultHandler {
                 currentRoadName,
                 currentRoadPolyline,
                 1,
-                1
+                1,
+                currentRoadLayer
         );
 
         result.roadDescriptions.add(description);

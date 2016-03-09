@@ -9,6 +9,7 @@ import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
  */
 public class RoadDescription {
     private final ID id;
+    private final int layer;
     private GeoPolyline geoPolyline;
     private String roadName;
     private int laneCountForward;
@@ -17,16 +18,18 @@ public class RoadDescription {
     /**
      * Constructor
      *
+     * @param id                Road's ID tag
      * @param laneCountForward  Number of lanes on side A of the road
      * @param laneCountBackward Number of lanes on side B of the road
-     * @param id                Road's ID tag
+     * @param currentRoadLayer
      */
-    public RoadDescription(ID id, String roadName, GeoPolyline geoPolyline, int laneCountForward, int laneCountBackward) {
+    public RoadDescription(ID id, String roadName, GeoPolyline geoPolyline, int laneCountForward, int laneCountBackward, int currentRoadLayer) {
         this.laneCountForward = laneCountForward;
         this.laneCountBackward = laneCountBackward;
         this.id = id;
         this.geoPolyline = geoPolyline;
         this.roadName = roadName;
+        this.layer = currentRoadLayer;
     }
 
     public GeoPolyline getGeoPolyline() {
@@ -76,5 +79,9 @@ public class RoadDescription {
      */
     public String getRoadName() {
         return roadName;
+    }
+
+    public int getLayer() {
+        return layer;
     }
 }

@@ -5,6 +5,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
@@ -77,7 +78,7 @@ public class SimulationImageProducer {
             if (feature instanceof Road) {
                 Road road = ((Road) feature);
                 road.getPolyline().getSegments().forEach(segment -> {
-                    primitives.drawSegment(segment, Color.BLACK);
+                    primitives.drawSegment(segment, getColorForLayer(road.getLayer()));
                 });
 
                 if (model.isShowSegmentEnds()) {
@@ -111,6 +112,10 @@ public class SimulationImageProducer {
         } else {
             imageConsumer.accept(image);
         }
+    }
+
+    private Color getColorForLayer(int layer) {
+        return Feature.COLORS[Math.abs(layer + 3) % Feature.COLORS.length];
     }
 
 

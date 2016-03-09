@@ -30,7 +30,7 @@ public class RoadDescriptionTest {
         pl.addPoint(new GeoPoint(0, 0));
         pl.addPoint(new GeoPoint(0, 1));
         pl.addPoint(new GeoPoint(1, 1));
-        this.rd = new RoadDescription(id, rname, pl, fLanes, bLanes);
+        this.rd = new RoadDescription(id, rname, pl, fLanes, bLanes, 0);
     }
 
     @After
