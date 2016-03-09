@@ -2,6 +2,7 @@ package kcl.teamIndexZero.traffic.simulator.data;
 
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ import java.util.List;
  * position 23.442 on the lane Z, and lane Z would be physically located somewhere (and so we can tell the car position
  * from these coordinate system composition.
  */
-public class SimulationMap implements ISimulationAware {
+public class SimulationMap implements ISimulationAware, Serializable {
 
     private final int width;
     private final int height;
