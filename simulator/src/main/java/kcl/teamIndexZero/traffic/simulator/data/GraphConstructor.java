@@ -9,10 +9,7 @@ import kcl.teamIndexZero.traffic.simulator.data.features.*;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.exceptions.*;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -24,7 +21,7 @@ import java.util.stream.Collectors;
  */
 public class GraphConstructor {
     private static Logger_Interface LOG = Logger.getLoggerInstance(GraphConstructor.class.getSimpleName());
-    private List<TrafficGenerator> trafficGenerators = new LinkedList<>();
+    private List<TrafficGenerator> trafficGenerators = new ArrayList<>();
     private Map<ID, Feature> mapFeatures = new HashMap<>();
     private Map<ID, Link> mapLinks = new HashMap<>();
     private GraphTools tools = new GraphTools();
@@ -121,8 +118,7 @@ public class GraphConstructor {
         this.mapLinks.keySet().forEach(id -> {
             visitedLinks.put(id, Boolean.FALSE);
         });
-        return;
-        /*
+
         this.trafficGenerators.forEach(trafficGenerator -> {
             trafficGenerator.getOutgoingLinks().forEach(link -> {
                 try {
@@ -138,7 +134,6 @@ public class GraphConstructor {
                 }
             });
         });
-        */
 
         //TODO check and count infinite loops
         //TODO check the integrity of the graph (no orphan features and no infinite directed loops with no exit  -o)
@@ -146,6 +141,7 @@ public class GraphConstructor {
 
     private boolean _checkGraphIntegrity(Map<ID, Boolean> visitedFeatures, Map<ID, Boolean> visitedLinks, Link nextLink) throws BadLinkException, DeadEndFeatureException {
         visitedLinks.put(nextLink.getID(), Boolean.TRUE);
+        LOG.log_Debug( "¬ Visited Link: '", nextLink.getID(), "'");
         if (nextLink.isDeadEnd()) {
             LOG.log_Error("Link '", nextLink.getID(), "' is a dead-end.");
             throw new BadLinkException("Dead end link found.");
@@ -167,6 +163,7 @@ public class GraphConstructor {
                 //LOG fatal
                 //throw exception
             }
+            LOG.log_Debug( "¬ Visited Feature: '", nextLink.getNextFeature().getID(), "'");
         }
         return false;
     }
@@ -178,13 +175,7 @@ public class GraphConstructor {
      */
     private void createRoadFeatures(List<RoadDescription> roadDescriptions) {
         roadDescriptions.forEach(rd -> {
-            Road r = new Road(rd.getId(),
-                    rd.getLaneCountForward(),
-                    rd.getLaneCountBackward(),
-                    rd.getLength(),
-                    rd.getGeoPolyline(),
-                    rd.getRoadName(),
-                    rd.getLayer());
+            Road r = new Road(rd.getId(), rd.getLaneCountForward(), rd.getLaneCountBackward(), rd.getLength(), rd.getGeoPolyline(), rd.getRoadName());
             mapFeatures.put(r.getID(), r);
             r.getForwardSide().getLanes().forEach(lane -> {
                 mapFeatures.put(lane.getID(), lane);
