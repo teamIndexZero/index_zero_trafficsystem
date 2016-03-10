@@ -11,8 +11,9 @@ import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
 /**
  * Created by Es on 02/03/2016.
  */
-public class TrafficLight extends Link {
+public class TrafficLight {
 
+    private ID id;
 
     public enum State {
         RED, GREEN
@@ -28,24 +29,32 @@ public class TrafficLight extends Link {
      */
     public TrafficLight(ID id) {
 
-       super(id);
+       this.id=id;
        this.currentState = TrafficLight.State.RED;
 
     }
 
     /**
-     * showState - method returns the current state of the Lights
+     *  getState - method returns the current state of the TrafficLights
      *
      * @param id Link ID tag
      */
-    public State showState(ID id){
+    public State getState(ID id){
         return this.currentState;
     }
+
+
+    /**
+     * getTrafficLightID - method returns the ID of the  current object
+     *
+     * @param trafficLight an object of a TrafficLight class
+     */
+    public ID getTrafficLightID(TrafficLight trafficLight) { return trafficLight.id;}
 
     /**
      * {@inheritDoc}
      */
-    @Override
+    //@Override
     public void tick(SimulationTick tick) {
 
     }

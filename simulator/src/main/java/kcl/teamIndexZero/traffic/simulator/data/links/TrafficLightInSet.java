@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.links;
 
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
+import kcl.teamIndexZero.traffic.simulator.Simulator;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
@@ -10,8 +11,8 @@ import java.util.Date;
  * Created by Es on 02/03/2016.
  */
 public /*abstract*/ class TrafficLightInSet extends TrafficLight implements ISimulationAware {
-    long CurrentDate = (new Date().getTime()) / 1000;
-    long lastChange = CurrentDate;
+    long CurrentTime;
+    long lastChange;
     long timer;
     private TrafficLight model;
     private TrafficLightSet modelSet;
@@ -26,12 +27,12 @@ public /*abstract*/ class TrafficLightInSet extends TrafficLight implements ISim
      */
     @Override
     public void tick(SimulationTick tick) {
-        CurrentDate = (new Date().getTime()) / 1000;
+       // CurrentTime =
 
-        if (CurrentDate - lastChange > timer) {
+        if (CurrentTime - lastChange > timer) {
             if (modelSet != null) {
                 modelSet.changeColour(model, model.currentState);
-                lastChange = CurrentDate;
+                lastChange = CurrentTime;
             }
         }
     }
