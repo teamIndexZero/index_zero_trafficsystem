@@ -7,8 +7,6 @@ import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MissingImplementationException;
 
@@ -27,15 +25,17 @@ public class GraphTools {
      * @return Full connection state
      * @throws MapIntegrityException when the lanes in DirectedLanes group have partly implemented links
      */
-    public boolean checkForwardLinks(DirectedLanes lanes) throws MapIntegrityException {
+    public boolean checkFwdLinksPresent(DirectedLanes lanes) throws MapIntegrityException {
+        LOG.log_Trace("Checking the connections at the end of ", lanes);
         int link_count = 0;
         for (Lane l : lanes.getLanes()) {
             if (l.getNextLink() != null)
                 link_count++;
         }
-        if (link_count == 0)
+        if (link_count == 0) {
+            LOG.log_Trace("--> ", lanes.getID(), " is end linked.");
             return false;
-        else if (link_count == lanes.getNumberOfLanes())
+        } else if (link_count == lanes.getNumberOfLanes())
             return true;
         else {
             LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links. ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");
@@ -56,10 +56,10 @@ public class GraphTools {
                 return new Link(linkID, point);
             case AUTONOMOUS_TL:
                 //TODO maybe add the TrafficLight to the tfcontroller?
-                return new TrafficLight(linkID, point);
+                return new Link(linkID, point);
             case SYNC_TL:
                 //TODO definitely add the TrafficLight to the TFcontroller!
-                return new TrafficLightInSet(linkID, point);
+                return new Link(linkID, point);
             default:
                 LOG.log_Error("LinkType not implemented in .createLink(..)!");
                 throw new MissingImplementationException("LinkType not implemented!");

@@ -42,10 +42,10 @@ public class TrafficGenerator extends Feature {
         GraphTools tools = new GraphTools();
         DirectedLanes incoming;
         DirectedLanes outgoing;
-        if (!tools.checkForwardLinks(road.getForwardSide())) {
+        if (!tools.checkFwdLinksPresent(road.getForwardSide())) {
             incoming = road.getForwardSide();
             outgoing = road.getBackwardSide();
-        } else if (!tools.checkForwardLinks(road.getBackwardSide())) {
+        } else if (!tools.checkFwdLinksPresent(road.getBackwardSide())) {
             incoming = road.getBackwardSide();
             outgoing = road.getForwardSide();
         } else {
@@ -59,7 +59,7 @@ public class TrafficGenerator extends Feature {
             Link link = tools.createLink(LinkType.GENERIC, id, road.getPolyline().getStartPoint());
             link.in = lane;
             link.out = this;
-            lane.connect(link);
+            lane.connectNext(link);
             this.incoming.add(link);
             LOG.log("Linked: '", link.getID(), "'.");
         }

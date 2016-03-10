@@ -84,9 +84,9 @@ public class Lane extends Feature {
     /**
      * Connects the directed end of the lane to a link
      *
-     * @param link Link to connect to
+     * @param link Link to connectNext to
      */
-    public void connect(Link link) {
+    public void connectNext(Link link) {
         this.nextLink = link;
     }
 

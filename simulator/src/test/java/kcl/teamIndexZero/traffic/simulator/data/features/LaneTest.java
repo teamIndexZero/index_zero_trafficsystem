@@ -1,7 +1,6 @@
 package kcl.teamIndexZero.traffic.simulator.data.features;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
-import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import org.junit.Test;
@@ -62,8 +61,8 @@ public class LaneTest {
         RoadSpecs rs = new RoadSpecs();
         DirectedLanes mocked_dl = mock(DirectedLanes.class);
         Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl);
-        Link link = new Link(new ID("LinkID"), new GeoPoint(0, 0));
-        l.connect(link);
+        Link link = new Link(new ID("LinkID"));
+        l.connectNext(link);
         assertEquals(link, l.getNextLink());
     }
 }
