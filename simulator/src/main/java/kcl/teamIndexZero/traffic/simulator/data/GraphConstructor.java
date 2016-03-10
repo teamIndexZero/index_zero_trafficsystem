@@ -39,7 +39,9 @@ public class GraphConstructor {
      *                               <p>
      *                               //TODO doc update
      */
-    public GraphConstructor(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException {
+    public GraphConstructor(List<JunctionDescription> junction_descriptions,
+                            List<RoadDescription> road_descriptions,
+                            List<LinkDescription> link_descriptions) throws MapIntegrityException {
         //TODO make it so that a lone single feature can be passed to the sim
         if (tools.checkEmpty(junction_descriptions, road_descriptions, link_descriptions)) {
             LOG.log_Error("Nothing was passed to the GraphConstructor.");
@@ -203,7 +205,8 @@ public class GraphConstructor {
      */
     private void createJunctionsFeatures(List<JunctionDescription> junction_descriptions) {
         junction_descriptions.forEach(junctionDescription -> {
-            Junction junction = new Junction(junctionDescription.getID(), junctionDescription.hasTrafficLight());
+            Junction junction = new Junction(junctionDescription.getID(), junctionDescription.hasTrafficLight(),
+                    junctionDescription.getGeoPoint());
             junctionDescription.getConnectedIDs().forEach((id, roadDirection) -> {
                 try {
                     junction.addRoad((Road) this.mapFeatures.get(id), roadDirection);
@@ -265,7 +268,7 @@ public class GraphConstructor {
                 for (int i = 0; i < ((Road) feature_from).getForwardLaneCount(); i++) {
                     try {
                         ID id = new ID(desc.linkID + "F:" + Integer.toString(i));
-                        Link link = tools.createLink(desc.type, id);
+                        Link link = tools.createLink(desc.type, id, desc.geoPoint);
                         Lane from = ((Road) feature_from).getForwardSide().getLanes().get(i);
                         Lane to = ((Road) feature_to).getForwardSide().getLanes().get(i);
                         link.in = from;
@@ -281,7 +284,7 @@ public class GraphConstructor {
                 for (int i = 0; i < ((Road) feature_to).getBackwardLaneCount(); i++) {
                     try {
                         ID id = new ID(desc.linkID + "B:" + Integer.toString(i));
-                        Link link = tools.createLink(desc.type, id);
+                        Link link = tools.createLink(desc.type, id, desc.geoPoint);
                         Lane from = ((Road) feature_to).getBackwardSide().getLanes().get(i);
                         Lane to = ((Road) feature_from).getBackwardSide().getLanes().get(i);
                         link.in = from;

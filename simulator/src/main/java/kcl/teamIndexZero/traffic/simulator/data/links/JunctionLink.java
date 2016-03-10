@@ -7,6 +7,7 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.exceptions.JunctionPathException;
 
 import java.util.ArrayList;
@@ -27,8 +28,8 @@ public class JunctionLink extends Link {
      * @param id       Link ID tag
      * @param junction Junction the link belongs to
      */
-    public JunctionLink(ID id, Road road, Junction junction) {
-        super(id);
+    public JunctionLink(ID id, Road road, Junction junction, GeoPoint point) {
+        super(id, point);
         this.road = road;
         this.junction = junction;
     }

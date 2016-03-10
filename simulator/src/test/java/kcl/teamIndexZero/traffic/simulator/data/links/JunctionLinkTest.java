@@ -3,6 +3,7 @@ package kcl.teamIndexZero.traffic.simulator.data.links;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class JunctionLinkTest {
     public void setUp() throws Exception {
         mockedRoad = mock(Road.class);
         mockedJunction = mock(Junction.class);
-        jl = new JunctionLink(new ID("JunctionLinkTest"), mockedRoad, mockedJunction);
+        jl = new JunctionLink(new ID("JunctionLinkTest"), mockedRoad, mockedJunction, new GeoPoint(0, 0));
     }
 
     @After

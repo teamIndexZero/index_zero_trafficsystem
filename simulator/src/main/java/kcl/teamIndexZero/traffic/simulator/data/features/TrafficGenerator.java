@@ -56,7 +56,7 @@ public class TrafficGenerator extends Feature {
         //Linking time!
         for (Lane lane : incoming.getLanes()) { //entering the generator
             ID id = new ID(lane.getID() + "->" + this.getID());
-            Link link = tools.createLink(LinkType.GENERIC, id);
+            Link link = tools.createLink(LinkType.GENERIC, id, road.getPolyline().getStartPoint());
             link.in = lane;
             link.out = this;
             lane.connect(link);
@@ -65,7 +65,7 @@ public class TrafficGenerator extends Feature {
         }
         for (Lane lane : outgoing.getLanes()) { //leaving the generator
             ID id = new ID(lane.getID() + "<-" + this.getID());
-            Link link = tools.createLink(LinkType.GENERIC, id);
+            Link link = tools.createLink(LinkType.GENERIC, id, road.getPolyline().getStartPoint());
             link.in = this;
             link.out = lane;
             this.outgoing.add(link);

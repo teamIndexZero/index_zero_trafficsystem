@@ -4,6 +4,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.features.DirectedLanes;
 import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
@@ -49,16 +50,16 @@ public class GraphTools {
      * @param linkID ID tag of the new link
      * @return New link
      */
-    public Link createLink(LinkType type, ID linkID) throws MissingImplementationException {
+    public Link createLink(LinkType type, ID linkID, GeoPoint point) throws MissingImplementationException {
         switch (type) {
             case GENERIC:
-                return new Link(linkID);
+                return new Link(linkID, point);
             case AUTONOMOUS_TL:
                 //TODO maybe add the TrafficLight to the tfcontroller?
-                return new TrafficLight(linkID);
+                return new TrafficLight(linkID, point);
             case SYNC_TL:
                 //TODO definitely add the TrafficLight to the TFcontroller!
-                return new TrafficLightInSet(linkID);
+                return new TrafficLightInSet(linkID, point);
             default:
                 LOG.log_Error("LinkType not implemented in .createLink(..)!");
                 throw new MissingImplementationException("LinkType not implemented!");

@@ -6,20 +6,27 @@ import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 
 public class Link implements ISimulationAware {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Link.class.getSimpleName());
     public Feature in;
     public Feature out;
     private ID id;
+    private GeoPoint geoPoint;
 
     /**
      * Constructor
      *
      * @param id Link ID tag
      */
-    public Link(ID id) {
+    public Link(ID id, GeoPoint geoPoint) {
         this.id = id;
+        this.geoPoint = geoPoint;
+    }
+
+    public GeoPoint getGeoPoint() {
+        return geoPoint;
     }
 
     /**

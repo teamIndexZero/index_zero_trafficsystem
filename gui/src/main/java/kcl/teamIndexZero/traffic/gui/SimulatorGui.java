@@ -8,20 +8,13 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
 import kcl.teamIndexZero.traffic.simulator.data.GraphConstructor;
-import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
-import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
-import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
-import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
-import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 
 /**
@@ -51,15 +44,13 @@ public class SimulatorGui {
 
     private void startSimulatorWindow(OsmParseResult result) {
         try {
+            LOG.log_Error("Parsed OSM xml file, got ", result.roadDescriptions.size(), " roads, ",
+                    result.linkDescriptions.size(), " links and ", result.junctionDescriptions.size(), " junctions");
             //TODO factory then pass the stuff below to graph constructor
-            java.util.List<JunctionDescription> junctionDescriptions = new ArrayList<>();
-            junctionDescriptions.add(new JunctionDescription(new ID("Junc1"), Collections.emptyMap(), false));
-            java.util.List<LinkDescription> linkDescriptions = new ArrayList<>();
-            java.util.List<RoadDescription> roadDescriptions = result.roadDescriptions;
-
-            linkDescriptions.add(new LinkDescription(roadDescriptions.get(0).getId(), roadDescriptions.get(0).getId(), LinkType.SYNC_TL, new ID("Link1")));
-
-            GraphConstructor graph = new GraphConstructor(junctionDescriptions, roadDescriptions, linkDescriptions); //TODO temp stuff. need to take care of the exceptions too
+            GraphConstructor graph = new GraphConstructor(
+                    result.junctionDescriptions,
+                    result.roadDescriptions,
+                    result.linkDescriptions);
 
             SimulationMap map = new SimulationMap(4, 400, graph);
             map.widthMeters = result.boundingBox.end.xMeters;

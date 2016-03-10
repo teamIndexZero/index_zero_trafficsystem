@@ -2,6 +2,7 @@ package kcl.teamIndexZero.traffic.simulator.data;
 
 import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
@@ -44,7 +45,7 @@ public class GraphToolsTest {
         assertFalse(gt.checkForwardLinks(r.getBackwardSide()));
         for (Lane l : r.getForwardSide().getLanes()) {
             ID id = new ID(l.getID() + "->" + "Link");
-            Link link = new Link(id);
+            Link link = new Link(id, new GeoPoint(0, 0));
             link.in = l;
             l.connect(link);
         }
@@ -59,7 +60,7 @@ public class GraphToolsTest {
         assertFalse(gt.checkForwardLinks(r.getForwardSide()));
         assertFalse(gt.checkForwardLinks(r.getBackwardSide()));
         ID id = new ID("LaneB0" + "->" + "Link");
-        Link link = new Link(id);
+        Link link = new Link(id, new GeoPoint(0, 0));
         r.getBackwardSide().getLanes().get(0).connect(link);
         gt.checkForwardLinks(r.getBackwardSide());
     }
@@ -78,9 +79,9 @@ public class GraphToolsTest {
 
     @Test
     public void testCreateLink() throws Exception {
-        Link l1 = gt.createLink(LinkType.GENERIC, new ID("GenericLink"));
-        Link l2 = gt.createLink(LinkType.AUTONOMOUS_TL, new ID("ATFlink"));
-        Link l3 = gt.createLink(LinkType.SYNC_TL, new ID("STFlink"));
+        Link l1 = gt.createLink(LinkType.GENERIC, new ID("GenericLink"), new GeoPoint(0, 0));
+        Link l2 = gt.createLink(LinkType.AUTONOMOUS_TL, new ID("ATFlink"), new GeoPoint(0, 0));
+        Link l3 = gt.createLink(LinkType.SYNC_TL, new ID("STFlink"), new GeoPoint(0, 0));
         assertTrue(l1 instanceof Link);
         assertTrue(l2 instanceof TrafficLight);
         assertTrue(l3 instanceof TrafficLightInSet);

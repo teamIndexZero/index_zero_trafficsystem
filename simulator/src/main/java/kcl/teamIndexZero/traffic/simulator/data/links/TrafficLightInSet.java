@@ -3,6 +3,7 @@ package kcl.teamIndexZero.traffic.simulator.data.links;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 
 import java.util.Date;
 
@@ -16,8 +17,8 @@ public /*abstract*/ class TrafficLightInSet extends TrafficLight implements ISim
     private TrafficLight model;
     private TrafficLightSet modelSet;
 
-    public TrafficLightInSet(ID linkId) {
-        super(linkId);
+    public TrafficLightInSet(ID linkId, GeoPoint point) {
+        super(linkId, point);
         //TODO Fix construction?
     }
 

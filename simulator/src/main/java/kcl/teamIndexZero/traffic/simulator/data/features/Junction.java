@@ -4,6 +4,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.links.JunctionLink;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.trafficBehaviour.TrafficBehaviour;
@@ -22,6 +23,7 @@ import java.util.Map;
  */
 public class Junction extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Junction.class.getSimpleName());
+    private final GeoPoint geoPoint;
     private TrafficBehaviour behaviour;
     private List<Feature> connectedFeatures;
     private Map<ID, JunctionLink> inflowLinks;
@@ -34,13 +36,18 @@ public class Junction extends Feature {
      * @param id                    Feature ID tag
      * @param requiresTrafficLights States whether the junction uses traffic lights or not
      */
-    public Junction(ID id, boolean requiresTrafficLights) {
+    public Junction(ID id, boolean requiresTrafficLights, GeoPoint geoPoint) {
         super(id);
+        this.geoPoint = geoPoint;
         this.connectedFeatures = new ArrayList<>();
         this.inflowLinks = new HashMap<>();
         this.outflowLinks = new HashMap<>();
         this.trafficLight_flag = requiresTrafficLights;
         this.behaviour = new TrafficBehaviour(this);
+    }
+
+    public GeoPoint getGeoPoint() {
+        return geoPoint;
     }
 
     /**
@@ -71,7 +78,7 @@ public class Junction extends Feature {
                 ID link_ID = new ID(this.getID() + "<-" + l.getID());
                 if (!inflowLinks.containsKey(link_ID)) {
                     LOG.log("Adding inflow link '", link_ID, "' to Junction.");
-                    JunctionLink link = new JunctionLink(link_ID, road, this);
+                    JunctionLink link = new JunctionLink(link_ID, road, this, geoPoint);
                     link.in = l;
                     link.out = this;
                     l.connect(link);
@@ -86,7 +93,7 @@ public class Junction extends Feature {
                 ID link_ID = new ID(this.getID() + "->" + l.getID());
                 if (!outflowLinks.containsKey(link_ID)) {
                     LOG.log("Adding outflow link '", link_ID, "' to Junction.");
-                    JunctionLink link = new JunctionLink(link_ID, road, this);
+                    JunctionLink link = new JunctionLink(link_ID, road, this, geoPoint);
                     link.in = this;
                     link.out = l;
                     l.connect(link);

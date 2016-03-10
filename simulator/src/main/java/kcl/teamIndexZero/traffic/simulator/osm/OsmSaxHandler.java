@@ -2,10 +2,13 @@ package kcl.teamIndexZero.traffic.simulator.osm;
 
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
+import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -20,6 +23,8 @@ import java.util.*;
  * XML parse events (bounds element found, tag element found, etc.)
  */
 class OsmSaxHandler extends DefaultHandler {
+    // TODO to complete links, we probably want to have Map<NodeID, WayID> participating, and every time we read
+    // way > nd, we push that in. After all ways are read, we just collect these links altogether and voila we're good.
 
     public static final String BOUNDS_ELEMENT = "bounds";
     public static final String NODE_ELEMENT = "node";
@@ -29,9 +34,9 @@ class OsmSaxHandler extends DefaultHandler {
 
     private static final Logger LOG = Logger.getLoggerInstance(OsmSaxHandler.class.getName());
 
-    private OsmParseResult result;
     private Set<String> interestingElements = new HashSet<>(Arrays.asList(BOUNDS_ELEMENT, NODE_ELEMENT, WAY_ELEMENT, NODE_WITHIN_WAY_ELEMENT, TAG_ELEMENT));
     private Map<String, GeoPoint> points = new HashMap<>();
+    private Map<String, List<String>> possibleJunctionsOrLinks = new HashMap<>();
 
     private GeoPolyline currentRoadPolyline = null;
     private int currentRoadLayer = 0;
@@ -41,14 +46,17 @@ class OsmSaxHandler extends DefaultHandler {
     private double boundsMinLon;
     private double boundsMinLat;
     private boolean boundsHandled = false;
+    private double boundsMaxLat;
+    private double boundsMaxLon;
+
+    private Map<String, RoadDescription> roadDescriptions = new HashMap<>();
+    private List<JunctionDescription> junctionDescriptions = new ArrayList<>();
+    private List<LinkDescription> linkDescriptions = new ArrayList<>();
 
     /**
      * Constructor, we pass in the result which is to be filled by this class methods.
-     *
-     * @param result result object to fill.
      */
-    public OsmSaxHandler(OsmParseResult result) {
-        this.result = result;
+    public OsmSaxHandler() {
     }
 
     /**
@@ -74,6 +82,18 @@ class OsmSaxHandler extends DefaultHandler {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return R * c;
+    }
+
+    private NodePositionInRoad getNodePositionInRoad(String nodeId, RoadDescription road) {
+        GeoPoint point = points.get(nodeId);
+        if (road.getGeoPolyline().getStartPoint().equals(point)) {
+            return NodePositionInRoad.START;
+        }
+        if (road.getGeoPolyline().getFinishPoint().equals(point)) {
+            return NodePositionInRoad.END;
+        }
+
+        return NodePositionInRoad.NOT_START_OR_END;
     }
 
     /**
@@ -137,7 +157,6 @@ class OsmSaxHandler extends DefaultHandler {
         }
     }
 
-
     // <way id="8032768" version="20" timestamp="2016-03-02T22:08:00Z" uid="352985" user="ecatmur"
     //          changeset="32783057">
     //  <nd ref="108192"/>
@@ -153,6 +172,14 @@ class OsmSaxHandler extends DefaultHandler {
         if (thisPoint != null) {
             currentRoadPolyline.addPoint(thisPoint);
         }
+
+        // add this to the candidates for junctions and/or links
+        List<String> connectedRoadIDs = possibleJunctionsOrLinks.get(nodeId);
+        if (connectedRoadIDs == null) {
+            connectedRoadIDs = new ArrayList<>();
+            possibleJunctionsOrLinks.put(nodeId, connectedRoadIDs);
+        }
+        connectedRoadIDs.add(currentRoadId);
     }
 
     //        <way id="8032768" version="20" timestamp="2016-03-02T22:08:00Z"
@@ -177,7 +204,7 @@ class OsmSaxHandler extends DefaultHandler {
                 currentRoadLayer
         );
 
-        result.roadDescriptions.add(description);
+        roadDescriptions.put(currentRoadId, description);
         currentRoadPolyline = null;
         currentRoadId = null;
         currentRoadName = null;
@@ -204,9 +231,82 @@ class OsmSaxHandler extends DefaultHandler {
         this.boundsMinLat = Double.parseDouble(attributes.getValue("minlat"));
         this.boundsMinLon = Double.parseDouble(attributes.getValue("minlon"));
 
-        double boundsMaxLat = Double.parseDouble(attributes.getValue("maxlat"));
-        double boundsMaxLon = Double.parseDouble(attributes.getValue("maxlon"));
+        this.boundsMaxLat = Double.parseDouble(attributes.getValue("maxlat"));
+        this.boundsMaxLon = Double.parseDouble(attributes.getValue("maxlon"));
 
+    }
+
+    private void createLinkAndJunctionDescriptions() {
+        possibleJunctionsOrLinks.entrySet().forEach(entry -> {
+            // only interested in nodes which belong to more than one road
+            if (entry.getValue() == null || entry.getValue().size() <= 1) {
+                return;
+            }
+
+            List<String> connectedRoadIDs = entry.getValue();
+            String nodeId = entry.getKey();
+            GeoPoint geoPoint = points.get(nodeId);
+            if (connectedRoadIDs.size() == 2) {
+                RoadDescription road1 = roadDescriptions.get(connectedRoadIDs.get(0));
+                RoadDescription road2 = roadDescriptions.get(connectedRoadIDs.get(1));
+                if (road1 == null || road2 == null || road1.getGeoPolyline().getSegments().size() == 0 || road2.getGeoPolyline().getSegments().size() == 0) {
+                    LOG.log_Error("Found a link but not a corresponding road. Error. Will skip link ");
+                    return;
+                }
+                NodePositionInRoad nodeOnRoad1 = getNodePositionInRoad(nodeId, road1);
+                NodePositionInRoad nodeOnRoad2 = getNodePositionInRoad(nodeId, road2);
+                // TODO add traffic light type!
+                if (nodeOnRoad1 == NodePositionInRoad.END && nodeOnRoad2 == NodePositionInRoad.START) {
+                    linkDescriptions.add(new LinkDescription(
+                            road1.getId(),
+                            road2.getId(),
+                            LinkType.GENERIC,
+                            new ID("link_" + nodeId),
+                            geoPoint));
+                } else {
+                    // probably all other options could go here. If we are not even too accurate in this case, let's leave it as is.
+                    linkDescriptions.add(new LinkDescription(
+                            road2.getId(),
+                            road1.getId(),
+                            LinkType.GENERIC,
+                            new ID("link_" + nodeId),
+                            geoPoint));
+                }
+            } else {
+                // TODO traffic light for a junction!
+                Map<ID, JunctionDescription.RoadDirection> roadsWithDirections = new HashMap<>();
+                for (String connectedRoadId : connectedRoadIDs) {
+                    RoadDescription road = roadDescriptions.get(connectedRoadId);
+                    if (road.getGeoPolyline().getSegments().size() == 0) {
+                        LOG.log_Error("Empty road for junction found, will skip ", road.getRoadName(), " road");
+                        continue;
+                    }
+                    NodePositionInRoad positionInRoad = getNodePositionInRoad(nodeId, road);
+                    switch (positionInRoad) {
+                        case START:
+                            roadsWithDirections.put(road.getId(), JunctionDescription.RoadDirection.OUTGOING);
+                            break;
+                        case END:
+                            roadsWithDirections.put(road.getId(), JunctionDescription.RoadDirection.INCOMING);
+                            break;
+                        default:
+                            LOG.log_Error("Got a road and a junction, and road goes through junction - wrong.", road.getRoadName());
+                            break;
+
+                    }
+                }
+                JunctionDescription junctionDescription = new JunctionDescription(new ID("junction_" + nodeId),
+                        roadsWithDirections, false, geoPoint);
+                junctionDescriptions.add(junctionDescription);
+            }
+        });
+    }
+
+    public OsmParseResult collectResult() {
+        createLinkAndJunctionDescriptions();
+        OsmParseResult result = new OsmParseResult();
+
+        //bounding box
         GeoSegment segment = new GeoSegment(
                 new GeoPoint(0, 0),
                 new GeoPoint(
@@ -215,6 +315,22 @@ class OsmSaxHandler extends DefaultHandler {
                 ));
         LOG.log_Warning("Got bounds ", segment);
         result.boundingBox = segment;
+
+        //roads
+        result.roadDescriptions.addAll(roadDescriptions.values());
+
+        // junctions
+        result.junctionDescriptions.addAll(junctionDescriptions);
+
+        // links
+        result.linkDescriptions.addAll(linkDescriptions);
+
+        return result;
     }
 
+    private enum NodePositionInRoad {
+        START,
+        END,
+        NOT_START_OR_END
+    }
 }

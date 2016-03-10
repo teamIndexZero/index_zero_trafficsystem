@@ -70,6 +70,30 @@ public class GeoPolyline {
     }
 
     /**
+     * Gets the starting point for the segment.
+     *
+     * @return start point.
+     */
+    public GeoPoint getStartPoint() {
+        if (getSegments().size() == 0) {
+            return null;
+        }
+        return getSegments().get(0).start;
+    }
+
+    /**
+     * Gets the finish point.
+     *
+     * @return finish point.
+     */
+    public GeoPoint getFinishPoint() {
+        if (getSegments().size() == 0) {
+            return null;
+        }
+        return getSegments().get(getSegments().size() - 1).end;
+    }
+
+    /**
      * Get total linear metric length of the polyline.
      *
      * @return meters of the polyline length.

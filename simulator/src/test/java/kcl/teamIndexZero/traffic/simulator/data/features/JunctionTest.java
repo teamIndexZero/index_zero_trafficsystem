@@ -2,6 +2,7 @@ package kcl.teamIndexZero.traffic.simulator.data.features;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.exceptions.AlreadyExistsException;
@@ -27,7 +28,7 @@ public class JunctionTest {
 
     @Before
     public void setUp() throws Exception {
-        j = new Junction(new ID("JunctionTest"), true);
+        j = new Junction(new ID("JunctionTest"), true, new GeoPoint(0, 0));
         GeoPolyline mockedPolyLine = mock(GeoPolyline.class);
         r1 = new Road(new ID("Road1"), 1, 1, 12000, mockedPolyLine, "Road 1");
         r2 = new Road(new ID("Road2"), 1, 2, 10000, mockedPolyLine, "Road 2");
@@ -84,7 +85,7 @@ public class JunctionTest {
     @Test
     public void testHasTrafficLights() throws Exception {
         assertTrue(j.hasTrafficLights());
-        Junction j2 = new Junction(new ID("JunctionTest"), false);
+        Junction j2 = new Junction(new ID("JunctionTest"), false, new GeoPoint(0, 0));
         assertFalse(j2.hasTrafficLights());
     }
 }

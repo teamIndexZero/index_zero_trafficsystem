@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +26,11 @@ public class LinkDescriptionTest {
 
     @Test
     public void testToString() throws Exception {
-        LinkDescription ld = new LinkDescription(new ID("FromID"), new ID("ToID"), LinkType.GENERIC, new ID("LinkDescriptionTest"));
+        LinkDescription ld = new LinkDescription(new ID("FromID"),
+                new ID("ToID"),
+                LinkType.GENERIC,
+                new ID("LinkDescriptionTest"),
+                new GeoPoint(0, 0));
         assertEquals("LinkDescriptionTest[ FromID -> ToID ]", ld.toString());
     }
 }

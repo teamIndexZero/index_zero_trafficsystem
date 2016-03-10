@@ -3,6 +3,7 @@ package kcl.teamIndexZero.traffic.simulator.data.links;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.TrafficLightRule;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightSet;
 import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
 
@@ -26,9 +27,8 @@ public class TrafficLight extends Link {
      *
      * @param id Link ID tag
      */
-    public TrafficLight(ID id) {
-
-       super(id);
+    public TrafficLight(ID id, GeoPoint point) {
+       super(id, point);
        this.currentState = TrafficLight.State.RED;
 
     }
