@@ -89,7 +89,6 @@ public class Junction extends Feature {
                     JunctionLink link = new JunctionLink(link_ID, road, this);
                     link.in = this;
                     link.out = l;
-                    //l.connectNext(link);
                     outflowLinks.put(link_ID, link);
                 }
                 if (inflowLinks.containsKey(link_ID))

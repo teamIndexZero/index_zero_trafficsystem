@@ -42,10 +42,10 @@ public class TrafficGenerator extends Feature {
         GraphTools tools = new GraphTools();
         DirectedLanes incoming;
         DirectedLanes outgoing;
-        if (!tools.checkForwardLinks(road.getForwardSide())) {
+        if (!tools.checkFwdLinksPresent(road.getForwardSide())) {
             incoming = road.getForwardSide();
             outgoing = road.getBackwardSide();
-        } else if (!tools.checkForwardLinks(road.getBackwardSide())) {
+        } else if (!tools.checkFwdLinksPresent(road.getBackwardSide())) {
             incoming = road.getBackwardSide();
             outgoing = road.getForwardSide();
         } else {

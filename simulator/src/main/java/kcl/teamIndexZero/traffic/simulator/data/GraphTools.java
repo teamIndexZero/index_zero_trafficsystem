@@ -24,20 +24,17 @@ public class GraphTools {
      * @return Full connection state
      * @throws MapIntegrityException when the lanes in DirectedLanes group have partly implemented links
      */
-    public boolean checkForwardLinks(DirectedLanes lanes) throws MapIntegrityException {
+    public boolean checkFwdLinksPresent(DirectedLanes lanes) throws MapIntegrityException {
         LOG.log_Trace("Checking the connections at the end of ", lanes);
         int link_count = 0;
         for (Lane l : lanes.getLanes()) {
-            if (l.getNextLink() != null) {
-                LOG.log_Trace("--> ", l.getID(), " has a link at the end.");
+            if (l.getNextLink() != null)
                 link_count++;
-            } else {
-                LOG.log_Trace("--> ", l.getID(), " has its end free.");
-            }
         }
-        if (link_count == 0)
+        if (link_count == 0) {
+            LOG.log_Trace("--> ", lanes.getID(), " is end linked.");
             return false;
-        else if (link_count == lanes.getNumberOfLanes())
+        } else if (link_count == lanes.getNumberOfLanes())
             return true;
         else {
             LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links. ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");

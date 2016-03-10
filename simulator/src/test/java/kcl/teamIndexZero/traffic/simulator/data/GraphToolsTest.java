@@ -38,28 +38,28 @@ public class GraphToolsTest {
     public void testCheckForwardLinks() throws Exception {
         GeoPolyline mockedPolyLine = mock(GeoPolyline.class);
         Road r = new Road(new ID("testCheckForwardLinks"), 2, 3, 1000, mockedPolyLine, "Road1");
-        assertFalse(gt.checkForwardLinks(r.getForwardSide()));
-        assertFalse(gt.checkForwardLinks(r.getBackwardSide()));
+        assertFalse(gt.checkFwdLinksPresent(r.getForwardSide()));
+        assertFalse(gt.checkFwdLinksPresent(r.getBackwardSide()));
         for (Lane l : r.getForwardSide().getLanes()) {
             ID id = new ID(l.getID() + "->" + "Link");
             Link link = new Link(id);
             link.in = l;
             l.connectNext(link);
         }
-        assertTrue(gt.checkForwardLinks(r.getForwardSide()));
-        assertFalse(gt.checkForwardLinks(r.getBackwardSide()));
+        assertTrue(gt.checkFwdLinksPresent(r.getForwardSide()));
+        assertFalse(gt.checkFwdLinksPresent(r.getBackwardSide()));
     }
 
     @Test(expected = MapIntegrityException.class)
     public void testCheckForwardLinks_Exception() throws Exception {
         GeoPolyline mockedPolyLine = mock(GeoPolyline.class);
         Road r = new Road(new ID("testCheckForwardLinks"), 2, 3, 1000, mockedPolyLine, "Road1");
-        assertFalse(gt.checkForwardLinks(r.getForwardSide()));
-        assertFalse(gt.checkForwardLinks(r.getBackwardSide()));
+        assertFalse(gt.checkFwdLinksPresent(r.getForwardSide()));
+        assertFalse(gt.checkFwdLinksPresent(r.getBackwardSide()));
         ID id = new ID("LaneB0" + "->" + "Link");
         Link link = new Link(id);
         r.getBackwardSide().getLanes().get(0).connectNext(link);
-        gt.checkForwardLinks(r.getBackwardSide());
+        gt.checkFwdLinksPresent(r.getBackwardSide());
     }
 
     @Test
