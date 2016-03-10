@@ -74,4 +74,22 @@ public class DirectedLanes {
     public List<Lane> getLanes() {
         return lanes;
     }
+
+    /**
+     * Gets the ID
+     *
+     * @return DirectedLane's ID tag
+     */
+    public ID getID() {
+        return this.id;
+    }
+
+    /**
+     * toString method
+     *
+     * @return String of the DirectedLane state
+     */
+    public String toString() {
+        return "DirectedLane{ " + this.id.toString() + " [" + this.getNumberOfLanes() + " lane(s)] }";
+    }
 }

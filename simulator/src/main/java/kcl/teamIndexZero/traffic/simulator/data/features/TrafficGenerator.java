@@ -59,7 +59,7 @@ public class TrafficGenerator extends Feature {
             Link link = tools.createLink(LinkType.GENERIC, id);
             link.in = lane;
             link.out = this;
-            lane.connect(link);
+            lane.connectNext(link);
             this.incoming.add(link);
             LOG.log("Linked: '", link.getID(), "'.");
         }

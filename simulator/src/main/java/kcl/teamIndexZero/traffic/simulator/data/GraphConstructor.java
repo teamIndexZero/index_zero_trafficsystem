@@ -141,7 +141,7 @@ public class GraphConstructor {
 
     private boolean _checkGraphIntegrity(Map<ID, Boolean> visitedFeatures, Map<ID, Boolean> visitedLinks, Link nextLink) throws BadLinkException, DeadEndFeatureException {
         visitedLinks.put(nextLink.getID(), Boolean.TRUE);
-        LOG.log_Debug( "¬ Visited Link: '", nextLink.getID(), "'");
+        LOG.log_Debug("¬ Visited Link: '", nextLink.getID(), "'");
         if (nextLink.isDeadEnd()) {
             LOG.log_Error("Link '", nextLink.getID(), "' is a dead-end.");
             throw new BadLinkException("Dead end link found.");
@@ -163,7 +163,7 @@ public class GraphConstructor {
                 //LOG fatal
                 //throw exception
             }
-            LOG.log_Debug( "¬ Visited Feature: '", nextLink.getNextFeature().getID(), "'");
+            LOG.log_Debug("¬ Visited Feature: '", nextLink.getNextFeature().getID(), "'");
         }
         return false;
     }
@@ -236,32 +236,44 @@ public class GraphConstructor {
                     LOG.log_Error("Trying to link a Feature ('", feature_to.getID(), "') that is not an instance of Road.");
                     throw new BadLinkException("LinkDescription points to something other than a Road object.");
                 }
-                int f1_F = ((Road) feature_from).getForwardLaneCount();
-                int f1_B = ((Road) feature_from).getBackwardLaneCount();
-                int f2_F = ((Road) feature_to).getForwardLaneCount();
-                int f2_B = ((Road) feature_to).getBackwardLaneCount();
-                if (f1_F != f2_F || f1_B != f2_B) {
-                    LOG.log_Error("Directed linking '", feature_from.getID(), "' to '", feature_to.getID(), "' is not possible as the number of lanes do not match (FWD: ", f1_F, "->", f2_F, ", BCK: ", f1_B, "->", f2_B, " ).");
+                List<Lane> forwardLanes_atFrom;
+                List<Lane> backwardLanes_atFrom;
+                List<Lane> forwardLanes_atTo;
+                List<Lane> backwardLanes_atTo;
+                if (!(tools.checkForwardLinks(((Road) feature_from).getForwardSide())
+                        && tools.checkForwardLinks(((Road) feature_to).getBackwardSide()))) {
+                    //from->to links free
+                    forwardLanes_atFrom = ((Road) feature_from).getForwardSide().getLanes();
+                    backwardLanes_atFrom = ((Road) feature_from).getBackwardSide().getLanes();
+                    forwardLanes_atTo = ((Road) feature_to).getForwardSide().getLanes();
+                    backwardLanes_atTo = ((Road) feature_to).getBackwardSide().getLanes();
+                } else if (!(tools.checkForwardLinks(((Road) feature_from).getBackwardSide())
+                        && tools.checkForwardLinks(((Road) feature_to).getForwardSide()))) {
+                    //to->from links free
+                    forwardLanes_atFrom = ((Road) feature_from).getBackwardSide().getLanes();
+                    backwardLanes_atFrom = ((Road) feature_to).getForwardSide().getLanes();
+                    forwardLanes_atTo = ((Road) feature_to).getBackwardSide().getLanes();
+                    backwardLanes_atTo = ((Road) feature_from).getForwardSide().getLanes();
+                } else {
+                    LOG.log_Error("Detected attempt to cris-cross the lanes on Roads '", feature_from.getID(), "' and '", feature_to.getID(), "' in the link.");
+                    throw new BadLinkException("Road is already linked on the both sides.");
+                }
+                //Do the lanes match on both roads?
+                if (!(forwardLanes_atFrom.size() == forwardLanes_atTo.size() && backwardLanes_atFrom.size() == backwardLanes_atTo.size())) {
+                    LOG.log_Error("Directed linking '", feature_from.getID(), "' to '", feature_to.getID(), "' is not possible as the number of lanes do not match.");
                     throw new BadLinkException("Mismatch in the lanes of the directed Roads to be linked.");
                 }
-                if (tools.checkForwardLinks(((Road) feature_from).getForwardSide())) {
-                    LOG.log_Error("Road '", feature_from.getID(), "' to link is already linked on the forward side.");
-                    throw new BadLinkException("Road is already linked on the forward side.");
-                }
-                if (tools.checkForwardLinks(((Road) feature_from).getBackwardSide())) {
-                    LOG.log_Error("Road '", feature_from.getID(), "' to link is already linked on the backward side.");
-                    throw new BadLinkException("Road is already linked on the backward side.");
-                }
+
                 //Linking time for the LaneS inside the Road!
-                for (int i = 0; i < ((Road) feature_from).getForwardLaneCount(); i++) {
+                for (int i = 0; i < forwardLanes_atFrom.size(); i++) {
                     try {
                         ID id = new ID(desc.linkID + "F:" + Integer.toString(i));
                         Link link = tools.createLink(desc.type, id);
-                        Lane from = ((Road) feature_from).getForwardSide().getLanes().get(i);
-                        Lane to = ((Road) feature_to).getForwardSide().getLanes().get(i);
+                        Lane from = forwardLanes_atFrom.get(i);
+                        Lane to = forwardLanes_atTo.get(i);
                         link.in = from;
                         link.out = to;
-                        from.connect(link);
+                        from.connectNext(link);
                         this.mapLinks.put(link.getID(), link);
                         LOG.log("<GRAPH> Linking Lane '", from.getID(), "' to '", to.getID(), "'");
                     } catch (MissingImplementationException e) {
@@ -269,15 +281,15 @@ public class GraphConstructor {
                         throw e;
                     }
                 }
-                for (int i = 0; i < ((Road) feature_to).getBackwardLaneCount(); i++) {
+                for (int i = 0; i < backwardLanes_atTo.size(); i++) {
                     try {
                         ID id = new ID(desc.linkID + "B:" + Integer.toString(i));
                         Link link = tools.createLink(desc.type, id);
-                        Lane from = ((Road) feature_to).getBackwardSide().getLanes().get(i);
-                        Lane to = ((Road) feature_from).getBackwardSide().getLanes().get(i);
+                        Lane from = backwardLanes_atTo.get(i);
+                        Lane to = backwardLanes_atFrom.get(i);
                         link.in = from;
                         link.out = to;
-                        from.connect(link);
+                        from.connectNext(link);
                         this.mapLinks.put(link.getID(), link);
                         LOG.log("<GRAPH> Linking Lane '", from.getID(), "' to '", to.getID(), "'");
                     } catch (MissingImplementationException e) {

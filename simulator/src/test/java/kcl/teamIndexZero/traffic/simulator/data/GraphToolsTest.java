@@ -5,8 +5,6 @@ import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import org.junit.After;
 import org.junit.Before;
@@ -46,7 +44,7 @@ public class GraphToolsTest {
             ID id = new ID(l.getID() + "->" + "Link");
             Link link = new Link(id);
             link.in = l;
-            l.connect(link);
+            l.connectNext(link);
         }
         assertTrue(gt.checkForwardLinks(r.getForwardSide()));
         assertFalse(gt.checkForwardLinks(r.getBackwardSide()));
@@ -60,7 +58,7 @@ public class GraphToolsTest {
         assertFalse(gt.checkForwardLinks(r.getBackwardSide()));
         ID id = new ID("LaneB0" + "->" + "Link");
         Link link = new Link(id);
-        r.getBackwardSide().getLanes().get(0).connect(link);
+        r.getBackwardSide().getLanes().get(0).connectNext(link);
         gt.checkForwardLinks(r.getBackwardSide());
     }
 
@@ -82,7 +80,7 @@ public class GraphToolsTest {
         Link l2 = gt.createLink(LinkType.AUTONOMOUS_TL, new ID("ATFlink"));
         Link l3 = gt.createLink(LinkType.SYNC_TL, new ID("STFlink"));
         assertTrue(l1 instanceof Link);
-        assertTrue(l2 instanceof TrafficLight);
-        assertTrue(l3 instanceof TrafficLightInSet);
+        assertTrue(l2 instanceof Link);
+        assertTrue(l3 instanceof Link);
     }
 }

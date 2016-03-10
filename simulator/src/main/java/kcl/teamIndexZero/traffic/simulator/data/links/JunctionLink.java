@@ -4,7 +4,6 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
-import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 import kcl.teamIndexZero.traffic.simulator.exceptions.JunctionPathException;
@@ -57,11 +56,12 @@ public class JunctionLink extends Link {
     }
 
     /**
-     * {@inheritDoc}
+     * Gets the ID tag of the junction
+     *
+     * @return Junction ID tag
      */
-    @Override
-    public Feature getNextFeature() {
-        return super.out;
+    public ID getJunctionID() {
+        return this.junction.getID();
     }
 
     /**

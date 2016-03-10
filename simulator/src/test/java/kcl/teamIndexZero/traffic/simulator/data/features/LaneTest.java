@@ -62,7 +62,7 @@ public class LaneTest {
         DirectedLanes mocked_dl = mock(DirectedLanes.class);
         Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl);
         Link link = new Link(new ID("LinkID"));
-        l.connect(link);
+        l.connectNext(link);
         assertEquals(link, l.getNextLink());
     }
 }

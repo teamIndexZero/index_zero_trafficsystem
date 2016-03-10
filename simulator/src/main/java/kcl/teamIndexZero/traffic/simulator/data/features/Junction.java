@@ -46,7 +46,7 @@ public class Junction extends Feature {
     /**
      * Connects a road to the junction
      *
-     * @param road      Road to connect
+     * @param road      Road to connectNext
      * @param direction Direction of the road at connection point with the junction
      */
     public void addRoad(Road road, JunctionDescription.RoadDirection direction) throws AlreadyExistsException {
@@ -74,7 +74,7 @@ public class Junction extends Feature {
                     JunctionLink link = new JunctionLink(link_ID, road, this);
                     link.in = l;
                     link.out = this;
-                    l.connect(link);
+                    l.connectNext(link);
                     inflowLinks.put(link_ID, link);
                 }
                 if (outflowLinks.containsKey(link_ID))
@@ -89,7 +89,7 @@ public class Junction extends Feature {
                     JunctionLink link = new JunctionLink(link_ID, road, this);
                     link.in = this;
                     link.out = l;
-                    l.connect(link);
+                    //l.connectNext(link);
                     outflowLinks.put(link_ID, link);
                 }
                 if (inflowLinks.containsKey(link_ID))

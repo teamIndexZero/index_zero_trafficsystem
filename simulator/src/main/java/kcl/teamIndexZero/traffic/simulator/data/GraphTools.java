@@ -6,8 +6,6 @@ import kcl.teamIndexZero.traffic.simulator.data.features.DirectedLanes;
 import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MissingImplementationException;
 
@@ -27,10 +25,15 @@ public class GraphTools {
      * @throws MapIntegrityException when the lanes in DirectedLanes group have partly implemented links
      */
     public boolean checkForwardLinks(DirectedLanes lanes) throws MapIntegrityException {
+        LOG.log_Trace("Checking the connections at the end of ", lanes);
         int link_count = 0;
         for (Lane l : lanes.getLanes()) {
-            if (l.getNextLink() != null)
+            if (l.getNextLink() != null) {
+                LOG.log_Trace("--> ", l.getID(), " has a link at the end.");
                 link_count++;
+            } else {
+                LOG.log_Trace("--> ", l.getID(), " has its end free.");
+            }
         }
         if (link_count == 0)
             return false;
@@ -55,10 +58,10 @@ public class GraphTools {
                 return new Link(linkID);
             case AUTONOMOUS_TL:
                 //TODO maybe add the TrafficLight to the tfcontroller?
-                return new TrafficLight(linkID);
+                return new Link(linkID);
             case SYNC_TL:
                 //TODO definitely add the TrafficLight to the TFcontroller!
-                return new TrafficLightInSet(linkID);
+                return new Link(linkID);
             default:
                 LOG.log_Error("LinkType not implemented in .createLink(..)!");
                 throw new MissingImplementationException("LinkType not implemented!");
