@@ -11,12 +11,12 @@ import java.awt.*;
 public class Feature implements ISimulationAware {
     /* Random color selection*/
     public static final Color[] COLORS = {
-            new Color(0, 0, 0),
-            new Color(120, 120, 120),
-            new Color(150, 0, 60),
-            new Color(0, 60, 150),
-            new Color(60, 150, 0),
-            new Color(150, 150, 0)
+            new Color(140, 200, 200),
+            new Color(140, 200, 140),
+            new Color(140, 140, 200),
+            new Color(170, 170, 170),
+            new Color(200, 140, 140),
+            new Color(200, 200, 140),
     };
     private static Logger_Interface LOG = Logger.getLoggerInstance(Feature.class.getSimpleName());
     private ID id;

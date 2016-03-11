@@ -29,6 +29,7 @@ public class Junction extends Feature {
     private Map<ID, JunctionLink> inflowLinks;
     private Map<ID, JunctionLink> outflowLinks;
     private boolean trafficLight_flag;
+    private int usage = 0;
 
     /**
      * Constructor
@@ -146,7 +147,7 @@ public class Junction extends Feature {
             return links;
         } catch (JunctionPathException e) {
             LOG.log_Error("Either the inflow link ID doesn't exist or the there are no outflow links bound to it.");
-            LOG.log_Exception(e);
+//            LOG.log_Exception(e);
             throw new JunctionPathException("Either the inflow link ID doesn't exist or the there are no outflow links bound to it.", e);
         }
     }
@@ -160,4 +161,19 @@ public class Junction extends Feature {
         return this.trafficLight_flag;
     }
 
+    /**
+     * Add one to the usage profile - basically car counter.
+     */
+    public void incrementUsage() {
+        this.usage++;
+    }
+
+    /**
+     * Get amount of cars passed through this junction.
+     *
+     * @return usage.
+     */
+    public int getUsage() {
+        return usage;
+    }
 }

@@ -32,7 +32,7 @@ class OsmSaxHandler extends DefaultHandler {
     public static final String NODE_WITHIN_WAY_ELEMENT = "nd";
     public static final String TAG_ELEMENT = "tag";
 
-    private static final Logger LOG = Logger.getLoggerInstance(OsmSaxHandler.class.getName());
+    private static final Logger LOG = Logger.getLoggerInstance(OsmSaxHandler.class.getSimpleName());
 
     private Set<String> interestingElements = new HashSet<>(Arrays.asList(BOUNDS_ELEMENT, NODE_ELEMENT, WAY_ELEMENT, NODE_WITHIN_WAY_ELEMENT, TAG_ELEMENT));
     private Map<String, GeoPoint> points = new HashMap<>();
@@ -52,6 +52,8 @@ class OsmSaxHandler extends DefaultHandler {
     private Map<String, RoadDescription> roadDescriptions = new HashMap<>();
     private List<JunctionDescription> junctionDescriptions = new ArrayList<>();
     private List<LinkDescription> linkDescriptions = new ArrayList<>();
+    private boolean isOneWay = false;
+    private Integer numberOfLanes;
 
     /**
      * Constructor, we pass in the result which is to be filled by this class methods.
@@ -155,6 +157,12 @@ class OsmSaxHandler extends DefaultHandler {
         if ("layer".equals(key)) {
             this.currentRoadLayer = Integer.valueOf(value);
         }
+        if ("oneway".equals(key) && "yes".equals(value)) {
+            this.isOneWay = true;
+        }
+        if ("lanes".equals(key)) {
+            this.numberOfLanes = Integer.valueOf(value);
+        }
     }
 
     // <way id="8032768" version="20" timestamp="2016-03-02T22:08:00Z" uid="352985" user="ecatmur"
@@ -192,15 +200,26 @@ class OsmSaxHandler extends DefaultHandler {
         currentRoadId = attributes.getValue("id");
         currentRoadPolyline = new GeoPolyline();
         currentRoadLayer = 0;
+        isOneWay = false;
+        numberOfLanes = 2;
     }
 
     private void handleWayClose() {
+        int laneCountForward;
+        int laneCountBackward;
+        if (isOneWay) {
+            laneCountForward = numberOfLanes;
+            laneCountBackward = 0;
+        } else {
+            laneCountBackward = (int) Math.floor(numberOfLanes / 2);
+            laneCountForward = numberOfLanes - laneCountBackward;
+        }
         RoadDescription description = new RoadDescription(
                 new ID(currentRoadId),
                 currentRoadName,
                 currentRoadPolyline,
-                1,
-                1,
+                laneCountForward,
+                laneCountBackward,
                 currentRoadLayer
         );
 
@@ -239,14 +258,16 @@ class OsmSaxHandler extends DefaultHandler {
     private void createLinkAndJunctionDescriptions() {
         possibleJunctionsOrLinks.entrySet().forEach(entry -> {
             // only interested in nodes which belong to more than one road
-            if (entry.getValue() == null || entry.getValue().size() <= 1) {
+            if (entry.getValue() == null || entry.getValue().size() < 2) {
                 return;
             }
+            LOG.log_Error(String.format("Node %s belongs to %d ways", entry.getKey(), entry.getValue().size()));
 
             List<String> connectedRoadIDs = entry.getValue();
             String nodeId = entry.getKey();
             GeoPoint geoPoint = points.get(nodeId);
-            if (connectedRoadIDs.size() == 2) {
+
+            if (connectedRoadIDs.size() == -1) {
                 RoadDescription road1 = roadDescriptions.get(connectedRoadIDs.get(0));
                 RoadDescription road2 = roadDescriptions.get(connectedRoadIDs.get(1));
                 if (road1 == null || road2 == null || road1.getGeoPolyline().getSegments().size() == 0 || road2.getGeoPolyline().getSegments().size() == 0) {
@@ -277,6 +298,10 @@ class OsmSaxHandler extends DefaultHandler {
                 Map<ID, JunctionDescription.RoadDirection> roadsWithDirections = new HashMap<>();
                 for (String connectedRoadId : connectedRoadIDs) {
                     RoadDescription road = roadDescriptions.get(connectedRoadId);
+                    if (road == null) {
+                        LOG.log_Error(String.format("Have to skip road %s as could not find it in data file", connectedRoadId));
+                        continue;
+                    }
                     if (road.getGeoPolyline().getSegments().size() == 0) {
                         LOG.log_Error("Empty road for junction found, will skip ", road.getRoadName(), " road");
                         continue;
@@ -290,7 +315,7 @@ class OsmSaxHandler extends DefaultHandler {
                             roadsWithDirections.put(road.getId(), JunctionDescription.RoadDirection.INCOMING);
                             break;
                         default:
-                            LOG.log_Error("Got a road and a junction, and road goes through junction - wrong.", road.getRoadName());
+                            LOG.log_Error(String.format("Got a road and a junction, and road goes through junction - wrong. %s", road.getRoadName()));
                             break;
 
                     }

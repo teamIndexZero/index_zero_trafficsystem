@@ -31,6 +31,7 @@ public class GuiModel implements ISimulationAware {
     private SimulationStatus status;
     private SimulationParams params;
     private List<ChangeListener> listeners = new ArrayList<>();
+    private boolean showJunctions;
 
 
     /**
@@ -185,6 +186,15 @@ public class GuiModel implements ISimulationAware {
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (params != null ? params.hashCode() : 0);
         return result;
+    }
+
+    public boolean isShowJunctions() {
+        return showJunctions;
+    }
+
+    public void setShowJunctions(boolean showJunctions) {
+        this.showJunctions = showJunctions;
+        fireChangeEvent();
     }
 
     /**

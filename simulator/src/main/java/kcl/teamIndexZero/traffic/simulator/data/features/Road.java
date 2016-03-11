@@ -57,6 +57,11 @@ public class Road extends Feature {
         this.backwardSide = new DirectedLanes(new ID(id, "B"), backwardLaneCount, roadSpecs, this);
     }
 
+    @Override
+    public String toString() {
+        return String.format("{Road %s {id:%s}}", getName(), getID());
+    }
+
     /**
      * Return current layer we are in.
      *
@@ -82,6 +87,15 @@ public class Road extends Feature {
      */
     public double getRoadLength() {
         return this.roadSpecs.length;
+    }
+
+    /**
+     * Get roads metric width.
+     *
+     * @return road width in meters
+     */
+    public double getRoadWidth() {
+        return getForwardSide().getWidth() + getBackwardSide().getWidth();
     }
 
     /**

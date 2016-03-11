@@ -12,10 +12,10 @@ import java.util.List;
  */
 public class DirectedLanes {
     private static Logger_Interface LOG = Logger.getLoggerInstance(DirectedLanes.class.getSimpleName());
-    private ID id;
+    private final Road road;
     List<Lane> lanes = new ArrayList<>();
     RoadSpecs roadSpecs;
-    private final Road road;
+    private ID id;
 
     /**
      * Constructor
@@ -90,6 +90,10 @@ public class DirectedLanes {
      * @return String of the DirectedLane state
      */
     public String toString() {
-        return "DirectedLane{ " + this.id.toString() + " [" + this.getNumberOfLanes() + " lane(s)] }";
+        return String.format("{DirLanes of %s}", road.toString());
+    }
+
+    public double getWidth() {
+        return roadSpecs.width * getNumberOfLanes();
     }
 }

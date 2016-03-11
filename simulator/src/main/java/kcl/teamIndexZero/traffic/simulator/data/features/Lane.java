@@ -11,8 +11,8 @@ import kcl.teamIndexZero.traffic.simulator.data.links.Link;
  */
 public class Lane extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Lane.class.getSimpleName());
-    private RoadSpecs roadSpecs;
     private final DirectedLanes lanes;
+    private RoadSpecs roadSpecs;
     private Link nextLink;
 
     /**
@@ -96,5 +96,10 @@ public class Lane extends Feature {
     @Override
     public void tick(SimulationTick tick) {
 
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{Lane in %s}", lanes);
     }
 }

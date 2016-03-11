@@ -2,6 +2,8 @@ package kcl.teamIndexZero.traffic.gui.mvc;
 
 import kcl.teamIndexZero.traffic.gui.SimulatorGui;
 import kcl.teamIndexZero.traffic.gui.components.SimulationWindow;
+import kcl.teamIndexZero.traffic.log.Logger;
+import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
 import kcl.teamIndexZero.traffic.simulator.SimulatorFactory;
 
@@ -13,6 +15,8 @@ import javax.swing.*;
  * simulator or from the UI.
  */
 public class GuiController {
+
+    protected static Logger_Interface LOG = Logger.getLoggerInstance(GuiController.class.getSimpleName());
 
     private GuiModel model;
     private SimulatorFactory factory;
@@ -72,6 +76,7 @@ public class GuiController {
                 try {
                     simulator.start();
                 } catch (Exception e) {
+                    LOG.log_Exception(e);
                     SwingUtilities.invokeLater(() -> {
                         JOptionPane.showMessageDialog(
                                 null,

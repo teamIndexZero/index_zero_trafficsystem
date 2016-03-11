@@ -43,10 +43,10 @@ public class GraphConstructor {
                             List<RoadDescription> road_descriptions,
                             List<LinkDescription> link_descriptions) throws MapIntegrityException {
         //TODO make it so that a lone single feature can be passed to the sim
-        if (tools.checkEmpty(junction_descriptions, road_descriptions, link_descriptions)) {
-            LOG.log_Error("Nothing was passed to the GraphConstructor.");
-            throw new MapIntegrityException("Nothing was passed to the GraphConstructor.");
-        }
+//        if (tools.checkEmpty(junction_descriptions, road_descriptions, link_descriptions)) {
+//            LOG.log_Error("Nothing was passed to the GraphConstructor.");
+//            throw new MapIntegrityException("Nothing was passed to the GraphConstructor.");
+//        }
         try {
             createGraph(junction_descriptions, road_descriptions, link_descriptions);
         } catch (MissingImplementationException e) {
@@ -91,7 +91,8 @@ public class GraphConstructor {
             createRoadFeatures(road_descriptions); //DONE
             createJunctionsFeatures(junction_descriptions); //DONE
             linkFeatures(link_descriptions); //DONE - CHECK
-            //addTrafficGenerators(); //DONE - CHECK
+            //TODO Es, please uncomment and check this out - traffic generators are blue circles with TG letters next to them
+            // addTrafficGenerators();
             //checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
         } catch (MapIntegrityException e) {
             LOG.log_Error("Graph integrity is compromised. Aborting construction...");
@@ -180,7 +181,8 @@ public class GraphConstructor {
      */
     private void createRoadFeatures(List<RoadDescription> roadDescriptions) {
         roadDescriptions.forEach(rd -> {
-            Road r = new Road(rd.getId(), rd.getLaneCountForward(), rd.getLaneCountBackward(), rd.getLength(), rd.getGeoPolyline(), rd.getRoadName());
+            Road r = new Road(rd.getId(), rd.getLaneCountForward(), rd.getLaneCountBackward(), rd.getLength(), rd.getGeoPolyline(), rd.getRoadName(), rd.getLayer());
+
             mapFeatures.put(r.getID(), r);
             r.getForwardSide().getLanes().forEach(lane -> {
                 mapFeatures.put(lane.getID(), lane);
@@ -209,6 +211,7 @@ public class GraphConstructor {
                     LOG.log_Warning("Trying to add Road '", id, "' to Junction '", junction.getID(), "' failed as it's already connected.");
                 }
             });
+            junction.computeAllPaths();
             this.mapFeatures.put(junction.getID(), junction);
         });
     }
@@ -226,6 +229,16 @@ public class GraphConstructor {
             for (LinkDescription desc : linkDescriptions) {
                 Feature feature_from = mapFeatures.get(desc.fromID);
                 Feature feature_to = mapFeatures.get(desc.toID);
+
+                LOG.log_Error(String.format("Going to create link %s for roads %s and %s",
+                        desc.linkID,
+                        feature_from.getID(),
+                        feature_to.getID()));
+            }
+            for (LinkDescription desc : linkDescriptions) {
+                Feature feature_from = mapFeatures.get(desc.fromID);
+                Feature feature_to = mapFeatures.get(desc.toID);
+
                 if (feature_from == null) {
                     LOG.log_Error("ID '", desc.fromID, "' not in loaded features.");
                     throw new BadLinkException("ID in LinkDescription points to a Feature that is not loaded.");
@@ -246,6 +259,7 @@ public class GraphConstructor {
                 List<Lane> backwardLanes_atFrom;
                 List<Lane> forwardLanes_atTo;
                 List<Lane> backwardLanes_atTo;
+
                 if (!tools.checkFwdLinksPresent(((Road) feature_from).getForwardSide())
                         && !tools.checkFwdLinksPresent(((Road) feature_to).getBackwardSide())) {
                     //from->to links free
@@ -264,7 +278,8 @@ public class GraphConstructor {
                     throw new BadLinkException("Road is already linked on the both sides.");
                 }
                 //Do the lanes match on both roads?
-                if (!(forwardLanes_atFrom.size() == forwardLanes_atTo.size() && backwardLanes_atFrom.size() == backwardLanes_atTo.size())) {
+                if (!(forwardLanes_atFrom.size() == forwardLanes_atTo.size()
+                        && backwardLanes_atFrom.size() == backwardLanes_atTo.size())) {
                     LOG.log_Error("Directed linking '", feature_from.getID(), "' to '", feature_to.getID(), "' is not possible as the number of lanes do not match.");
                     throw new BadLinkException("Mismatch in the lanes of the directed Roads to be linked.");
                 }
@@ -319,7 +334,9 @@ public class GraphConstructor {
         for (Feature road : mapFeatures.values()) {
             if (road instanceof Road) {
                 if (!tools.checkFwdLinksPresent(((Road) road).getForwardSide()) || !tools.checkFwdLinksPresent(((Road) road).getBackwardSide())) {
-                    TrafficGenerator tg = new TrafficGenerator(new ID("TrafficGenerator:" + this.trafficGenerators.size()));
+                    TrafficGenerator tg = new TrafficGenerator(
+                            new ID("TrafficGenerator:" + this.trafficGenerators.size()),
+                            ((Road) road).getPolyline().getStartPoint());
                     tg.linkRoad((Road) road);
                     this.trafficGenerators.add(tg);
                     LOG.log("Created a TrafficGenerator ('", tg.getID(), "').");

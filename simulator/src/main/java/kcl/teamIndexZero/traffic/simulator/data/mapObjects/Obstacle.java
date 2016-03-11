@@ -4,6 +4,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 
 /**
@@ -16,8 +17,8 @@ public class Obstacle extends MapObject {
     /**
      * Constructor. See constructor in {@link MapObject}
      */
-    public Obstacle(String name, MapPosition position, Road road) {
-        super(name, position, road);
+    public Obstacle(String name, MapPosition position, Lane lane) {
+        super(name, position, lane);
     }
 
 

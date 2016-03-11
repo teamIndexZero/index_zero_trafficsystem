@@ -5,6 +5,7 @@ import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.GraphTools;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 public class TrafficGenerator extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(TrafficGenerator.class.getSimpleName());
+    private final GeoPoint geoPoint;
     private int counter = 1;
     private java.util.List<Link> incoming = new ArrayList<>();
     private java.util.List<Link> outgoing = new ArrayList<>();
@@ -27,8 +29,13 @@ public class TrafficGenerator extends Feature {
      *
      * @param id Feature ID tag
      */
-    public TrafficGenerator(ID id) {
+    public TrafficGenerator(ID id, GeoPoint geoPoint) {
         super(id);
+        this.geoPoint = geoPoint;
+    }
+
+    public GeoPoint getGeoPoint() {
+        return geoPoint;
     }
 
     /**
@@ -105,6 +112,8 @@ public class TrafficGenerator extends Feature {
      */
     @Override
     public void tick(SimulationTick tick) {
+        // test if it is working at all.
+        LOG.log_Error("Got message from traffic generator.");
         /*
         //TODO Es: move that to sim map
         //TODO Alex: not so sure, I'd rather leave it here and figure out how to get rid of map link/ChickenEgg problem.

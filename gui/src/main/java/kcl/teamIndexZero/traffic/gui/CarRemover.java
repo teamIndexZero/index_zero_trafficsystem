@@ -3,6 +3,7 @@ package kcl.teamIndexZero.traffic.gui;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 
 /**
  * A simple implementation of the {@link ISimulationAware} which simply deletes the objects which have moved (or happened
@@ -28,7 +29,7 @@ public class CarRemover implements ISimulationAware {
     public void tick(SimulationTick tick) {
         //todo probably we just want to skip that form simulation, or at least move to crossings/outlets, hm?
         synchronized (map) {
-            map.getObjectsOnSurface().removeIf(object -> object.getPositionOnMap() == null);
+            map.getObjectsOnSurface().removeIf(MapObject::isPleaseRemoveMeFromSimulation);
         }
     }
 }

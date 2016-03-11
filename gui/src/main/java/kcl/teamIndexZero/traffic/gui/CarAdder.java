@@ -3,6 +3,7 @@ package kcl.teamIndexZero.traffic.gui;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
@@ -35,34 +36,35 @@ public class CarAdder implements ISimulationAware {
         });
     }
 
-    private Road getRandomRoad() {
-        return roads.get((int) (Math.random() * roads.size() - 1));
+    private Lane getRandomRoad() {
+        return roads.get((int) (Math.random() * roads.size() - 1)).getForwardSide().getLanes().get(0);
     }
 
     @Override
     public void tick(SimulationTick tick) {
-        if (Math.random() > 0.7) {
+        if (Math.random() > 0.2) {
+            return;
+        }
 
-            // speed somehow varies between 0.5 and 1 m/s
-            double speed = Math.random() * 0.5 + 0.5;
+        // speed somehow varies between 0.5 and 1 m/s
+        double speed = 5;
 
-            // some cars should accelerate
-            double acceleration = Math.random() > 0.6 ? 0.04 : 0;
-            Color carColor = null;
-            String name = null;
-            if (acceleration == 0) {
-                carColor = MapObject.COLORS[0];
-                name = "SLOW";
-            } else {
-                carColor = MapObject.COLORS[1];
-                name = "FAST";
-            }
+        // some cars should accelerate
+        double acceleration = 0;
+        Color carColor = null;
+        String name = null;
+        if (acceleration == 0) {
+            carColor = MapObject.getRandomColor();
+            name = "SLOW";
+        } else {
+            carColor = MapObject.COLORS[1];
+            name = "FAST";
+        }
 
-            Vehicle v = new Vehicle(name + counter++, new MapPosition(0, 1, 2, 1), getRandomRoad(), speed, acceleration);
-            v.setColor(carColor);
-            synchronized (map) {
-                map.addMapObject(v);
-            }
+        Vehicle v = new Vehicle(name + counter++, new MapPosition(0, 1, 2, 1), getRandomRoad(), speed, acceleration);
+        v.setColor(carColor);
+        synchronized (map) {
+            map.addMapObject(v);
         }
     }
 }

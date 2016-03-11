@@ -6,7 +6,9 @@ import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.features.TrafficGenerator;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
 
@@ -74,11 +76,71 @@ public class SimulationImageProducer {
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
         primitives.drawMapBounds();
 
+        drawAllRoads();
+        drawAllJunctions();
+        drawAllTrafficGenerators();
+        drawAllMapObjects();
+
+        if (imageConsumer == null) {
+            LOG.log_Fatal("Image consumer not present. Can not draw.");
+        } else {
+            imageConsumer.accept(image);
+        }
+    }
+
+    private void drawAllTrafficGenerators() {
+        map.getMapFeatures().values().forEach(feature -> {
+            if (feature instanceof TrafficGenerator) {
+                TrafficGenerator junction = (TrafficGenerator) feature;
+                primitives.drawCircle(junction.getGeoPoint(), 7, Color.BLUE);
+                primitives.drawText(junction.getGeoPoint(), "TG", Color.BLUE);
+            }
+        });
+    }
+
+    public void drawAllMapObjects() {
+        map.getObjectsOnSurface().forEach(object -> {
+            GeoPoint point = object.getPositionOnMap();
+            if (point == null) {
+                return;
+            }
+
+            primitives.drawCircle(point, 4, object.getColor(), true);
+
+            if (object.equals(model.getSelectedMapObject())) {
+                primitives.drawCircle(point, 15, object.getColor());
+                primitives.drawText(point, object.getNameAndRoad(), object.getColor());
+            }
+        });
+    }
+
+    public void drawAllJunctions() {
+        if (!model.isShowJunctions()) {
+            return;
+        }
+        map.getMapFeatures().values().forEach(feature -> {
+            if (feature instanceof Junction) {
+                Junction junction = (Junction) feature;
+                primitives.drawCircle(junction.getGeoPoint(), 7, Color.GRAY);
+                primitives.drawText(junction.getGeoPoint(), Integer.toString(junction.getUsage()), Color.BLACK);
+            }
+        });
+    }
+
+    public void drawAllRoads() {
         map.getMapFeatures().values().forEach(feature -> {
             if (feature instanceof Road) {
                 Road road = ((Road) feature);
                 road.getPolyline().getSegments().forEach(segment -> {
-                    primitives.drawSegment(segment, getColorForLayer(road.getLayer()));
+                    primitives.drawSegment(
+                            segment,
+                            getColorForLayer(road.getLayer()),
+                            new BasicStroke(
+                                    (int) Math.floor(model.getViewport().getPixelsInMeter() * road.getRoadWidth() * 0.6),
+                                    BasicStroke.CAP_ROUND,
+                                    BasicStroke.JOIN_ROUND
+                            )
+                    );
                 });
 
                 if (model.isShowSegmentEnds()) {
@@ -92,26 +154,6 @@ public class SimulationImageProducer {
                 }
             }
         });
-
-        map.getObjectsOnSurface().forEach(object -> {
-            GeoPoint point = object.getPositionOnMap();
-            if (point == null) {
-                return;
-            }
-
-            primitives.drawCross(point, object.getColor(), primitives.CAR_STROKE);
-
-            if (object.equals(model.getSelectedMapObject())) {
-                primitives.drawCircle(point, 15, object.getColor());
-                primitives.drawText(point, object.getNameAndRoad(), object.getColor());
-            }
-        });
-
-        if (imageConsumer == null) {
-            LOG.log_Fatal("Image consumer not present. Can not draw.");
-        } else {
-            imageConsumer.accept(image);
-        }
     }
 
     private Color getColorForLayer(int layer) {
@@ -133,8 +175,8 @@ public class SimulationImageProducer {
          * @param segment segment to draw
          * @param color   color to draw with
          */
-        public void drawSegment(GeoSegment segment, Color color) {
-            graphics.setStroke(THIN_STROKE);
+        public void drawSegment(GeoSegment segment, Color color, Stroke stroke) {
+            graphics.setStroke(stroke);
             graphics.setColor(color);
             graphics.drawLine(
                     model.getViewport().convertXMetersToPixels(segment.start.xMeters),
@@ -171,21 +213,34 @@ public class SimulationImageProducer {
             graphics.drawLine(x, y - size / 2, x, y + size / 2);
         }
 
+        public void drawCircle(GeoPoint startPoint, int pixelRadius, Color color) {
+            drawCircle(startPoint, pixelRadius, color, false);
+        }
+
         /**
          * Draw a little circle around a point.
          *
          * @param startPoint  center
          * @param pixelRadius radius
          * @param color       color
+         * @param fill        whether to fill the cirle
          */
-        public void drawCircle(GeoPoint startPoint, int pixelRadius, Color color) {
+        public void drawCircle(GeoPoint startPoint, int pixelRadius, Color color, boolean fill) {
+            if (startPoint == null) {
+                LOG.log_Error("Got null trying to draw geo point. Debug me.");
+                return;
+            }
             graphics.setStroke(THIN_STROKE);
             graphics.setColor(color);
 
             int x = model.getViewport().convertXMetersToPixels(startPoint.xMeters);
             int y = model.getViewport().convertYMetersToPixels(startPoint.yMeters);
 
-            graphics.drawOval(x - pixelRadius, y - pixelRadius, pixelRadius * 2, pixelRadius * 2);
+            if (fill) {
+                graphics.fillOval(x - pixelRadius, y - pixelRadius, pixelRadius * 2, pixelRadius * 2);
+            } else {
+                graphics.drawOval(x - pixelRadius, y - pixelRadius, pixelRadius * 2, pixelRadius * 2);
+            }
         }
 
         /**
@@ -196,6 +251,11 @@ public class SimulationImageProducer {
          * @param color      color
          */
         public void drawText(GeoPoint startPoint, String text, Color color) {
+            if (startPoint == null) {
+                LOG.log_Error("Got null trying to draw geo point. Debug me.");
+                return;
+            }
+
             graphics.setStroke(THIN_STROKE);
             graphics.setColor(color);
 

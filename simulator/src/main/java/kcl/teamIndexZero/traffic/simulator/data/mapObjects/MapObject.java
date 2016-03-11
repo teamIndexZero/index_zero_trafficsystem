@@ -4,7 +4,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
-import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 
 import java.awt.*;
@@ -18,8 +18,6 @@ import java.awt.*;
  */
 public abstract class MapObject implements ISimulationAware {
 
-    protected static Logger_Interface LOG = Logger.getLoggerInstance(MapObject.class.getSimpleName());
-
     /* Random color selection*/
     public static final Color[] COLORS = {
             new Color(230, 0, 0),
@@ -30,17 +28,14 @@ public abstract class MapObject implements ISimulationAware {
             new Color(0, 0, 210)
     };
 
-    private Color color;
+    protected static Logger_Interface LOG = Logger.getLoggerInstance(MapObject.class.getSimpleName());
+    protected Lane lane;
     protected String name;
     protected MapPosition position;
-    protected Road road;
-
-    public Road getRoad() {
-        return road;
-    }
-
     protected double positionOnRoad = 0;
     protected SimulationMap map;
+    protected boolean pleaseRemoveMeFromSimulation = false;
+    private Color color;
 
     /**
      * Map object constructor - not meant to be actually called from outside, only by subclasses as super(). Anyway as
@@ -49,10 +44,10 @@ public abstract class MapObject implements ISimulationAware {
      * @param name     name of the object (to be shown in simulation maps)
      * @param position position of the object on map.
      */
-    public MapObject(String name, MapPosition position, Road road) {
+    public MapObject(String name, MapPosition position, Lane lane) {
         this.name = name;
         this.position = position;
-        this.road = road;
+        this.lane = lane;
         this.color = MapObject.getRandomColor();
     }
 
@@ -67,8 +62,20 @@ public abstract class MapObject implements ISimulationAware {
                 (int) Math.round(Math.random() * COLORS.length))];
     }
 
+    public boolean isPleaseRemoveMeFromSimulation() {
+        return pleaseRemoveMeFromSimulation;
+    }
+
+    public Lane getLane() {
+        return lane;
+    }
+
     public Color getColor() {
         return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public void setMap(SimulationMap map) {
@@ -79,10 +86,6 @@ public abstract class MapObject implements ISimulationAware {
         return position;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
     public void setPosition(MapPosition position) {
         this.position = position;
     }
@@ -91,16 +94,16 @@ public abstract class MapObject implements ISimulationAware {
         return name;
     }
 
-    public String getNameAndRoad() {
-        String roadName = getRoad().getName();
-        return name + " " + (roadName != null ? roadName : "NONAME ") + " at pos " + getPositionOnMap();
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
+    public String getNameAndRoad() {
+        return name + " " + lane.getID() + " " + lane.getRoad().getName();
+    }
+
     public GeoPoint getPositionOnMap() {
-        return road.getPolyline().getGeoPointAtDistanceFromStart(positionOnRoad);
+        //TODO: add appropriate width shift
+        return lane.getRoad().getPolyline().getGeoPointAtDistanceFromStart(positionOnRoad);
     }
 }

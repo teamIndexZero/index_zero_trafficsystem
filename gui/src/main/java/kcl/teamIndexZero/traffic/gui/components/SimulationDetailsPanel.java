@@ -98,12 +98,19 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         extraDelayBetweenTicksSlider.setPaintTicks(true);
         extraDelayBetweenTicksSlider.setPaintLabels(true);
 
-        JToggleButton drawSegmentEnds = new JCheckBox("Show segment ends", model.isShowSegmentEnds());
-
-        drawSegmentEnds.addActionListener(new ActionListener() {
+        JToggleButton drawSegmentEndsCheckbox = new JCheckBox("Show segment ends", model.isShowSegmentEnds());
+        drawSegmentEndsCheckbox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                model.setShowSegmentEnds(drawSegmentEnds.isSelected());
+                model.setShowSegmentEnds(drawSegmentEndsCheckbox.isSelected());
+            }
+        });
+
+        JToggleButton showJunctionsCheckbox = new JCheckBox("Show junctions as circles", model.isShowJunctions());
+        showJunctionsCheckbox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setShowJunctions(showJunctionsCheckbox.isSelected());
             }
         });
 
@@ -111,11 +118,13 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         settingsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JLabel delayLabel = new JLabel("Extra delay between simulation ticks");
 
-        drawSegmentEnds.setAlignmentX(Component.LEFT_ALIGNMENT);
+        drawSegmentEndsCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        showJunctionsCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
         delayLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         extraDelayBetweenTicksSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        settingsPanel.add(drawSegmentEnds);
+        settingsPanel.add(drawSegmentEndsCheckbox);
+        settingsPanel.add(showJunctionsCheckbox);
         settingsPanel.add(delayLabel);
         settingsPanel.add(extraDelayBetweenTicksSlider);
     }
@@ -153,7 +162,7 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
     private String createDetailsText(MapObject selectedMapObject) {
         String content = "";
         content += createTableRow("Name", selectedMapObject.getName());
-        content += createTableRow("Road", selectedMapObject.getRoad().getName());
+        content += createTableRow("Road", selectedMapObject.getLane().getRoad().getName());
         if (selectedMapObject instanceof Vehicle) {
             Vehicle vehicle = (Vehicle) selectedMapObject;
             content += createTableRow("Speed", String.format("%.2f", vehicle.getSpeedMetersPerSecond()) + " m/s");

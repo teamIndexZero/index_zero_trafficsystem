@@ -2,9 +2,6 @@ package kcl.teamIndexZero.traffic.simulator.data.osm;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
-import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
-import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
-import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.osm.MapParseException;
 import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
 import kcl.teamIndexZero.traffic.simulator.osm.OsmParser;
@@ -54,19 +51,18 @@ public class OsmParseTest {
     @Test
     public void shouldConstructJunctionsCorrectly() throws MapParseException {
         OsmParseResult result = (new OsmParser()).parse(STREAM_NAME, stream);
-        List<LinkDescription> links = result.linkDescriptions;
-        assertThat(links).hasSize(1);
-        assertThat(links).containsSequence(
-                new LinkDescription(new ID("w0"), new ID("w1"), LinkType.GENERIC, new ID("link_2"), new GeoPoint(0.2, 0.2))
-        );
+        List<JunctionDescription> links = result.junctionDescriptions;
+        assertThat(links).hasSize(2);
     }
 
     @Test
     public void shouldConstructLinksCorrectly() throws MapParseException {
         OsmParseResult result = (new OsmParser()).parse(STREAM_NAME, stream);
-        List<JunctionDescription> links = result.junctionDescriptions;
-        assertThat(links).hasSize(1);
-        JunctionDescription junction = result.junctionDescriptions.get(0);
+
+        List<JunctionDescription> junctions = result.junctionDescriptions;
+        assertThat(junctions).hasSize(2);
+
+        JunctionDescription junction = junctions.get(1);
         assertThat(junction.getConnectedIDs()).hasSize(3);
 
         assertThat(junction.getConnectedIDs()).contains(
