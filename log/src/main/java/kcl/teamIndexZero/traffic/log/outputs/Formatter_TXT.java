@@ -36,7 +36,7 @@ public class Formatter_TXT implements Formatter_Interface {
                 origin_name
         );
         for (Object o : objects) {
-            s += o.toString();
+            s += o;
         }
         return s + System.lineSeparator();
     }
@@ -62,7 +62,7 @@ public class Formatter_TXT implements Formatter_Interface {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        s += sw.toString() + System.lineSeparator();
+        s += sw + System.lineSeparator();
         return s;
     }
 }

@@ -39,14 +39,11 @@ public class GraphConstructor {
      *                               <p>
      *                               //TODO doc update
      */
-    public GraphConstructor(List<JunctionDescription> junction_descriptions,
-                            List<RoadDescription> road_descriptions,
-                            List<LinkDescription> link_descriptions) throws MapIntegrityException {
-        //TODO make it so that a lone single feature can be passed to the sim
-//        if (tools.checkEmpty(junction_descriptions, road_descriptions, link_descriptions)) {
-//            LOG.log_Error("Nothing was passed to the GraphConstructor.");
-//            throw new MapIntegrityException("Nothing was passed to the GraphConstructor.");
-//        }
+    public GraphConstructor(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException {
+        if (tools.checkEmpty(road_descriptions)) {
+            LOG.log_Error("No road descriptions were passed to the GraphConstructor.");
+            throw new MapIntegrityException("No road descriptions were passed to the GraphConstructor.");
+        }
         try {
             createGraph(junction_descriptions, road_descriptions, link_descriptions);
         } catch (MissingImplementationException e) {
@@ -89,21 +86,22 @@ public class GraphConstructor {
     private void createGraph(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions, List<LinkDescription> link_descriptions) throws MapIntegrityException, MissingImplementationException {
         try {
             createRoadFeatures(road_descriptions); //DONE
-            createJunctionsFeatures(junction_descriptions); //DONE
-            linkFeatures(link_descriptions); //DONE - CHECK
-            //TODO Es, please uncomment and check this out - traffic generators are blue circles with TG letters next to them
-            // addTrafficGenerators();
-            //checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
+            if (!tools.checkEmpty(junction_descriptions))
+                createJunctionsFeatures(junction_descriptions); //DONE
+            if (!tools.checkEmpty(link_descriptions))
+                linkFeatures(link_descriptions); //DONE - CHECK
+            //addTrafficGenerators(); //DONE - CHECK
+            checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
         } catch (MapIntegrityException e) {
             LOG.log_Error("Graph integrity is compromised. Aborting construction...");
             throw e;
         } catch (BadLinkException e) {
             LOG.log_Error("The graph has a bad link.");
             throw new MapIntegrityException("Bad link detected in the graph..", e);
-        } /* catch (OrphanFeatureException e) {
+        } catch (OrphanFeatureException e) {
             LOG.log_Error("An orphan feature has been detected in the graph.");
             throw new MapIntegrityException("An orphan feature has been found in the graph.", e);
-        }*/ catch (MissingImplementationException e) {
+        } catch (MissingImplementationException e) {
             LOG.log_Fatal("An implementation is missing for a case.");
             throw e;
         }
@@ -155,23 +153,47 @@ public class GraphConstructor {
         if (visitedFeatures.get(nextLink.getNextFeature().getID()) == Boolean.TRUE) {
             return true;
         } else {
+            LOG.log_Debug("¬ Visiting Feature: '", nextLink.getNextFeature().getID(), "'");
             if (nextLink.getNextFeature() instanceof Junction) {
-
+                boolean flag = true;
+                try {
+                    for (Link l : ((Junction) nextLink.getNextFeature()).getNextLinks(nextLink.getID())) {
+                        if (!_checkGraphIntegrity(visitedFeatures, visitedLinks, l))
+                            flag = false;
+                    }
+                    return flag;
+                } catch (JunctionPathException e) {
+                    LOG.log_Error("Path problem found in '", nextLink.getNextFeature().getID(), "'.");
+                    return false;
+                }
             } else if (nextLink.getNextFeature() instanceof Lane) {
-                //get the road it belongs to and check the other lanes belonging to it have been visited
-                //> if not then check it, switch to visited and recurse to the next link
-                //> else check it, switch lane to visited and the road as visited too. recurse to next link
+                visitedFeatures.put(nextLink.getNextFeature().getID(), Boolean.TRUE);
+                if (!visitedFeatures.get(((Lane) nextLink.getNextFeature()).getRoadID()) == Boolean.TRUE) {
+                    boolean flag = true;
+                    for (Lane lane : ((Lane) nextLink.getNextFeature()).getRoad().getForwardSide().getLanes()) {
+                        if (!visitedFeatures.get(lane.getID())) {
+                            flag = false;
+                        }
+                    }
+                    for (Lane lane : ((Lane) nextLink.getNextFeature()).getRoad().getBackwardSide().getLanes()) {
+                        if (!visitedFeatures.get(lane.getID())) {
+                            flag = false;
+                        }
+                    }
+                    if (flag) {
+                        visitedFeatures.put(((Lane) nextLink.getNextFeature()).getRoadID(), Boolean.TRUE);
+                    }
+                }
+                return _checkGraphIntegrity(visitedFeatures, visitedLinks, ((Lane) nextLink.getNextFeature()).getNextLink());
             } else if (nextLink.getNextFeature() instanceof TrafficGenerator) {
-                //check if traffic generator has been visited.
-                //> if not switch to visited and return true;
+                if (visitedFeatures.get(nextLink.getNextFeature().getID()) == Boolean.FALSE)
+                    visitedFeatures.put(nextLink.getNextFeature().getID(), Boolean.TRUE);
+                return true;
             } else {
-                //NOT Supported!
-                //LOG fatal
-                //throw exception
+                LOG.log_Fatal("Found an unrecognised object in the map at '", nextLink.getNextFeature().getID(), "'.");
+                return false;
             }
-            LOG.log_Debug("¬ Visited Feature: '", nextLink.getNextFeature().getID(), "'");
         }
-        return false;
     }
 
     /**
@@ -229,7 +251,7 @@ public class GraphConstructor {
             for (LinkDescription desc : linkDescriptions) {
                 Feature feature_from = mapFeatures.get(desc.fromID);
                 Feature feature_to = mapFeatures.get(desc.toID);
-
+                //FIXME check this, looks to break on the test
                 LOG.log_Error(String.format("Going to create link %s for roads %s and %s",
                         desc.linkID,
                         feature_from.getID(),
