@@ -1,14 +1,24 @@
-package kcl.teamIndexZero.traffic.simulator.data.trafficLight;
+package kcl.teamIndexZero.traffic.simulator.data.links;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
 
 /**
- * Stand-alone independent Traffic Light
+ * Created by Es on 02/03/2016.
  */
 public class TrafficLight {
+
     private ID id;
-    private TrafficLightState currentState;
+
+    public TrafficLight() {
+    }
+
+    public enum State {
+        RED, GREEN
+    }
+
+    public State currentState;
 
 
     /**
@@ -17,14 +27,32 @@ public class TrafficLight {
      * @param id Link ID tag
      */
     public TrafficLight(ID id) {
-        this.id = id;
-        this.currentState = TrafficLightState.GREEN;
+
+        this.id=id;
+        this.currentState = TrafficLight.State.GREEN;
+
     }
 
     /**
-     * Gets the current Traffic Light state
+     *  getState - method returns the current state of the TrafficLights
+     *
+     * @param id Link ID tag
      */
-    public TrafficLightState getState() {
+    public State getState(ID id){
         return this.currentState;
+    }
+
+
+    /**
+     * getTrafficLightID - method returns the ID of the  current object
+     *
+     * @param trafficLight an object of a TrafficLight class
+     */
+    public ID getTrafficLightID(TrafficLight trafficLight) { return trafficLight.id;}
+
+
+    //@Override
+    public void tick(SimulationTick tick) {
+
     }
 }

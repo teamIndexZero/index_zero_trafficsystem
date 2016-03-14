@@ -11,7 +11,7 @@ public class TrafficLightInSet {
     long CurrentDate = (new Date().getTime()) / 1000;
     long lastChange = CurrentDate;
     long timer;
-    private TrafficLight model;
+
     private TrafficLightSet modelSet;
 
     public TrafficLightInSet(ID linkId) {
