@@ -36,9 +36,8 @@ public class TrafficLight {
     /**
      *  getState - method returns the current state of the TrafficLights
      *
-     * @param id Link ID tag
      */
-    public State getState(ID id){
+    public State getState(){
         return this.currentState;
     }
 
@@ -46,9 +45,8 @@ public class TrafficLight {
     /**
      * getTrafficLightID - method returns the ID of the  current object
      *
-     * @param trafficLight an object of a TrafficLight class
      */
-    public ID getTrafficLightID(TrafficLight trafficLight) { return trafficLight.id;}
+    public ID getTrafficLightID() { return this.id;}
 
 
     //@Override
