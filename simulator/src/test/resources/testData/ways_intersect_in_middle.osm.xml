@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<osm generator="Osmosis 0.44.1">
+    <!--An example of diagonal crossing. Road 1 goes from bottom left to top right through 3 points, road 2 goes from top
+    left to bottom right through 3 points. they boss cross in mid point.-->
+
+    <bounds minlon="0" minlat="0" maxlon="1" maxlat="1"/>
+
+    <node id="n1" lat="0" lon="0"/>
+    <node id="n2" lat="1" lon="0"/>
+    <node id="n3" lat="1" lon="1"/>
+    <node id="n4" lat="0" lon="1"/>
+    <node id="n5" lat="0.5" lon="0.5"/>
+
+    <way id="w1">
+        <nd ref="n1"/>
+        <nd ref="n5"/>
+        <nd ref="n3"/>
+    </way>
+
+    <way id="w2">
+        <nd ref="n2"/>
+        <nd ref="n5"/>
+        <nd ref="n4"/>
+    </way>
+
+</osm>

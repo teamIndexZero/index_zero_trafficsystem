@@ -33,6 +33,9 @@ public class SimulationImageProducer {
     private BufferedImage image = null;
     private Graphics2D graphics;
 
+    //helper variable used to cycle colors when debugging road - helpful to spot issues in distribution.
+    private int debugRoadsColorCounter;
+
     /**
      * Constructor
      *
@@ -74,7 +77,6 @@ public class SimulationImageProducer {
 
         graphics.setBackground(Color.WHITE);
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
-        primitives.drawMapBounds();
 
         drawAllRoads();
         drawAllJunctions();
@@ -122,19 +124,29 @@ public class SimulationImageProducer {
             if (feature instanceof Junction) {
                 Junction junction = (Junction) feature;
                 primitives.drawCircle(junction.getGeoPoint(), 7, Color.GRAY);
-                primitives.drawText(junction.getGeoPoint(), Integer.toString(junction.getUsage()), Color.BLACK);
+                Color color = junction.getConnectedFeatures().size() < 2 ? Color.RED : Color.black;
+                primitives.drawText(
+                        junction.getGeoPoint(),
+                        String.format(
+                                "%dF, %dP",
+                                junction.getConnectedFeatures().size(),
+                                junction.getUsage()),
+                        color);
             }
         });
     }
 
     public void drawAllRoads() {
+        debugRoadsColorCounter = 0;
         map.getMapFeatures().values().forEach(feature -> {
             if (feature instanceof Road) {
                 Road road = ((Road) feature);
+                debugRoadsColorCounter++;
                 road.getPolyline().getSegments().forEach(segment -> {
                     primitives.drawSegment(
                             segment,
-                            getColorForLayer(road.getLayer()),
+                            model.debugRoads() ? Feature.COLORS[debugRoadsColorCounter % Feature.COLORS.length] :
+                                    getColorForLayer(road.getLayer()),
                             new BasicStroke(
                                     (int) Math.floor(model.getViewport().getPixelsInMeter() * road.getRoadWidth() * 0.6),
                                     BasicStroke.CAP_ROUND,
@@ -143,7 +155,7 @@ public class SimulationImageProducer {
                     );
                 });
 
-                if (model.isShowSegmentEnds()) {
+                if (model.debugRoads()) {
                     // for debug purposes, we want to draw road segment start/ends.
                     if (road.getPolyline().getSegments().size() > 0) {
                         GeoPoint startPoint = road.getPolyline().getSegments().get(0).start;

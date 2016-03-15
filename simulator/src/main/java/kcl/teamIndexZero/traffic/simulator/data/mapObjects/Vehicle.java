@@ -108,7 +108,6 @@ public class Vehicle extends MapObject {
                 pleaseRemoveMeFromSimulation = true;
             }
         }
-        LOG.log(this);
     }
 
     /**

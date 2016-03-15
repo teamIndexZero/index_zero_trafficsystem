@@ -98,11 +98,11 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         extraDelayBetweenTicksSlider.setPaintTicks(true);
         extraDelayBetweenTicksSlider.setPaintLabels(true);
 
-        JToggleButton drawSegmentEndsCheckbox = new JCheckBox("Show segment ends", model.isShowSegmentEnds());
-        drawSegmentEndsCheckbox.addActionListener(new ActionListener() {
+        JToggleButton debugRoads = new JCheckBox("Debug roads", model.debugRoads());
+        debugRoads.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                model.setShowSegmentEnds(drawSegmentEndsCheckbox.isSelected());
+                model.setDebugRoads(debugRoads.isSelected());
             }
         });
 
@@ -118,12 +118,12 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         settingsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JLabel delayLabel = new JLabel("Extra delay between simulation ticks");
 
-        drawSegmentEndsCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        debugRoads.setAlignmentX(Component.LEFT_ALIGNMENT);
         showJunctionsCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
         delayLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         extraDelayBetweenTicksSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        settingsPanel.add(drawSegmentEndsCheckbox);
+        settingsPanel.add(debugRoads);
         settingsPanel.add(showJunctionsCheckbox);
         settingsPanel.add(delayLabel);
         settingsPanel.add(extraDelayBetweenTicksSlider);

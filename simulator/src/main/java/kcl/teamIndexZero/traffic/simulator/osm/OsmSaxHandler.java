@@ -3,17 +3,16 @@ package kcl.teamIndexZero.traffic.simulator.osm;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
-import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
-import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * SAX Xml handler to read elements from OpenStreetMap.
@@ -36,24 +35,23 @@ class OsmSaxHandler extends DefaultHandler {
 
     private Set<String> interestingElements = new HashSet<>(Arrays.asList(BOUNDS_ELEMENT, NODE_ELEMENT, WAY_ELEMENT, NODE_WITHIN_WAY_ELEMENT, TAG_ELEMENT));
     private Map<String, GeoPoint> points = new HashMap<>();
-    private Map<String, List<String>> possibleJunctionsOrLinks = new HashMap<>();
+    private Map<String, List<String>> possibleJunctions = new HashMap<>();
 
     private GeoPolyline currentRoadPolyline = null;
-    private int currentRoadLayer = 0;
     private String currentRoadId;
     private String currentRoadName;
+    private Integer currentRoadLanes;
+    private int currentRoadLayer = 0;
+    private boolean isCurrentRoadOneWay = false;
 
+    private boolean isBoundsHandled = false;
     private double boundsMinLon;
     private double boundsMinLat;
-    private boolean boundsHandled = false;
     private double boundsMaxLat;
     private double boundsMaxLon;
 
     private Map<String, RoadDescription> roadDescriptions = new HashMap<>();
     private List<JunctionDescription> junctionDescriptions = new ArrayList<>();
-    private List<LinkDescription> linkDescriptions = new ArrayList<>();
-    private boolean isOneWay = false;
-    private Integer numberOfLanes;
 
     /**
      * Constructor, we pass in the result which is to be filled by this class methods.
@@ -84,6 +82,43 @@ class OsmSaxHandler extends DefaultHandler {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return R * c;
+    }
+
+    public static RoadDescription[] splitRoadDescriptionAtPoint(RoadDescription roadDescription, GeoPoint pivotPoint) {
+        List<GeoSegment> firstSegments = new ArrayList<>();
+        List<GeoSegment> secondSegments = new ArrayList<>();
+        boolean afterPivot = false;
+        List<GeoSegment> segments = roadDescription.getGeoPolyline().getSegments();
+
+        for (GeoSegment s : segments) {
+            if (s.start.equals(pivotPoint)) {
+                afterPivot = true;
+            }
+            if (afterPivot) {
+                secondSegments.add(s);
+            } else {
+                firstSegments.add(s);
+            }
+        }
+
+        return new RoadDescription[]{
+                new RoadDescription(
+                        new ID(roadDescription.getId().toString() + "_s1"),
+                        roadDescription.getRoadName(),
+                        new GeoPolyline(firstSegments),
+                        roadDescription.getLaneCountForward(),
+                        roadDescription.getLaneCountBackward(),
+                        roadDescription.getLayer()
+                ),
+                new RoadDescription(
+                        new ID(roadDescription.getId().toString() + "_s2"),
+                        roadDescription.getRoadName(),
+                        new GeoPolyline(secondSegments),
+                        roadDescription.getLaneCountForward(),
+                        roadDescription.getLaneCountBackward(),
+                        roadDescription.getLayer()
+                )
+        };
     }
 
     private NodePositionInRoad getNodePositionInRoad(String nodeId, RoadDescription road) {
@@ -158,10 +193,10 @@ class OsmSaxHandler extends DefaultHandler {
             this.currentRoadLayer = Integer.valueOf(value);
         }
         if ("oneway".equals(key) && "yes".equals(value)) {
-            this.isOneWay = true;
+            this.isCurrentRoadOneWay = true;
         }
         if ("lanes".equals(key)) {
-            this.numberOfLanes = Integer.valueOf(value);
+            this.currentRoadLanes = Integer.valueOf(value);
         }
     }
 
@@ -179,15 +214,15 @@ class OsmSaxHandler extends DefaultHandler {
         GeoPoint thisPoint = points.get(nodeId);
         if (thisPoint != null) {
             currentRoadPolyline.addPoint(thisPoint);
+            // add this to the candidates for junctions and/or links
+            List<String> connectedRoadIDs = possibleJunctions.get(nodeId);
+            if (connectedRoadIDs == null) {
+                connectedRoadIDs = new ArrayList<>();
+                possibleJunctions.put(nodeId, connectedRoadIDs);
+            }
+            connectedRoadIDs.add(currentRoadId);
         }
 
-        // add this to the candidates for junctions and/or links
-        List<String> connectedRoadIDs = possibleJunctionsOrLinks.get(nodeId);
-        if (connectedRoadIDs == null) {
-            connectedRoadIDs = new ArrayList<>();
-            possibleJunctionsOrLinks.put(nodeId, connectedRoadIDs);
-        }
-        connectedRoadIDs.add(currentRoadId);
     }
 
     //        <way id="8032768" version="20" timestamp="2016-03-02T22:08:00Z"
@@ -200,20 +235,21 @@ class OsmSaxHandler extends DefaultHandler {
         currentRoadId = attributes.getValue("id");
         currentRoadPolyline = new GeoPolyline();
         currentRoadLayer = 0;
-        isOneWay = false;
-        numberOfLanes = 2;
+        isCurrentRoadOneWay = false;
+        currentRoadLanes = 2;
     }
 
     private void handleWayClose() {
         int laneCountForward;
         int laneCountBackward;
-        if (isOneWay) {
-            laneCountForward = numberOfLanes;
+        if (isCurrentRoadOneWay) {
+            laneCountForward = currentRoadLanes;
             laneCountBackward = 0;
         } else {
-            laneCountBackward = (int) Math.floor(numberOfLanes / 2);
-            laneCountForward = numberOfLanes - laneCountBackward;
+            laneCountBackward = (int) Math.floor(currentRoadLanes / 2);
+            laneCountForward = currentRoadLanes - laneCountBackward;
         }
+
         RoadDescription description = new RoadDescription(
                 new ID(currentRoadId),
                 currentRoadName,
@@ -223,7 +259,9 @@ class OsmSaxHandler extends DefaultHandler {
                 currentRoadLayer
         );
 
-        roadDescriptions.put(currentRoadId, description);
+        if (currentRoadPolyline.getSegments().size() > 0) {
+            roadDescriptions.put(currentRoadId, description);
+        }
         currentRoadPolyline = null;
         currentRoadId = null;
         currentRoadName = null;
@@ -232,21 +270,23 @@ class OsmSaxHandler extends DefaultHandler {
     // <node id="2684347240" version="1" timestamp="2016-03-02T22:08:00Z" uid="1016290"
     // user="Amaroussi" changeset="20704202" lat="51.4971865" lon="-0.1002579"/>
     private void handleNode(Attributes attributes) {
-        if (!boundsHandled) {
+        if (!isBoundsHandled) {
             throw new IllegalStateException("Can not handle node as bounds are not loaded yet = no conversion to meters.");
         }
         double lat = Double.parseDouble(attributes.getValue("lat"));
         double lon = Double.parseDouble(attributes.getValue("lon"));
-        points.put(attributes.getValue("id"),
+        String nodeId = attributes.getValue("id");
+        points.put(nodeId,
                 new GeoPoint(
-                        getDistanceMeters(this.boundsMinLat, this.boundsMinLon, this.boundsMinLat, lon),
-                        getDistanceMeters(this.boundsMinLat, this.boundsMinLon, lat, this.boundsMinLon)));
+                        (lon < this.boundsMinLon ? -1 : 1) * getDistanceMeters(this.boundsMinLat, this.boundsMinLon, this.boundsMinLat, lon),
+                        (lat < this.boundsMinLat ? -1 : 1) * getDistanceMeters(this.boundsMinLat, this.boundsMinLon, lat, this.boundsMinLon),
+                        new ID(nodeId)));
     }
 
     // <bounds minlon="-0.10625" minlat="51.49189" maxlon="-0.09609"
     //                          maxlat="51.49982" origin="osmconvert 0.7T"/>
     private void handleBounds(Attributes attributes) {
-        boundsHandled = true;
+        isBoundsHandled = true;
         this.boundsMinLat = Double.parseDouble(attributes.getValue("minlat"));
         this.boundsMinLon = Double.parseDouble(attributes.getValue("minlon"));
 
@@ -256,77 +296,154 @@ class OsmSaxHandler extends DefaultHandler {
     }
 
     private void createLinkAndJunctionDescriptions() {
-        possibleJunctionsOrLinks.entrySet().forEach(entry -> {
-            // only interested in nodes which belong to more than one road
-            if (entry.getValue() == null || entry.getValue().size() < 2) {
+        // Sometimes, roads are connected in OSM  via a 'middle part'. With this, we want to split these into two parts
+        // as individual sub-roads, and add both of them to the connected IDs list.
+        filterAndSplitRoadsWhichIntersectInMiddle();
+
+        possibleJunctions.entrySet().forEach(entry -> {
+            String nodeId = entry.getKey();
+            if (!points.keySet().contains(nodeId)) {
                 return;
             }
-            LOG.log_Error(String.format("Node %s belongs to %d ways", entry.getKey(), entry.getValue().size()));
-
             List<String> connectedRoadIDs = entry.getValue();
-            String nodeId = entry.getKey();
-            GeoPoint geoPoint = points.get(nodeId);
+            if (connectedRoadIDs.size() < 2) {
+                return;
+            }
 
-            if (connectedRoadIDs.size() == -1) {
-                RoadDescription road1 = roadDescriptions.get(connectedRoadIDs.get(0));
-                RoadDescription road2 = roadDescriptions.get(connectedRoadIDs.get(1));
-                if (road1 == null || road2 == null || road1.getGeoPolyline().getSegments().size() == 0 || road2.getGeoPolyline().getSegments().size() == 0) {
-                    LOG.log_Error("Found a link but not a corresponding road. Error. Will skip link ");
-                    return;
-                }
-                NodePositionInRoad nodeOnRoad1 = getNodePositionInRoad(nodeId, road1);
-                NodePositionInRoad nodeOnRoad2 = getNodePositionInRoad(nodeId, road2);
-                // TODO add traffic light type!
-                if (nodeOnRoad1 == NodePositionInRoad.END && nodeOnRoad2 == NodePositionInRoad.START) {
-                    linkDescriptions.add(new LinkDescription(
-                            road1.getId(),
-                            road2.getId(),
-                            LinkType.GENERIC,
-                            new ID("link_" + nodeId),
-                            geoPoint));
-                } else {
-                    // probably all other options could go here. If we are not even too accurate in this case, let's leave it as is.
-                    linkDescriptions.add(new LinkDescription(
-                            road2.getId(),
-                            road1.getId(),
-                            LinkType.GENERIC,
-                            new ID("link_" + nodeId),
-                            geoPoint));
-                }
-            } else {
-                // TODO traffic light for a junction!
-                Map<ID, JunctionDescription.RoadDirection> roadsWithDirections = new HashMap<>();
-                for (String connectedRoadId : connectedRoadIDs) {
-                    RoadDescription road = roadDescriptions.get(connectedRoadId);
-                    if (road == null) {
-                        LOG.log_Error(String.format("Have to skip road %s as could not find it in data file", connectedRoadId));
-                        continue;
-                    }
-                    if (road.getGeoPolyline().getSegments().size() == 0) {
-                        LOG.log_Error("Empty road for junction found, will skip ", road.getRoadName(), " road");
-                        continue;
-                    }
-                    NodePositionInRoad positionInRoad = getNodePositionInRoad(nodeId, road);
-                    switch (positionInRoad) {
+            Map<ID, JunctionDescription.RoadDirection> connectedRoadIDsWithDirection = new HashMap<>();
+            for (String roadId : connectedRoadIDs) {
+                RoadDescription description = roadDescriptions.get(roadId);
+                if (description != null) {
+                    // we have it as is - it belongs to a map, and also it was not removed during splitting process.
+                    NodePositionInRoad nodeStatus = getNodePositionInRoad(nodeId, description);
+                    switch (nodeStatus) {
                         case START:
-                            roadsWithDirections.put(road.getId(), JunctionDescription.RoadDirection.OUTGOING);
+                            connectedRoadIDsWithDirection.put(description.getId(), JunctionDescription.RoadDirection.OUTGOING);
                             break;
                         case END:
-                            roadsWithDirections.put(road.getId(), JunctionDescription.RoadDirection.INCOMING);
+                            connectedRoadIDsWithDirection.put(description.getId(), JunctionDescription.RoadDirection.INCOMING);
                             break;
-                        default:
-                            LOG.log_Error(String.format("Got a road and a junction, and road goes through junction - wrong. %s", road.getRoadName()));
-                            break;
-
+                        case NOT_START_OR_END:
+                            throw new IllegalStateException("Encountered a road which has junction in the middle. This " +
+                                    "should have been handled by filterAndSplitRoadsWhichIntersectInMiddle");
                     }
+                } else {
+                    // we don't have that road by ID: possible 2 cases:
+                    //   1. It does not belong to a map - skip it.
+                    //   2. It has been split. We can find the new leaves, as their IDs have a specific form of {original_id}_s[12], like
+                    //      4421232_s1, or if split happened multiple times, 4421232_s1_s2_s1 - so with startsWith.
+
+                    // First of all, we find all sub-roads (the ones into which original road was transformed)
+                    roadDescriptions.values()
+                            .stream()
+                            // First of all, we find all sub-roads (the ones into which original road was split, judging by ID)
+                            .filter(desc -> desc.getId().toString().startsWith(roadId + "_s") && desc.getGeoPolyline().getSegments().size() > 0)
+                            // Of these candidates, we do the check - if junction belongs to any of these (and position)
+                            .forEach((desc -> {
+                                // we get the position of the node related to subroad.
+                                NodePositionInRoad nodeStatus = getNodePositionInRoad(nodeId, desc);
+                                switch (nodeStatus) {
+                                    case START:
+                                        connectedRoadIDsWithDirection.put(desc.getId(), JunctionDescription.RoadDirection.OUTGOING);
+                                        break;
+                                    case END:
+                                        connectedRoadIDsWithDirection.put(desc.getId(), JunctionDescription.RoadDirection.INCOMING);
+                                        break;
+                                    default:
+                                        // perfectly legit here - this just means that the segment we are looking at does
+                                        // not touch the point of interest.
+                                        break;
+                                }
+                            }));
                 }
-                JunctionDescription junctionDescription = new JunctionDescription(new ID("junction_" + nodeId),
-                        roadsWithDirections, false, geoPoint);
+
+            }
+
+            GeoPoint geoPoint = points.get(nodeId);
+
+            // TODO traffic light for a junction!
+            if (geoPoint != null) {
+                JunctionDescription junctionDescription = new JunctionDescription(
+                        new ID("junction_" + nodeId),
+                        connectedRoadIDsWithDirection,
+                        false,
+                        geoPoint);
                 junctionDescriptions.add(junctionDescription);
             }
         });
     }
 
+    private void filterAndSplitRoadsWhichIntersectInMiddle() {
+        //remove the roads which are empty (due to bounding box cutting)
+        roadDescriptions.entrySet()
+                .removeIf(entry -> entry.getValue() == null || entry.getValue().getGeoPolyline().getSegments().size() < 1);
+
+        // for every possible junction, that is (PointID -> List<RoadId>), or roads grouped by point.
+        possibleJunctions.entrySet().forEach(entry -> {
+            // only interested in nodes which belong to more than one road
+            if (entry.getValue() == null || entry.getValue().size() < 2) {
+                return;
+            }
+
+            List<String> connectedRoadIDs = entry.getValue();
+            String nodeId = entry.getKey();
+            GeoPoint node = points.get(nodeId);
+            // referncing node which is off-screen.
+            if (node == null) {
+                return;
+            }
+
+            connectedRoadIDs
+                    .forEach(roadId -> {
+                        RoadDescription road = roadDescriptions.get(roadId);
+                        if (road == null) {
+                            // maybe it has been already split, let's try to find the parts:
+                            List<RoadDescription> children = roadDescriptions
+                                    .values()
+                                    .stream()
+                                    .filter(descr -> descr.getId().toString().startsWith(roadId + "_s"))
+                                    .collect(Collectors.toList());
+                            if (children.size() == 0) {
+                                LOG.log_Warning("Found orphaned road. Not attempting to split.");
+                                return;
+                            }
+
+                            for (RoadDescription dec : children) {
+                                if (dec.getGeoPolyline().containsPoint(node)) {
+                                    road = dec;
+                                }
+                            }
+                            if (road == null) {
+                                throw new IllegalStateException("Could not terminate split procedure. Found a road " +
+                                        "which is not on list. It should have been already split, but none of " +
+                                        "chunks contains given point");
+                            }
+                        }
+                        NodePositionInRoad positionInRoad = getNodePositionInRoad(nodeId, road);
+                        if (positionInRoad == NodePositionInRoad.NOT_START_OR_END) {
+                            RoadDescription[] split = splitRoadDescriptionAtPoint(road, points.get(nodeId));
+                            RoadDescription fromStartToMiddle = split[0];
+                            RoadDescription fromMiddleToEnd = split[1];
+
+                            // add new half-roads to the road descriptions, remove the old one
+                            roadDescriptions.put(fromStartToMiddle.getId().toString(), fromStartToMiddle);
+                            roadDescriptions.put(fromMiddleToEnd.getId().toString(), fromMiddleToEnd);
+                            roadDescriptions.remove(road.getId().toString());
+                        }
+                    });
+        });
+
+        //remove the roads which are empty (due to bounding box cutting)
+        roadDescriptions.entrySet()
+                .removeIf(entry -> entry.getValue() == null || entry.getValue().getGeoPolyline().getSegments().size() < 1);
+    }
+
+    /**
+     * Get results parsed out from an OpenStreetMap XML file. Some additional processing and improvement of data is required,
+     * and also we may need to have a signal for XML reading end to get to this step.
+     *
+     * @return parse result - basically, bounding box, list of junction descriptions and list of road descriptions.
+     */
     public OsmParseResult collectResult() {
         createLinkAndJunctionDescriptions();
         OsmParseResult result = new OsmParseResult();
@@ -338,7 +455,7 @@ class OsmSaxHandler extends DefaultHandler {
                         getDistanceMeters(this.boundsMinLat, this.boundsMinLon, this.boundsMinLat, boundsMaxLon),
                         getDistanceMeters(this.boundsMinLat, this.boundsMinLon, boundsMaxLat, this.boundsMinLon)
                 ));
-        LOG.log_Warning("Got bounds ", segment);
+        LOG.log_Debug("Got bounds ", segment);
         result.boundingBox = segment;
 
         //roads
@@ -346,9 +463,6 @@ class OsmSaxHandler extends DefaultHandler {
 
         // junctions
         result.junctionDescriptions.addAll(junctionDescriptions);
-
-        // links
-        result.linkDescriptions.addAll(linkDescriptions);
 
         return result;
     }

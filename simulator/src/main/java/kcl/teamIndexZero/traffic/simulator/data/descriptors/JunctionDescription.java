@@ -15,10 +15,6 @@ public class JunctionDescription {
     private boolean trafficLightFlag;
     private GeoPoint geoPoint;
 
-    public GeoPoint getGeoPoint() {
-        return geoPoint;
-    }
-
     /**
      * Constructor
      *
@@ -31,6 +27,10 @@ public class JunctionDescription {
         this.connectedRoadIDs = connectedRoadIDs;
         this.trafficLightFlag = trafficLight_flag;
         this.geoPoint = geoPoint;
+    }
+
+    public GeoPoint getGeoPoint() {
+        return geoPoint;
     }
 
     /**

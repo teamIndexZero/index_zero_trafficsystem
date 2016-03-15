@@ -12,8 +12,14 @@ public class GeoPolyline {
     // list of segments? or map of points/lenght?
     private List<GeoSegment> segments = new ArrayList<>();
 
-    private float polylineLength = 0;
     private GeoPoint lastPoint = null;
+
+    public GeoPolyline() {
+    }
+
+    public GeoPolyline(List<GeoSegment> segments) {
+        this.segments = segments;
+    }
 
     /**
      * Adds another point to the line. If this is point #2 and above, it will result in adding a new segment.
@@ -23,7 +29,6 @@ public class GeoPolyline {
     public void addPoint(GeoPoint point) {
         if (lastPoint != null) {
             GeoSegment segment = new GeoSegment(lastPoint, point);
-            polylineLength += segment.getLength();
             segments.add(segment);
         }
         lastPoint = point;
@@ -94,11 +99,26 @@ public class GeoPolyline {
     }
 
     /**
+     * Check if the polyline contains a point.
+     *
+     * @param point to check
+     * @return true if contains.
+     */
+    public boolean containsPoint(GeoPoint point) {
+        for (GeoSegment s : segments) {
+            if (s.start.equals(point) || s.end.equals(point)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get total linear metric length of the polyline.
      *
      * @return meters of the polyline length.
      */
-    public float getPolylineLength() {
-        return polylineLength;
+    public double getPolylineLength() {
+        return segments.stream().map(GeoSegment::getLength).reduce(Double::sum).get();
     }
 }

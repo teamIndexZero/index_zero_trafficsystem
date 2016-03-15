@@ -99,7 +99,7 @@ public abstract class MapObject implements ISimulationAware {
     }
 
     public String getNameAndRoad() {
-        return name + " " + lane.getID() + " " + lane.getRoad().getName();
+        return name + " " + lane.getRoad().getName();
     }
 
     public GeoPoint getPositionOnMap() {

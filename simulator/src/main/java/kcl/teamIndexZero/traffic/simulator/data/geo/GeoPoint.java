@@ -1,16 +1,27 @@
 package kcl.teamIndexZero.traffic.simulator.data.geo;
 
+import kcl.teamIndexZero.traffic.simulator.data.ID;
+
 /**
  * Represents a geographical point (in our synthetic coordinate system (offset to north and east from 0,0).
  */
 public class GeoPoint {
 
+    private static final ID SYNTETIC = new ID("SYNTH_POINT");
+
     public double xMeters;
     public double yMeters;
+    public ID id;
 
     public GeoPoint(double xMeters, double yMeters) {
+        this(xMeters, yMeters, SYNTETIC);
+    }
+
+    public GeoPoint(double xMeters, double yMeters, ID id) {
         this.xMeters = xMeters;
         this.yMeters = yMeters;
+        this.id = id;
+
     }
 
     /**
@@ -24,6 +35,10 @@ public class GeoPoint {
         return Math.sqrt(
                 (point.xMeters - point1.xMeters) * (point.xMeters - point1.xMeters) +
                         (point.yMeters - point1.yMeters) * (point.yMeters - point1.yMeters));
+    }
+
+    public ID getId() {
+        return id;
     }
 
     @Override

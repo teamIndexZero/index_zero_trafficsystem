@@ -25,7 +25,7 @@ public class GuiModel implements ISimulationAware {
     private final ViewportModel viewport;
     private final SimulationMap map;
     private int delayBetweenTicks = DELAY_INITIAL;
-    private boolean showSegmentEnds;
+    private boolean debugRoads;
     private MapObject selectedMapObject;
     private SimulationTick tick;
     private SimulationStatus status;
@@ -80,17 +80,17 @@ public class GuiModel implements ISimulationAware {
      *
      * @return current setting.
      */
-    public boolean isShowSegmentEnds() {
-        return this.showSegmentEnds;
+    public boolean debugRoads() {
+        return this.debugRoads;
     }
 
     /**
-     * Setter for showSegmentEnds
+     * Setter for debugRoads
      *
-     * @param showSegmentEnds set
+     * @param debugRoads set
      */
-    public void setShowSegmentEnds(boolean showSegmentEnds) {
-        this.showSegmentEnds = showSegmentEnds;
+    public void setDebugRoads(boolean debugRoads) {
+        this.debugRoads = debugRoads;
         fireChangeEvent();
     }
 
@@ -167,7 +167,7 @@ public class GuiModel implements ISimulationAware {
 
         GuiModel guiModel = (GuiModel) o;
 
-        if (showSegmentEnds != guiModel.showSegmentEnds) return false;
+        if (debugRoads != guiModel.debugRoads) return false;
         if (delayBetweenTicks != guiModel.delayBetweenTicks) return false;
         if (selectedMapObject != null ? !selectedMapObject.equals(guiModel.selectedMapObject) : guiModel.selectedMapObject != null)
             return false;
@@ -179,7 +179,7 @@ public class GuiModel implements ISimulationAware {
 
     @Override
     public int hashCode() {
-        int result = (showSegmentEnds ? 1 : 0);
+        int result = (debugRoads ? 1 : 0);
         result = 31 * result + (selectedMapObject != null ? selectedMapObject.hashCode() : 0);
         result = 31 * result + delayBetweenTicks;
         result = 31 * result + (tick != null ? tick.hashCode() : 0);
