@@ -53,8 +53,14 @@ public class SimulationMap implements ISimulationAware {
     public SimulationMap(int width, int height, GraphConstructor graph_constructor) throws MapIntegrityException {
         this.width = width;
         this.height = height;
-        this.mapFeatures = graph_constructor.getFeatures();
+        graph_constructor.getFeatures().forEach((id, feature) -> {
+            addFeature(feature);
+        });
         this.mapLinks = graph_constructor.getLinks();
+    }
+
+    private void addFeature(Feature feature) {
+        feature.setMap(this);
     }
 
     public Map<ID, Feature> getMapFeatures() {
