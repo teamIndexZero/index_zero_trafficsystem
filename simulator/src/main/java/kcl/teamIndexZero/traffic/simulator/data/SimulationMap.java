@@ -12,6 +12,7 @@ import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.OrphanFeatureException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class SimulationMap implements ISimulationAware {
     private final int height;
     public double widthMeters;
     public double heightMeters;
-    private Map<ID, Feature> mapFeatures;
+    private Map<ID, Feature> mapFeatures = new HashMap<>();
     private Map<ID, Link> mapLinks;
     private List<MapObject> objectsOnSurface = new ArrayList<>();
 
@@ -59,14 +60,29 @@ public class SimulationMap implements ISimulationAware {
         this.mapLinks = graph_constructor.getLinks();
     }
 
+    /**
+     * Adds features to the map
+     *
+     * @param feature Feature to add
+     */
     private void addFeature(Feature feature) {
+        LOG.log_Trace("Adding feature '", feature.getID(), "' to map.");
         feature.setMap(this);
+        this.mapFeatures.putIfAbsent(feature.getID(), feature);
     }
 
+    /**
+     * Get the features on the map
+     *
+     * @return all features on the map
+     */
     public Map<ID, Feature> getMapFeatures() {
         return mapFeatures;
     }
 
+    /**
+     * @return
+     */
     public Map<ID, Link> getMapLinks() {
         return mapLinks;
     }
@@ -94,7 +110,6 @@ public class SimulationMap implements ISimulationAware {
      */
     public int getWidth() {
         return width;
-
     }
 
     /**

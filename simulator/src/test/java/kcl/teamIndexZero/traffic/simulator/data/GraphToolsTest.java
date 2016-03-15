@@ -5,7 +5,6 @@ import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
-import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -73,16 +71,5 @@ public class GraphToolsTest {
         assertTrue(gt.checkEmpty(list1, list2));
         list2.add(5);
         assertFalse(gt.checkEmpty(list1, list2));
-    }
-
-
-    @Test
-    public void testCreateLink() throws Exception {
-        Link l1 = gt.createLink(LinkType.GENERIC, new ID("GenericLink"), new GeoPoint(0, 0));
-        Link l2 = gt.createLink(LinkType.AUTONOMOUS_TL, new ID("ATFlink"), new GeoPoint(0, 0));
-        Link l3 = gt.createLink(LinkType.SYNC_TL, new ID("STFlink"), new GeoPoint(0, 0));
-        assertTrue(l1 instanceof Link);
-        assertTrue(l2 instanceof Link);
-        assertTrue(l3 instanceof Link);
     }
 }

@@ -14,6 +14,7 @@ public class Link implements ISimulationAware {
     public Feature out;
     private ID id;
     private GeoPoint geoPoint;
+    //TODO add private traffic lights + shebang
 
     /**
      * Constructor

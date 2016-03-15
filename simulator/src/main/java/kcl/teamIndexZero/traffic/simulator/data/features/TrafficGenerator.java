@@ -7,7 +7,7 @@ import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
-import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MissingImplementationException;
 
@@ -20,7 +20,8 @@ import java.util.List;
 public class TrafficGenerator extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(TrafficGenerator.class.getSimpleName());
     private final GeoPoint geoPoint;
-    private int counter = 1;
+    private int creationCounter = 0;
+    private int receiptCounter = 0;
     private java.util.List<Link> incoming = new ArrayList<>();
     private java.util.List<Link> outgoing = new ArrayList<>();
 
@@ -34,6 +35,11 @@ public class TrafficGenerator extends Feature {
         this.geoPoint = geoPoint;
     }
 
+    /**
+     * Gets the Geo point of the TrafficGenerator
+     *
+     * @return GeoPoint
+     */
     public GeoPoint getGeoPoint() {
         return geoPoint;
     }
@@ -63,7 +69,7 @@ public class TrafficGenerator extends Feature {
         //Linking time!
         for (Lane lane : incoming.getLanes()) { //entering the generator
             ID id = new ID(lane.getID() + "->" + this.getID());
-            Link link = tools.createLink(LinkType.GENERIC, id, road.getPolyline().getStartPoint());
+            Link link = new Link(id, road.getPolyline().getStartPoint());
             link.in = lane;
             link.out = this;
             lane.connectNext(link);
@@ -72,7 +78,7 @@ public class TrafficGenerator extends Feature {
         }
         for (Lane lane : outgoing.getLanes()) { //leaving the generator
             ID id = new ID(lane.getID() + "<-" + this.getID());
-            Link link = tools.createLink(LinkType.GENERIC, id, road.getPolyline().getStartPoint());
+            Link link = new Link(id, road.getPolyline().getStartPoint());
             link.in = this;
             link.out = lane;
             this.outgoing.add(link);
@@ -99,6 +105,23 @@ public class TrafficGenerator extends Feature {
     }
 
     /**
+     * Take receipt of incoming vehicle
+     *
+     * @param vehicle Vehicle to receive into the TrafficGenerator
+     */
+    public void terminateTravel(Vehicle vehicle) {
+        LOG.log("TF[ '", this.getID(), "' ] Vehicle '", vehicle.getName(), "' terminated journey.");
+        /*
+        synchronized (super.getMap()) {
+            //TODO maybe a bit heavy as will be called every time a car exits..
+            //super.getMap().getObjectsOnSurface().removeIf(MapObject::isPleaseRemoveMeFromSimulation);
+            //TODO or maybe access via ID (means changing the surface object list to a map. quicker access time though and can still iterate)
+        }
+        this.receiptCounter++;
+        */
+    }
+
+    /**
      * Gets a random lane to place a vehicle onto
      *
      * @return Random Lane
@@ -112,34 +135,46 @@ public class TrafficGenerator extends Feature {
      */
     @Override
     public void tick(SimulationTick tick) {
-        // test if it is working at all.
-        LOG.log_Error("Got message from traffic generator.");
         /*
-        //TODO Es: move that to sim map
-        //TODO Alex: not so sure, I'd rather leave it here and figure out how to get rid of map link/ChickenEgg problem.
-         // this code feels like it belongs here - traffic generator is a thing which creates new car and injects them
-         // into the network...
+        if (Math.random() > 0.2) {
+            return;
+        }
 
-        if (Math.random() > 0.7) {
-            // speed somehow varies between 0.5 and 1 m/s
-            double speed = Math.random() * 0.5 + 0.5;
+        // speed somehow varies between 0.5 and 1 m/s
+        double speed = 5;
 
-            // some cars should accelerate
-            double acceleration = Math.random() > 0.6 ? 0.04 : 0;
-            Color carColor = null;
-            String name = null;
-            if (acceleration == 0) {
-                carColor = MapObject.COLORS[0];
-                name = "SLOW";
-            } else {
-                carColor = MapObject.COLORS[1];
-                name = "FAST";
-            }
+        // some cars should accelerate
+        double acceleration = Math.random() > 0.6 ? 0.04 : 0;
+        Color carColor = null;
+        String name = null;
+        if (acceleration == 0) {
+            carColor = MapObject.getRandomColor();
+            name = "SLOW";
+        } else {
+            carColor = MapObject.COLORS[1];
+            name = "FAST";
+        }
 
-            Vehicle v = new Vehicle(name + counter++, new MapPosition(0, 1, 2, 1), getRandomLane(), speed, acceleration);
-            v.setColor(carColor);
-            map.addMapObject(v);
+        Vehicle v = new Vehicle(name + creationCounter++, new MapPosition(0, 1, 2, 1), getRandomLane(), speed, acceleration);
+        v.setColor(carColor);
+        synchronized (super.getMap()) {
+            super.getMap().addMapObject(v);
         }
         */
+    }
+
+    /**
+     * toString method
+     *
+     * @return Description of the TrafficGenerator state
+     */
+    public String toString() {
+        return "TrafficGenerator '" +
+                this.getID() +
+                "' { Created: " +
+                Integer.toString(this.creationCounter) +
+                ", Received: " +
+                Integer.toString(this.receiptCounter) +
+                " }";
     }
 }

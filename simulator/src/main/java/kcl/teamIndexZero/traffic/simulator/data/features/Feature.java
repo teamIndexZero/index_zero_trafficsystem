@@ -42,15 +42,29 @@ public class Feature implements ISimulationAware {
     }
 
     /**
+     * Sets the simulation map the feature belongs to
+     *
+     * @param map Simulation map
+     */
+    public void setMap(SimulationMap map) {
+        this.map = map;
+    }
+
+    /**
+     * Gets the SimulationMap the feature belongs to
+     *
+     * @return SimulationMap
+     */
+    public synchronized SimulationMap getMap() {
+        return this.map;
+    }
+
+    /**
      * By default, do nothing
      * {@inheritDoc}
      */
     @Override
     public void tick(SimulationTick tick) {
 
-    }
-
-    public void setMap(SimulationMap map) {
-        this.map = map;
     }
 }

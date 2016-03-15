@@ -44,14 +44,10 @@ public class SimulatorGui {
 
     private void startSimulatorWindow(OsmParseResult result) {
         try {
-            LOG.log_Error("Parsed OSM xml file, got ", result.roadDescriptions.size(), " roads, ",
-                    result.linkDescriptions.size(), " links and ", result.junctionDescriptions.size(), " junctions");
-            //TODO factory then pass the stuff below to graph constructor
+            LOG.log_Error("Parsed OSM xml file, got ", result.roadDescriptions.size(), " roads and ", result.junctionDescriptions.size(), " junctions");
             GraphConstructor graph = new GraphConstructor(
                     result.junctionDescriptions,
-                    result.roadDescriptions,
-                    result.linkDescriptions);
-
+                    result.roadDescriptions);
             SimulationMap map = new SimulationMap(4, 400, graph);
             map.widthMeters = result.boundingBox.end.xMeters;
             map.heightMeters = result.boundingBox.end.yMeters;

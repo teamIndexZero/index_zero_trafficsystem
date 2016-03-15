@@ -1,11 +1,9 @@
 package kcl.teamIndexZero.traffic.simulator.data;
 
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
-import kcl.teamIndexZero.traffic.simulator.data.descriptors.LinkDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
-import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -25,7 +23,6 @@ import static org.mockito.Mockito.mock;
 public class GraphConstructorTest {
     private RoadDescription rd1, rd2, rd3, rd4, rd5, rd6, rd7, rd8, rd9, rd10, rd11;
     private JunctionDescription j1, j2, j3, j4;
-    private LinkDescription l1, l2, l3, l4;
     private GraphConstructor graphConstructor;
 
     @Before
@@ -66,10 +63,6 @@ public class GraphConstructorTest {
         j4rd.put(rd4.getId(), JunctionDescription.RoadDirection.OUTGOING);
         j4rd.put(rd7.getId(), JunctionDescription.RoadDirection.OUTGOING);
         j4 = new JunctionDescription(new ID("j4"), j4rd, false, new GeoPoint(0, 0));
-        //Remaining Links
-        l1 = new LinkDescription(rd7.getId(), rd9.getId(), LinkType.GENERIC, new ID("link1"), new GeoPoint(0, 0));
-        l2 = new LinkDescription(rd8.getId(), rd10.getId(), LinkType.GENERIC, new ID("link2"), new GeoPoint(0, 0));
-        l3 = new LinkDescription(rd9.getId(), rd10.getId(), LinkType.GENERIC, new ID("link3"), new GeoPoint(0, 0));
         //List of descriptions
         List<RoadDescription> roadDescriptionList = new ArrayList<>();
         roadDescriptionList.add(rd1);
@@ -88,12 +81,8 @@ public class GraphConstructorTest {
         junctionDescriptionList.add(j2);
         junctionDescriptionList.add(j3);
         junctionDescriptionList.add(j4);
-        List<LinkDescription> linkDescriptionList = new ArrayList<>();
-        linkDescriptionList.add(l1);
-        linkDescriptionList.add(l2);
-        //linkDescriptionList.add(l3);
         //Graph
-        graphConstructor = new GraphConstructor(junctionDescriptionList, roadDescriptionList, linkDescriptionList);
+        graphConstructor = new GraphConstructor(junctionDescriptionList, roadDescriptionList);
     }
 
     @After
