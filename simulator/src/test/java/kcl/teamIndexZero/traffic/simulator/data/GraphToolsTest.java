@@ -5,8 +5,6 @@ import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLightInSet;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import org.junit.After;
 import org.junit.Before;
@@ -82,7 +80,7 @@ public class GraphToolsTest {
         Link l2 = gt.createLink(LinkType.AUTONOMOUS_TL, new ID("ATFlink"));
         Link l3 = gt.createLink(LinkType.SYNC_TL, new ID("STFlink"));
         assertTrue(l1 instanceof Link);
-        assertTrue(l2 instanceof TrafficLight);
-        assertTrue(l3 instanceof TrafficLightInSet);
+        assertTrue(l2 instanceof Link);
+        assertTrue(l3 instanceof Link);
     }
 }

@@ -6,8 +6,6 @@ import kcl.teamIndexZero.traffic.simulator.data.features.DirectedLanes;
 import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.links.LinkType;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
-import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightInSet;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MissingImplementationException;
 
@@ -54,11 +52,9 @@ public class GraphTools {
             case GENERIC:
                 return new Link(linkID);
             case AUTONOMOUS_TL:
-                //TODO maybe add the TrafficLight to the tfcontroller?
-                return new TrafficLight(linkID);
+                return new Link(linkID);
             case SYNC_TL:
-                //TODO definitely add the TrafficLight to the TFcontroller!
-                return new TrafficLightInSet(linkID);
+                return new Link(linkID);
             default:
                 LOG.log_Error("LinkType not implemented in .createLink(..)!");
                 throw new MissingImplementationException("LinkType not implemented!");
