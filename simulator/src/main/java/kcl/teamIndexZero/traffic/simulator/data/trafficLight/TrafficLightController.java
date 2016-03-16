@@ -8,6 +8,7 @@ import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.TrafficLightRule;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.TrafficLightsInSetRule;
+import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightInSet;
 import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLight;
 
 import java.time.LocalDateTime;
@@ -25,8 +26,9 @@ public class TrafficLightController implements ISimulationAware {
         public LocalDateTime Temporary;
         public long lastChange = 0;
         public long timer;
+        public long delay;
         private TrafficLight model; //list this
-        private TrafficLightSet modelSet; //list this
+        private TrafficLightInSet modelSet; //list this
         public List<TrafficLight> TrafficLightSinglesList;
         public List<TrafficLightInSet> TrafficLightSetList;
         SimulationTick simulationTick;
@@ -68,6 +70,19 @@ public class TrafficLightController implements ISimulationAware {
         @Override
         public void tick(SimulationTick tick) {
             CurrentTime = formatTimeToLong(simulationTick.getSimulatedTime());
+
+            /*when single traffic lights do not work in a synchronous way with the ticks*/
+            model.TrafficLightDelay = CurrentTime - lastChange;
+            if ((model.TrafficLightDelay >= timer) && (model.currentState == TrafficLightState.GREEN)) {
+                model.currentState = TrafficLightState.RED;
+            }
+
+            /*when set's traffic lights do not work in a synchronous way with the ticks*/
+            modelSet.TrafficLightInSetDelay = CurrentTime - lastChange;
+            if ((modelSet.TrafficLightInSetDelay >= timer) && (modelSet.currentState == TrafficLightState.GREEN)){
+                modelSet.currentState = TrafficLightState.RED;
+            }
+
             if ((CurrentTime - lastChange) > timer) {
                 if (modelSet != null) {
                     TrafficLightsInSetRule.changeStateofSet(TrafficLightSetList);
@@ -81,13 +96,13 @@ public class TrafficLightController implements ISimulationAware {
          * Adds rule to the one traffic light
          */
         public void addRule(TrafficLightRule rule){
-
+            rule.changeStateofSingleTrafficLights(TrafficLightSinglesList);
         }
         /**
          * Adds rule to the one traffic light set
          */
         public void addRule(TrafficLightsInSetRule rule){
-
+             rule.changeStateofSet(TrafficLightSetList);
         }
 
 }

@@ -10,7 +10,7 @@ import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightState;
 public class TrafficLightInSet {
 
     private ID id;
-
+    public long TrafficLightInSetDelay;
     public TrafficLightState currentState;
 
     /**
@@ -21,7 +21,7 @@ public class TrafficLightInSet {
     public TrafficLightInSet(ID id) {
 
         this.id=id;
-        this.currentState = currentState.GREEN;
+        this.currentState = TrafficLightState.GREEN;
 
     }
 

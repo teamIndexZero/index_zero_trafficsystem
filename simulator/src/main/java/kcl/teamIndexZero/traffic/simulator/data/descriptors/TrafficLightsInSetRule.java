@@ -17,8 +17,15 @@ public class TrafficLightsInSetRule {
      */
     public static void changeStateofSet(List<TrafficLightInSet> trafficLightList){
 
+        final int[] i = {0};
+
         trafficLightList.forEach(TrafficLight -> {
-            TrafficLight.currentState = (TrafficLight.currentState == TrafficLightState.RED) ? TrafficLightState.GREEN : TrafficLightState.RED;
+            if (i[0] % 2 == 0){
+                TrafficLight.currentState = (TrafficLight.currentState == TrafficLightState.RED) ? TrafficLightState.GREEN : TrafficLightState.RED;
+                i[0]++;
+            }
+           else
+                i[0]++;
         });
     }
 }

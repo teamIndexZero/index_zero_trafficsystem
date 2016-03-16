@@ -3,12 +3,12 @@ package kcl.teamIndexZero.traffic.simulator.data.trafficLight;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
-
 /**
  * Created by Es on 02/03/2016.
  */
 public class TrafficLight {
     private ID id;
+    public long TrafficLightDelay;
     public TrafficLightState currentState;
 
     /**
@@ -30,12 +30,10 @@ public class TrafficLight {
         return this.currentState;
     }
 
-
     /**
      * Returns the ID of the current TrafficLight object
      */
     public ID getTrafficLightID() { return this.id;}
-
 
     //@Override
     public void tick(SimulationTick tick) {
