@@ -1,7 +1,10 @@
 package kcl.teamIndexZero.traffic.simulator.data.trafficLight;
 
+import kcl.teamIndexZero.traffic.log.Logger;
+import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 //import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.TrafficLightRule;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.TrafficLightsInSetRule;
@@ -9,6 +12,7 @@ import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLight;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 
 /**
@@ -23,7 +27,10 @@ public class TrafficLightController implements ISimulationAware {
         public long timer;
         private TrafficLight model; //list this
         private TrafficLightSet modelSet; //list this
+        public List<TrafficLight> TrafficLightSinglesList;
+        public List<TrafficLightInSet> TrafficLightSetList;
         SimulationTick simulationTick;
+        private static Logger_Interface LOG = Logger.getLoggerInstance(TrafficLightController.class.getSimpleName());
 
 
         public long formatTimeToLong(LocalDateTime date) {
@@ -33,6 +40,29 @@ public class TrafficLightController implements ISimulationAware {
         }
 
         /**
+         * Adds single traffic light to the List of all single traffic lights
+         *
+         * @param trafficLight object to be added to the list
+         */
+        public void addTrafficlight(TrafficLight trafficLight){
+
+            if (trafficLight != null) {
+                TrafficLightSinglesList.add(trafficLight);
+                LOG.log("Added the following traffic lights to the set: ", trafficLight.getTrafficLightID());
+            }
+
+            else {
+                LOG.log_Error("Error while adding to TrafficLightLnSet to the set");
+            }
+        }
+
+        /**
+         * Returns a list List of all single traffic lights
+         *
+         */
+         public List<TrafficLight> getSingleSet() {return TrafficLightSinglesList;}
+
+        /**
          * {@inheritDoc}
          */
         @Override
@@ -40,11 +70,13 @@ public class TrafficLightController implements ISimulationAware {
             CurrentTime = formatTimeToLong(simulationTick.getSimulatedTime());
             if ((CurrentTime - lastChange) > timer) {
                 if (modelSet != null) {
-                    TrafficLightRule.changeColour(model, model.currentState); //change state got all tfs in list
+                    TrafficLightsInSetRule.changeStateofSet(TrafficLightSetList);
+                    TrafficLightRule.changeStateofSingleTrafficLights(TrafficLightSinglesList);
                     lastChange = CurrentTime;
                 }
             }
         }
+
         /**
          * Adding rule to the one traffic light
          *

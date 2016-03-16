@@ -31,11 +31,11 @@ public class TrafficLightSet implements ISimulationAware {
     }
 
     /**
-     * Adding traffic lights to the List of traffic lights within one junction
+     * Adds traffic lights to the List of traffic lights within one junction
      *
-     * @param trafficLightLnSet who will be added, id of the object adding to the list
+     * @param trafficLightLnSet object to be added to the list
      */
-     public List<TrafficLightInSet> addTrafficlight(TrafficLightInSet trafficLightLnSet){
+    public void addTrafficlight(TrafficLightInSet trafficLightLnSet){
 
        if (trafficLightLnSet != null) {
            TrafficLightSetList.add(trafficLightLnSet);
@@ -43,12 +43,16 @@ public class TrafficLightSet implements ISimulationAware {
        }
 
        else {
-           LOG.log_Fatal("Error while adding to TrafficLightLnSet to the set");
+           LOG.log_Error("Error while adding to TrafficLightLnSet to the set");
        }
-
-       return TrafficLightSetList;
      }
 
+    /**
+     * Returns a list of traffic lights within one junction
+     *
+     * @param id of the junction, to which list is assigned
+     */
+    public List<TrafficLightInSet> getSet(ID id) {return this.TrafficLightSetList;}
 
     /**
      * getID - method returns the ID of the TrafficLightSet
