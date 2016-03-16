@@ -63,7 +63,7 @@ public class SimulatorGui {
                 CarRemover remover = new CarRemover(map);
 
                 return new Simulator(
-                        new SimulationParams(LocalDateTime.now(), 1, 1000),
+                        new SimulationParams(LocalDateTime.now(), 0.4, 1000),
                         Arrays.asList(
                                 map,
                                 adder,

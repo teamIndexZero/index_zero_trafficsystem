@@ -125,7 +125,7 @@ public class Simulator {
         } else {
             currentTick = new SimulationTick(
                     currentTick.getTickNumber() + 1,
-                    currentTick.getSimulatedTime().plus(simParams.tickSeconds, ChronoUnit.SECONDS),
+                    currentTick.getSimulatedTime().plus((int) (1000 * simParams.tickSeconds), ChronoUnit.MILLIS),
                     simParams.tickSeconds);
         }
         return currentTick;

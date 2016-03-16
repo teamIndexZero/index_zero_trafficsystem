@@ -5,11 +5,8 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
-import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapPosition;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,33 +33,18 @@ public class CarAdder implements ISimulationAware {
         });
     }
 
-    private Lane getRandomRoad() {
+    private Lane getRandomLane() {
         return roads.get((int) (Math.random() * roads.size() - 1)).getForwardSide().getLanes().get(0);
     }
 
     @Override
     public void tick(SimulationTick tick) {
-        if (Math.random() > 0.2) {
+        if (Math.random() > 0.07) {
             return;
         }
 
-        // speed somehow varies between 0.5 and 1 m/s
-        double speed = 5;
+        Vehicle v = new Vehicle("Car " + counter++, getRandomLane());
 
-        // some cars should accelerate
-        double acceleration = 0;
-        Color carColor = null;
-        String name = null;
-        if (acceleration == 0) {
-            carColor = MapObject.getRandomColor();
-            name = "SLOW";
-        } else {
-            carColor = MapObject.COLORS[1];
-            name = "FAST";
-        }
-
-        Vehicle v = new Vehicle(name + counter++, new MapPosition(0, 1, 2, 1), getRandomRoad(), speed, acceleration);
-        v.setColor(carColor);
         synchronized (map) {
             map.addMapObject(v);
         }

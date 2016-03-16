@@ -31,7 +31,6 @@ public abstract class MapObject implements ISimulationAware {
     protected static Logger_Interface LOG = Logger.getLoggerInstance(MapObject.class.getSimpleName());
     protected Lane lane;
     protected String name;
-    protected MapPosition position;
     protected double positionOnRoad = 0;
     protected SimulationMap map;
     protected boolean pleaseRemoveMeFromSimulation = false;
@@ -41,12 +40,11 @@ public abstract class MapObject implements ISimulationAware {
      * Map object constructor - not meant to be actually called from outside, only by subclasses as super(). Anyway as
      * the class is abstract they will have to.
      *
-     * @param name     name of the object (to be shown in simulation maps)
-     * @param position position of the object on map.
+     * @param name name of the object (to be shown in simulation maps)
+     * @param lane lane to stay on initially
      */
-    public MapObject(String name, MapPosition position, Lane lane) {
+    public MapObject(String name, Lane lane) {
         this.name = name;
-        this.position = position;
         this.lane = lane;
         this.color = MapObject.getRandomColor();
     }
@@ -80,14 +78,6 @@ public abstract class MapObject implements ISimulationAware {
 
     public void setMap(SimulationMap map) {
         this.map = map;
-    }
-
-    public MapPosition getPosition() {
-        return position;
-    }
-
-    public void setPosition(MapPosition position) {
-        this.position = position;
     }
 
     public String getName() {

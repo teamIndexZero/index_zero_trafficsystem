@@ -93,8 +93,8 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
             model.setDelayBetweenTicks(extraDelayBetweenTicksSlider.getValue());
         });
 
-        extraDelayBetweenTicksSlider.setMajorTickSpacing(20);
-        extraDelayBetweenTicksSlider.setMinorTickSpacing(10);
+        extraDelayBetweenTicksSlider.setMajorTickSpacing(200);
+        extraDelayBetweenTicksSlider.setMinorTickSpacing(50);
         extraDelayBetweenTicksSlider.setPaintTicks(true);
         extraDelayBetweenTicksSlider.setPaintLabels(true);
 

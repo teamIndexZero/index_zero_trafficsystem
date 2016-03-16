@@ -79,7 +79,7 @@ public class GraphConstructor {
             createRoadFeatures(road_descriptions); //DONE
             if (!tools.checkEmpty(junction_descriptions))
                 createJunctionsFeatures(junction_descriptions); //DONE
-            //addTrafficGenerators(); //DONE - CHECK
+//            addTrafficGenerators(); //DONE - CHECK
             checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
         } catch (MapIntegrityException e) {
             LOG.log_Error("Graph integrity is compromised. Aborting construction...");

@@ -5,7 +5,6 @@ import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
-import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 
 /**
  * An Obstacle is a non-moving map object. Think of it as of fallen tree or a stone or roadworks something.
@@ -17,8 +16,8 @@ public class Obstacle extends MapObject {
     /**
      * Constructor. See constructor in {@link MapObject}
      */
-    public Obstacle(String name, MapPosition position, Lane lane) {
-        super(name, position, lane);
+    public Obstacle(String name, Lane lane, float positionInLane) {
+        super(name, lane);
     }
 
 
@@ -28,11 +27,10 @@ public class Obstacle extends MapObject {
     @Override
     public void tick(SimulationTick tick) {
         LOG.log(this.toString(), " is doing nothing as it is static");
-        map.moveObject(this, position);
     }
 
     @Override
     public String toString() {
-        return String.format("{Obstacle \"%s\" at %s}", name, position.toString());
+        return String.format("{Obstacle \"%s\"}", name);
     }
 }

@@ -6,6 +6,7 @@ import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.links.JunctionLink;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -30,20 +31,24 @@ public class Vehicle extends MapObject {
     /**
      * Vehicle Constructor.
      *
-     * @param name                              used for identification in logs for example
-     * @param position                          initial {@link MapPosition} of the vehicle
-     * @param lane                              Lane the vehicle is on
-     * @param speedMetersPerSecond              initial speed m/s
-     * @param accelerationMetersPerSecondSecond initial acceleration m/s/s
+     * @param name used for identification in logs for example
+     * @param lane Lane the vehicle is on
      */
     public Vehicle(String name,
-                   MapPosition position,
-                   Lane lane,
-                   double speedMetersPerSecond,
-                   double accelerationMetersPerSecondSecond) {
-        super(name, position, lane);
-        this.speedMetersPerSecond = speedMetersPerSecond;
-        this.accelerationMetersPerSecondSecond = accelerationMetersPerSecondSecond;
+                   Lane lane) {
+        super(name, lane);
+        this.speedMetersPerSecond = 0 * 1000 / 3600;
+    }
+
+    @Override
+    public Color getColor() {
+        if (accelerationMetersPerSecondSecond > 0) {
+            return Color.GREEN;
+        } else if (accelerationMetersPerSecondSecond < 0) {
+            return Color.RED;
+        } else {
+            return Color.BLACK;
+        }
     }
 
     /**
@@ -51,62 +56,75 @@ public class Vehicle extends MapObject {
      */
     @Override
     public void tick(SimulationTick tick) {
+        Link link = lane.getNextLink();
+        if (link == null) {
+            LOG.log_Error("Car terminating its run. Seems to be dead end (map end).");
+            pleaseRemoveMeFromSimulation = true;
+            return;
+        }
+
+        JunctionLink j = (JunctionLink) link;
+        Junction junction = (Junction) map.getMapFeatures().get(((JunctionLink) link).getJunctionID());
+        boolean isThisLaneTerminatingAtCrossing = false;
+        if (junction.getConnectedFeatures().size() > 2) {
+            isThisLaneTerminatingAtCrossing = true;
+        }
+
+        double distanceToTheEndOfTheLane = isOnReverseLane ? positionOnRoad : getLane().getLength() - positionOnRoad;
+        if (
+                ((isThisLaneTerminatingAtCrossing && distanceToTheEndOfTheLane > 60) || !isThisLaneTerminatingAtCrossing)
+                        && Math.abs(speedMetersPerSecond) < (50 * 1000 / 3600)
+                        || Math.abs(speedMetersPerSecond) < 5 * 1000 / 3600) {
+            accelerationMetersPerSecondSecond = 0.7;
+        } else if (isThisLaneTerminatingAtCrossing && distanceToTheEndOfTheLane < 50
+                && Math.abs(speedMetersPerSecond) > 10 * 1000 / 3600) {
+            accelerationMetersPerSecondSecond = (Math.abs(speedMetersPerSecond) > 40 ? -0.7 : -0.15) * Math.abs(speedMetersPerSecond);
+        } else {
+            accelerationMetersPerSecondSecond = 0;
+        }
+
         speedMetersPerSecond =
-                speedMetersPerSecond +
-                        (isOnReverseLane ? -1 : 1)
-                                * accelerationMetersPerSecondSecond
-                                * tick.getTickDurationSeconds();
+                speedMetersPerSecond + accelerationMetersPerSecondSecond * tick.getTickDurationSeconds();
 
         positionOnRoad += (isOnReverseLane ? -1 : 1)
                 * speedMetersPerSecond
                 * tick.getTickDurationSeconds();
 
+
         //TODO if end of road is reached then pass to next feature with the remaining travel length??
         //TODO maybe addapt behavior for the looking ahead distance based on projected stopping time at current speed?
         //TODO if looking ahead distance goes out of scope of the current feature then query link
         if (positionOnRoad < 0 || positionOnRoad >= lane.getLength()) {
-            Link link = lane.getNextLink();
-            if (link == null) {
-                LOG.log_Error("Car terminating its run. Seems to be dead end (map end).");
-                pleaseRemoveMeFromSimulation = true;
-                return;
-            }
-            if (link instanceof JunctionLink) {
-                JunctionLink j = (JunctionLink) link;
-                Junction junction = (Junction) map.getMapFeatures().get(((JunctionLink) link).getJunctionID());
-                junction.incrementUsage();
+            junction.incrementUsage();
 
-                List<Link> nextLinks = j.getLinks();
-                if (nextLinks.size() > 0) {
-                    // get random link
-                    Link outLink = nextLinks.get((int) (Math.random() * nextLinks.size()));
-                    Lane nextLane = (Lane) outLink.getNextFeature();
-                    if (lane.getRoad().getName() != null && !lane.getRoad().getName().equals(nextLane.getRoad().getName())) {
-                        LOG.log_Error(String.format("%s turning from %s to %s", getName(), lane.getRoad().getName(),
-                                nextLane.getRoad().getName()));
-                    }
-                    this.lane = nextLane;
+            List<Link> nextLinks = j.getLinks();
+            if (nextLinks.size() > 0) {
+                // get random link
+                Link outLink = nextLinks.get((int) (Math.random() * nextLinks.size()));
+                Lane nextLane = (Lane) outLink.getNextFeature();
+                if (lane.getRoad().getName() != null && !lane.getRoad().getName().equals(nextLane.getRoad().getName())) {
+                    LOG.log_Error(String.format("%s turning from %s to %s", getName(), lane.getRoad().getName(),
+                            nextLane.getRoad().getName()));
+                }
+                this.lane = nextLane;
 
-                    // This is a weird case for forward/backward movement. If we are moving in the forward lane, we start
-                    // from road length 0, and carry on with positive speed/acceleration.
-                    // if we start from the 'end' of the road - say, in backwards lane - we end up starting movement in
-                    // roadLength, and movement decreases this position.
-                    // TODO probably worth making lanes direction agnostic.
-                    if (nextLane.getRoad().getForwardSide().getLanes().contains(nextLane)) {
-                        this.positionOnRoad = 0;
-                        isOnReverseLane = false;
-                    } else {
-                        this.positionOnRoad = lane.getLength();
-                        isOnReverseLane = true;
-                    }
+                // This is a weird case for forward/backward movement. If we are moving in the forward lane, we start
+                // from road length 0, and carry on with positive speed/acceleration.
+                // if we start from the 'end' of the road - say, in backwards lane - we end up starting movement in
+                // roadLength, and movement decreases this position.
+                // TODO probably worth making lanes direction agnostic.
+                if (nextLane.getRoad().getForwardSide().getLanes().contains(nextLane)) {
+                    this.positionOnRoad = 0;
+                    isOnReverseLane = false;
                 } else {
-                    LOG.log_Debug(String.format("Got end-link, car going to exit map soon. Link: %s", link.toString()));
-                    pleaseRemoveMeFromSimulation = true;
+                    this.positionOnRoad = lane.getLength();
+                    isOnReverseLane = true;
                 }
             } else {
-                LOG.log_Debug(String.format("Got link other than Junction link. Link: %s", link.toString()));
+                LOG.log_Debug(String.format("Got end-link, car going to exit map soon. Link: %s", link.toString()));
                 pleaseRemoveMeFromSimulation = true;
             }
+
         }
     }
 
@@ -115,9 +133,8 @@ public class Vehicle extends MapObject {
      */
     @Override
     public String toString() {
-        return String.format("{Vehicle \"%s\" is now at position %s with speed %.1f m/s and acceleration of %.5f m/s^2}",
+        return String.format("{Vehicle \"%s\" with speed %.1f m/s and acceleration of %.5f m/s^2}",
                 name,
-                position.toString(),
                 speedMetersPerSecond,
                 accelerationMetersPerSecondSecond);
     }

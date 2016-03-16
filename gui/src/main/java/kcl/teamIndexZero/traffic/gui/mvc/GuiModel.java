@@ -20,8 +20,8 @@ import java.util.List;
 public class GuiModel implements ISimulationAware {
 
     public static final int DELAY_MINIMAL = 10;
-    public static final int DELAY_MAXIMAL = 100;
-    private static final int DELAY_INITIAL = 50;
+    public static final int DELAY_MAXIMAL = 400;
+    private static final int DELAY_INITIAL = 100;
     private final ViewportModel viewport;
     private final SimulationMap map;
     private int delayBetweenTicks = DELAY_INITIAL;
