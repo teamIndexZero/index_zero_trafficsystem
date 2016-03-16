@@ -1,4 +1,4 @@
-package kcl.teamIndexZero.traffic.simulator.data.links;
+package kcl.teamIndexZero.traffic.simulator.data.trafficLight;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
@@ -11,20 +11,16 @@ public class TrafficLight {
 
     private ID id;
 
-    public TrafficLight() {
-    }
-
     public enum State {
         RED, GREEN
     }
 
     public State currentState;
 
-
     /**
      * Constructor
      *
-     * @param id Link ID tag
+     * @param id TrafficLight ID tag
      */
     public TrafficLight(ID id) {
 

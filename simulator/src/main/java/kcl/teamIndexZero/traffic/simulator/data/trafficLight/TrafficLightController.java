@@ -4,6 +4,8 @@ import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 //import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.TrafficLightRule;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.TrafficLightsInSetRule;
+import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLight;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,7 +21,7 @@ public class TrafficLightController implements ISimulationAware {
         public LocalDateTime Temporary;
         public long lastChange = 0;
         public long timer;
-        private kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight model;
+        private TrafficLight model;
         private TrafficLightSet modelSet;
         SimulationTick simulationTick;
 
@@ -44,6 +46,20 @@ public class TrafficLightController implements ISimulationAware {
                     lastChange = CurrentTime;
                 }
             }
+        }
+        /**
+         * Adding rule to the one traffic light
+         *
+         */
+        public void addRule(TrafficLightRule rule){
+
+        }
+        /**
+         * Adding rule to the one traffic light set
+         *
+         */
+        public void addRule(TrafficLightsInSetRule rule){
+
         }
 
 }

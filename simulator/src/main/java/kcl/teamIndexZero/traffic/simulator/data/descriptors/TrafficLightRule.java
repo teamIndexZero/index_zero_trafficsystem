@@ -1,5 +1,5 @@
 package kcl.teamIndexZero.traffic.simulator.data.descriptors;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
+import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLight;
 
 /**
  * Stand-alone Traffic Light rule description
