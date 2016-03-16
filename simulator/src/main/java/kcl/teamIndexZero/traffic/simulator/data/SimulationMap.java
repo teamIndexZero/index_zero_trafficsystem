@@ -99,4 +99,8 @@ public class SimulationMap implements ISimulationAware, Serializable {
     public List<MapObject> getObjectsOnMap() {
         return objectsOnMap;
     }
+
+    public String toString() {
+        return "Map (" + this.width + "x" + this.height + ") has " + this.objectsOnMap.size() + " objects.";
+    }
 }
