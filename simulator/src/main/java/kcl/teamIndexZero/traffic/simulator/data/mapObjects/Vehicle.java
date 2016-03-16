@@ -1,8 +1,10 @@
 package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
 
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
+import kcl.teamIndexZero.traffic.simulator.data.features.TrafficGenerator;
 import kcl.teamIndexZero.traffic.simulator.data.links.JunctionLink;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 
@@ -37,7 +39,8 @@ public class Vehicle extends MapObject {
     public Vehicle(String name,
                    Lane lane) {
         super(name, lane);
-        this.speedMetersPerSecond = 0 * 1000 / 3600;
+        setLane(lane);
+        this.speedMetersPerSecond = 5;
     }
 
     @Override
@@ -62,6 +65,24 @@ public class Vehicle extends MapObject {
             pleaseRemoveMeFromSimulation = true;
             return;
         }
+        if (link instanceof JunctionLink) {
+            driveOnJunction(tick, link);
+        } else {
+            driveOnGenericLink(tick, link);
+        }
+    }
+
+    private void driveOnGenericLink(SimulationTick tick, Link link) {
+        Feature f = link.getNextFeature();
+        if (f instanceof TrafficGenerator) {
+            TrafficGenerator tg = (TrafficGenerator) f;
+            tg.terminateTravel(this);
+        } else {
+            throw new IllegalStateException("Got a wrong type of link " + link.getClass().getName());
+        }
+    }
+
+    public void driveOnJunction(SimulationTick tick, Link link) {
         JunctionLink j = (JunctionLink) link;
         Junction junction = (Junction) map.getMapFeatures().get(((JunctionLink) link).getJunctionID());
         boolean isThisLaneTerminatingAtCrossing = false;
@@ -105,25 +126,11 @@ public class Vehicle extends MapObject {
                     LOG.log(String.format("%s turning from %s to %s", getName(), lane.getRoad().getName(),
                             nextLane.getRoad().getName()));
                 }
-                this.lane = nextLane;
-
-                // This is a weird case for forward/backward movement. If we are moving in the forward lane, we start
-                // from road length 0, and carry on with positive speed/acceleration.
-                // if we start from the 'end' of the road - say, in backwards lane - we end up starting movement in
-                // roadLength, and movement decreases this position.
-                // TODO probably worth making lanes direction agnostic.
-                if (nextLane.getRoad().getForwardSide().getLanes().contains(nextLane)) {
-                    this.positionOnRoad = 0;
-                    isOnReverseLane = false;
-                } else {
-                    this.positionOnRoad = lane.getLength();
-                    isOnReverseLane = true;
-                }
+                setLane(nextLane);
             } else {
                 LOG.log_Debug(String.format("Got end-link, car going to exit map soon. Link: %s", link.toString()));
                 pleaseRemoveMeFromSimulation = true;
             }
-
         }
     }
 
@@ -144,5 +151,22 @@ public class Vehicle extends MapObject {
 
     public double getSpeedMetersPerSecond() {
         return speedMetersPerSecond;
+    }
+
+    public void setLane(Lane lane) {
+        this.lane = lane;
+        // This is a weird case for forward/backward movement. If we are moving in the forward lane, we start
+        // from road length 0, and carry on with positive speed/acceleration.
+        // if we start from the 'end' of the road - say, in backwards lane - we end up starting movement in
+        // roadLength, and movement decreases this position.
+        // TODO probably worth making lanes direction agnostic.
+        if (lane.getRoad().getForwardSide().getLanes().contains(lane)) {
+            this.positionOnRoad = 0;
+            isOnReverseLane = false;
+        } else {
+            this.positionOnRoad = lane.getLength();
+            isOnReverseLane = true;
+        }
+
     }
 }

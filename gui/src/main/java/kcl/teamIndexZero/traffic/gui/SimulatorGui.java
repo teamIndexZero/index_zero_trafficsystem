@@ -57,17 +57,11 @@ public class SimulatorGui {
             SimulationImageProducer imageProducer = new SimulationImageProducer(map, model);
 
             GuiController controller = new GuiController(model, () -> {
-
                 SimulationDelay delay = new SimulationDelay(model);
-                CarAdder adder = new CarAdder(map);
-                CarRemover remover = new CarRemover(map);
-
                 return new Simulator(
                         new SimulationParams(LocalDateTime.now(), 0.4, 1000),
                         Arrays.asList(
                                 map,
-                                adder,
-                                remover,
                                 delay,
                                 model)
                 );

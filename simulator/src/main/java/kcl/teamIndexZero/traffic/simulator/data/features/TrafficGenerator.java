@@ -132,7 +132,7 @@ public class TrafficGenerator extends Feature {
     @Override
     public void tick(SimulationTick tick) {
         if (this.getOutgoingLinks().size() > 0) {
-            if (Math.random() > 0.2) {
+            if (Math.random() > 0.04) {
                 return;
             }
             Vehicle v = new Vehicle("Vehicle " + creationCounter++, getRandomLane());
