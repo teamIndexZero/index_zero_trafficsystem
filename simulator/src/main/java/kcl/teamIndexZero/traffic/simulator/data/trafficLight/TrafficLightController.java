@@ -21,8 +21,8 @@ public class TrafficLightController implements ISimulationAware {
         public LocalDateTime Temporary;
         public long lastChange = 0;
         public long timer;
-        private TrafficLight model;
-        private TrafficLightSet modelSet;
+        private TrafficLight model; //list this
+        private TrafficLightSet modelSet; //list this
         SimulationTick simulationTick;
 
 
@@ -37,12 +37,10 @@ public class TrafficLightController implements ISimulationAware {
          */
         @Override
         public void tick(SimulationTick tick) {
-            Temporary = simulationTick.getSimulatedTime();
-            CurrentTime = formatTimeToLong(Temporary);
-
+            CurrentTime = formatTimeToLong(simulationTick.getSimulatedTime());
             if ((CurrentTime - lastChange) > timer) {
                 if (modelSet != null) {
-                    TrafficLightRule.changeColour(model, model.currentState);
+                    TrafficLightRule.changeColour(model, model.currentState); //change state got all tfs in list
                     lastChange = CurrentTime;
                 }
             }
