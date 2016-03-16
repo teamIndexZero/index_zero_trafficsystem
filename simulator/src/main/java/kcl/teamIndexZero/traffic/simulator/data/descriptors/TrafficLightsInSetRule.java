@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
+import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightInSet;
+import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightState;
 
 import java.util.List;
 
@@ -12,14 +13,12 @@ public class TrafficLightsInSetRule {
     /**
      * Changes colours at trafficLights in one set
      *
-     * @param trafficLight1List List of the traffic light in one set
+     * @param trafficLightList List of the traffic light in one set
      */
-    public static void changeColourSet(List<TrafficLight> trafficLight1List){
+    public static void changeStateofSet(List<TrafficLightInSet> trafficLightList){
 
-        trafficLight1List.forEach(TrafficLight -> {
-            TrafficLight.currentState = (TrafficLight.currentState == kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight.State.RED) ?
-                    kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight.State.GREEN : kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight.State.RED;
+        trafficLightList.forEach(TrafficLight -> {
+            TrafficLight.currentState = (TrafficLight.currentState == TrafficLightState.RED) ? TrafficLightState.GREEN : TrafficLightState.RED;
         });
-
     }
 }
