@@ -8,14 +8,8 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
  * Created by Es on 02/03/2016.
  */
 public class TrafficLight {
-
     private ID id;
-
-    public enum State {
-        RED, GREEN
-    }
-
-    public State currentState;
+    public TrafficLightState currentState;
 
     /**
      * Constructor
@@ -25,7 +19,7 @@ public class TrafficLight {
     public TrafficLight(ID id) {
 
         this.id=id;
-        this.currentState = TrafficLight.State.GREEN;
+        this.currentState = TrafficLightState.GREEN;
 
     }
 
@@ -33,7 +27,7 @@ public class TrafficLight {
      *  getState - method returns the current state of the TrafficLights
      *
      */
-    public State getState(){
+    public TrafficLightState getState(){
         return this.currentState;
     }
 
