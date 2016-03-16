@@ -48,7 +48,7 @@ public class TrafficLightController implements ISimulationAware {
 
             if (trafficLight != null) {
                 TrafficLightSinglesList.add(trafficLight);
-                LOG.log("Added the following traffic lights to the set: ", trafficLight.getTrafficLightID());
+                LOG.log("Added the following traffic lights to the set of all single Traffic Lights: ", trafficLight.getTrafficLightID() );
             }
 
             else {
@@ -78,15 +78,13 @@ public class TrafficLightController implements ISimulationAware {
         }
 
         /**
-         * Adding rule to the one traffic light
-         *
+         * Adds rule to the one traffic light
          */
         public void addRule(TrafficLightRule rule){
 
         }
         /**
-         * Adding rule to the one traffic light set
-         *
+         * Adds rule to the one traffic light set
          */
         public void addRule(TrafficLightsInSetRule rule){
 

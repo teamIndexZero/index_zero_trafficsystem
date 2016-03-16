@@ -26,16 +26,14 @@ public class TrafficLightInSet {
     }
 
     /**
-     *  getState - method returns the current state of the TrafficLightInSet
-     *
+     *  Returns the current state of the TrafficLightInSet
      */
     public TrafficLightState getState(){
         return this.currentState;
     }
 
     /**
-     *  getID - method returns the current state of the TrafficLightInSet
-     *
+     *  Returns the current state of the TrafficLightInSet
      */
     public ID getID() { return this.id;}
 

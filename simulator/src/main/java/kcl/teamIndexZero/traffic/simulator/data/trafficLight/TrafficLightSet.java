@@ -39,7 +39,7 @@ public class TrafficLightSet implements ISimulationAware {
 
        if (trafficLightLnSet != null) {
            TrafficLightSetList.add(trafficLightLnSet);
-           LOG.log("Added the following traffic lights to the set: ", trafficLightLnSet.getID());
+           LOG.log("Added the following traffic lights: ", trafficLightLnSet.getID()," to the set: ", this.id);
        }
 
        else {
@@ -55,8 +55,7 @@ public class TrafficLightSet implements ISimulationAware {
     public List<TrafficLightInSet> getSet(ID id) {return this.TrafficLightSetList;}
 
     /**
-     * getID - method returns the ID of the TrafficLightSet
-     *
+     * Returns the ID of the TrafficLightSet
      */
     public ID getID() { return this.id;}
 

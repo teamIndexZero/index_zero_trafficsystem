@@ -24,8 +24,7 @@ public class TrafficLight {
     }
 
     /**
-     *  getState - method returns the current state of the TrafficLights
-     *
+     *  Returns the current state of the TrafficLight object
      */
     public TrafficLightState getState(){
         return this.currentState;
@@ -33,8 +32,7 @@ public class TrafficLight {
 
 
     /**
-     * getTrafficLightID - method returns the ID of the  current object
-     *
+     * Returns the ID of the current TrafficLight object
      */
     public ID getTrafficLightID() { return this.id;}
 
