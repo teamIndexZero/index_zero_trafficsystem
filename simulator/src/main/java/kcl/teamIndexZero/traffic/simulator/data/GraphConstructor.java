@@ -76,11 +76,11 @@ public class GraphConstructor {
      */
     private void createGraph(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions) throws MapIntegrityException {
         //try {
-            createRoadFeatures(road_descriptions); //DONE
-            if (!tools.checkEmpty(junction_descriptions))
-                createJunctionsFeatures(junction_descriptions); //DONE
-            //addTrafficGenerators(); //DONE - CHECK
-            //checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
+        createRoadFeatures(road_descriptions);
+        if (!tools.checkEmpty(junction_descriptions))
+            createJunctionsFeatures(junction_descriptions);
+        addTrafficGenerators(); //DONE - CHECK
+        //checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
             /*
         } catch (MapIntegrityException e) {
             LOG.log_Error("Graph integrity is compromised. Aborting construction...");
@@ -189,12 +189,12 @@ public class GraphConstructor {
         roadDescriptions.forEach(rd -> {
             Road r = new Road(rd.getId(), rd.getLaneCountForward(), rd.getLaneCountBackward(), rd.getLength(), rd.getGeoPolyline(), rd.getRoadName(), rd.getLayer());
 
-            mapFeatures.put(r.getID(), r);
+            mapFeatures.putIfAbsent(r.getID(), r);
             r.getForwardSide().getLanes().forEach(lane -> {
-                mapFeatures.put(lane.getID(), lane);
+                mapFeatures.putIfAbsent(lane.getID(), lane);
             });
             r.getBackwardSide().getLanes().forEach(lane -> {
-                mapFeatures.put(lane.getID(), lane);
+                mapFeatures.putIfAbsent(lane.getID(), lane);
             });
             LOG.log("Created Road '", rd.getId(), "' [Lanes{F:", rd.getLaneCountForward(), ", B:", rd.getLaneCountBackward(), "}.");
         });
@@ -230,17 +230,36 @@ public class GraphConstructor {
         int tgCounter = 0;
         for (Feature road : mapFeatures.values()) {
             if (road instanceof Road) {
-                if (!tools.checkFwdLinksPresent(((Road) road).getForwardSide()) ) {
+                int frwd = ((Road) road).getForwardLaneCount();
+                int bckd = ((Road) road).getBackwardLaneCount();
+                if (frwd > 0 && !tools.checkFwdLinksPresent(((Road) road).getForwardSide())) {
+                    LOG.log_Trace("Fwd links on '", road.getID(), "' [Forward] are not present. Adding TF.");
                     TrafficGenerator tg = new TrafficGenerator(
-                            new ID("TrafficGenerator:" + this.trafficGenerators.size()),
+                            new ID("TF" + this.trafficGenerators.size()),
+                            ((Road) road).getPolyline().getFinishPoint());
+                    tg.linkRoad((Road) road);
+                    this.trafficGenerators.add(tg);
+                    if (tg.getIncomingLinks().size() > 0) {
+                        tg.getIncomingLinks().forEach(link -> {
+                            this.mapLinks.put(link.getID(), link);
+                        });
+                    }
+                    if (tg.getOutgoingLinks().size() > 0) {
+                        tg.getOutgoingLinks().forEach(link -> {
+                            this.mapLinks.put(link.getID(), link);
+                        });
+                    }
+                    tgCounter++;
+                    LOG.log("Created a TrafficGenerator ('", tg.getID(), "') on forward side of '", road.getID(), "'.");
+                } else if (bckd > 0 && !tools.checkFwdLinksPresent(((Road) road).getBackwardSide())) {
+                    LOG.log_Trace("Fwd links on '", road.getID(), "' [Backward] are not present. Adding TF.");
+                    TrafficGenerator tg = new TrafficGenerator(
+                            new ID("TF" + this.trafficGenerators.size()),
                             ((Road) road).getPolyline().getStartPoint());
                     tg.linkRoad((Road) road);
                     this.trafficGenerators.add(tg);
                     tgCounter++;
-                    LOG.log("Created a TrafficGenerator ('", tg.getID(), "').");
-                } else if( !tools.checkFwdLinksPresent(((Road) road).getBackwardSide())) {
-
-
+                    LOG.log("Created a TrafficGenerator ('", tg.getID(), "') on backward side of '", road.getID(), "'.");
                 }
             }
         }

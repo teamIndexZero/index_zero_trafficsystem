@@ -176,4 +176,14 @@ public class Junction extends Feature {
     public int getUsage() {
         return usage;
     }
+
+    /**
+     * toString method
+     *
+     * @return Description of the junction
+     */
+    public String toString() {
+        return this.getID() + "{ features: " + this.connectedFeatures.size() + " | "
+                + ", inflow: " + this.inflowLinks.size() + ", outflow: " + this.outflowLinks.size() + " }";
+    }
 }

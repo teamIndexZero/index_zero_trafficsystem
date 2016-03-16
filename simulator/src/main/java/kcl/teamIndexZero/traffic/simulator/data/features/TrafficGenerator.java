@@ -131,12 +131,14 @@ public class TrafficGenerator extends Feature {
      */
     @Override
     public void tick(SimulationTick tick) {
-        if (Math.random() > 0.2) {
-            return;
+        if (this.getOutgoingLinks().size() > 0) {
+            if (Math.random() > 0.2) {
+                return;
+            }
+            Vehicle v = new Vehicle("Vehicle " + creationCounter++, getRandomLane());
+            super.getMap().addMapObject(v);
+            LOG.log_Trace("TrafficGenerator '", this.getID(), "' created '", v.getName(), "'.");
         }
-        Vehicle v = new Vehicle("Vehicle " + creationCounter++, getRandomLane());
-        super.getMap().addMapObject(v);
-        LOG.log_Trace("TrafficGenerator '", this.getID(), "' created '", v.getName(), "'.");
     }
 
     /**
@@ -145,12 +147,8 @@ public class TrafficGenerator extends Feature {
      * @return Description of the TrafficGenerator state
      */
     public String toString() {
-        return "TrafficGenerator '" +
-                this.getID() +
-                "' { Created: " +
-                Integer.toString(this.creationCounter) +
-                ", Received: " +
-                Integer.toString(this.receiptCounter) +
-                " }";
+        String in = this.getIncomingLinks().size() > 0 ? "IN: " + Integer.toString(this.receiptCounter) : "IN: -";
+        String out = this.getOutgoingLinks().size() > 0 ? "OUT: " + Integer.toString(this.creationCounter) : "OUT: -";
+        return this.getID() + "[" + in + ", " + out + "]";
     }
 }

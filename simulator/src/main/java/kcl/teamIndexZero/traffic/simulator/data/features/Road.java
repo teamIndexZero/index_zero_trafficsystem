@@ -104,7 +104,7 @@ public class Road extends Feature {
      * @return Number of left lanes
      */
     public int getForwardLaneCount() {
-        return this.backwardSide.getNumberOfLanes();
+        return this.forwardSide.getNumberOfLanes();
     }
 
     /**
@@ -113,7 +113,7 @@ public class Road extends Feature {
      * @return Number of right lanes
      */
     public int getBackwardLaneCount() {
-        return this.forwardSide.getNumberOfLanes();
+        return this.backwardSide.getNumberOfLanes();
     }
 
     /**

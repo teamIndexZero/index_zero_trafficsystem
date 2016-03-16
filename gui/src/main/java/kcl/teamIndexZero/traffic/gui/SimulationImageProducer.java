@@ -96,9 +96,9 @@ public class SimulationImageProducer {
         }
         map.getMapFeatures().values().forEach(feature -> {
             if (feature instanceof TrafficGenerator) {
-                TrafficGenerator junction = (TrafficGenerator) feature;
-                primitives.drawCircle(junction.getGeoPoint(), 7, Color.BLUE);
-                primitives.drawText(junction.getGeoPoint(), "TG", Color.BLUE);
+                TrafficGenerator trafficGen = (TrafficGenerator) feature;
+                primitives.drawCircle(trafficGen.getGeoPoint(), 7, Color.BLUE);
+                primitives.drawText(trafficGen.getGeoPoint(), trafficGen.toString(), Color.BLUE);
             }
         });
     }

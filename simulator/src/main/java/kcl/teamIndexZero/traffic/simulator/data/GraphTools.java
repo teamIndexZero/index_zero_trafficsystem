@@ -25,15 +25,19 @@ public class GraphTools {
         LOG.log_Trace("Checking the connections at the end of ", lanes);
         int link_count = 0;
         for (Lane l : lanes.getLanes()) {
-            if (l.getNextLink() != null)
+            if (l.getNextLink() != null) {
+                //LOG.log_Trace("-->O'", l.getID(), "' has a next link.");
                 link_count++;
+            } else {
+                LOG.log_Trace("-->X '", l.getID(), "' has no next link.");
+            }
         }
         if (link_count == 0) {
-            LOG.log_Trace("--> ", lanes.getID(), " is end linked.");
+            LOG.log_Trace("-->X '", lanes.getID(), "' has no next link(s).");
             return false;
-        } else if (link_count == lanes.getNumberOfLanes())
+        } else if (link_count == lanes.getNumberOfLanes()) {
             return true;
-        else {
+        } else {
             LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links. ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");
             throw new MapIntegrityException("Road has a group of directed lanes with partly implemented links.");
         }

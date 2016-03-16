@@ -62,7 +62,6 @@ public class Vehicle extends MapObject {
             pleaseRemoveMeFromSimulation = true;
             return;
         }
-
         JunctionLink j = (JunctionLink) link;
         Junction junction = (Junction) map.getMapFeatures().get(((JunctionLink) link).getJunctionID());
         boolean isThisLaneTerminatingAtCrossing = false;
@@ -92,7 +91,7 @@ public class Vehicle extends MapObject {
 
 
         //TODO if end of road is reached then pass to next feature with the remaining travel length??
-        //TODO maybe addapt behavior for the looking ahead distance based on projected stopping time at current speed?
+        //TODO maybe adapt behavior for the looking ahead distance based on projected stopping time at current speed?
         //TODO if looking ahead distance goes out of scope of the current feature then query link
         if (positionOnRoad < 0 || positionOnRoad >= lane.getLength()) {
             junction.incrementUsage();

@@ -70,7 +70,7 @@ public class Simulator {
                 SimulationTick tick = nextTick();
                 LOG.log(String.format(">>> %s Started", tick));
                 iSimulationAwares.forEach(simulationAware -> simulationAware.tick(tick));
-                LOG.log(String.format(">>> %s done", tick));
+                LOG.log(String.format(">>> %s Done", tick));
             }
         } finally {
             onSimulationFinish();
