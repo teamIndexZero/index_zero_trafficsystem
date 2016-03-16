@@ -6,9 +6,7 @@ import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
-import kcl.teamIndexZero.traffic.simulator.exceptions.EmptySimMapException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
-import kcl.teamIndexZero.traffic.simulator.exceptions.OrphanFeatureException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,8 +45,7 @@ public class SimulationMap implements ISimulationAware {
      *
      * @param width  map width
      * @param height map height
-     * @throws EmptySimMapException   when there are no features
-     * @throws OrphanFeatureException when there is 1+ unconnected features
+     * @throws MapIntegrityException when there is an unrecoverable error in the integrity of the map
      */
     public SimulationMap(int width, int height, GraphConstructor graph_constructor) throws MapIntegrityException {
         this.width = width;

@@ -80,7 +80,7 @@ public class GuiController {
                     SwingUtilities.invokeLater(() -> {
                         JOptionPane.showMessageDialog(
                                 null,
-                                "Error in simualtion - please see logs for details.\n" + e.getClass().getCanonicalName() + "\n" + e.getMessage(),
+                                "Error in simulation - please see logs for details.\n" + e.getClass().getCanonicalName() + "\n" + e.getMessage(),
                                 "Error",
                                 JOptionPane.ERROR_MESSAGE);
                     });

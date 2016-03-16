@@ -9,7 +9,6 @@ import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
-import kcl.teamIndexZero.traffic.simulator.exceptions.MissingImplementationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +47,9 @@ public class TrafficGenerator extends Feature {
      * Links a Road to the TrafficGenerator
      *
      * @param road Road to link
-     * @throws MapIntegrityException          when the lanes in DirectedLanes group have partly implemented links
-     * @throws MissingImplementationException when a LinkType construction is not implemented in the GraphTools.createLink(..) method
+     * @throws MapIntegrityException when the lanes in DirectedLanes group have partly implemented links
      */
-    public void linkRoad(Road road) throws MapIntegrityException, MissingImplementationException {
+    public void linkRoad(Road road) throws MapIntegrityException {
         GraphTools tools = new GraphTools();
         DirectedLanes incoming;
         DirectedLanes outgoing;
@@ -112,11 +110,9 @@ public class TrafficGenerator extends Feature {
     public void terminateTravel(Vehicle vehicle) {
         LOG.log("TF[ '", this.getID(), "' ] Vehicle '", vehicle.getName(), "' terminated journey.");
         /*
-        synchronized (super.getMap()) {
-            //TODO maybe a bit heavy as will be called every time a car exits..
-            //super.getMap().getObjectsOnSurface().removeIf(MapObject::isPleaseRemoveMeFromSimulation);
-            //TODO or maybe access via ID (means changing the surface object list to a map. quicker access time though and can still iterate)
-        }
+        //TODO maybe a bit heavy as will be called every time a car exits..
+        //super.getMap().getObjectsOnSurface().removeIf(MapObject::isPleaseRemoveMeFromSimulation);
+        //TODO or maybe access via ID (means changing the surface object list to a map. quicker access time though and can still iterate)
         this.receiptCounter++;
         */
     }
@@ -135,32 +131,12 @@ public class TrafficGenerator extends Feature {
      */
     @Override
     public void tick(SimulationTick tick) {
-        /*
         if (Math.random() > 0.2) {
             return;
         }
-
-        // speed somehow varies between 0.5 and 1 m/s
-        double speed = 5;
-
-        // some cars should accelerate
-        double acceleration = Math.random() > 0.6 ? 0.04 : 0;
-        Color carColor = null;
-        String name = null;
-        if (acceleration == 0) {
-            carColor = MapObject.getRandomColor();
-            name = "SLOW";
-        } else {
-            carColor = MapObject.COLORS[1];
-            name = "FAST";
-        }
-
-        Vehicle v = new Vehicle(name + creationCounter++, new MapPosition(0, 1, 2, 1), getRandomLane(), speed, acceleration);
-        v.setColor(carColor);
-        synchronized (super.getMap()) {
-            super.getMap().addMapObject(v);
-        }
-        */
+        Vehicle v = new Vehicle("Vehicle " + creationCounter++, getRandomLane());
+        super.getMap().addMapObject(v);
+        LOG.log_Trace("TrafficGenerator '", this.getID(), "' created '", v.getName(), "'.");
     }
 
     /**

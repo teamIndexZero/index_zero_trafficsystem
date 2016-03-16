@@ -103,7 +103,7 @@ public class Vehicle extends MapObject {
                 Link outLink = nextLinks.get((int) (Math.random() * nextLinks.size()));
                 Lane nextLane = (Lane) outLink.getNextFeature();
                 if (lane.getRoad().getName() != null && !lane.getRoad().getName().equals(nextLane.getRoad().getName())) {
-                    LOG.log_Error(String.format("%s turning from %s to %s", getName(), lane.getRoad().getName(),
+                    LOG.log(String.format("%s turning from %s to %s", getName(), lane.getRoad().getName(),
                             nextLane.getRoad().getName()));
                 }
                 this.lane = nextLane;

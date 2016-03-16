@@ -75,19 +75,20 @@ public class GraphConstructor {
      * @throws MapIntegrityException when issues have come up during construction
      */
     private void createGraph(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions) throws MapIntegrityException {
-        try {
+        //try {
             createRoadFeatures(road_descriptions); //DONE
             if (!tools.checkEmpty(junction_descriptions))
                 createJunctionsFeatures(junction_descriptions); //DONE
-//            addTrafficGenerators(); //DONE - CHECK
-            checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
+            //addTrafficGenerators(); //DONE - CHECK
+            //checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
+            /*
         } catch (MapIntegrityException e) {
             LOG.log_Error("Graph integrity is compromised. Aborting construction...");
             throw e;
         } catch (OrphanFeatureException e) {
             LOG.log_Error("An orphan feature has been detected in the graph.");
             throw new MapIntegrityException("An orphan feature has been found in the graph.", e);
-        }
+        }*/
     }
 
     /**
@@ -211,7 +212,6 @@ public class GraphConstructor {
             junctionDescription.getConnectedIDs().forEach((id, roadDirection) -> {
                 try {
                     junction.addRoad((Road) this.mapFeatures.get(id), roadDirection);
-                    LOG.log("Added Road '", id, "' to Junction '", junction.getID(), "'.");
                 } catch (AlreadyExistsException e) {
                     LOG.log_Warning("Trying to add Road '", id, "' to Junction '", junction.getID(), "' failed as it's already connected.");
                 }
@@ -224,19 +224,23 @@ public class GraphConstructor {
     /**
      * Adds TrafficGenerator features to all dead-ends in the simMap
      *
-     * @throws MissingImplementationException when the implementation for a LinkType has not been done
-     * @throws MapIntegrityException          when partly implemented links were found in a directed group of lanes
+     * @throws MapIntegrityException when partly implemented links were found in a directed group of lanes
      */
-    private void addTrafficGenerators() throws MissingImplementationException, MapIntegrityException {
+    private void addTrafficGenerators() throws MapIntegrityException {
+        int tgCounter = 0;
         for (Feature road : mapFeatures.values()) {
             if (road instanceof Road) {
-                if (!tools.checkFwdLinksPresent(((Road) road).getForwardSide()) || !tools.checkFwdLinksPresent(((Road) road).getBackwardSide())) {
+                if (!tools.checkFwdLinksPresent(((Road) road).getForwardSide()) ) {
                     TrafficGenerator tg = new TrafficGenerator(
                             new ID("TrafficGenerator:" + this.trafficGenerators.size()),
                             ((Road) road).getPolyline().getStartPoint());
                     tg.linkRoad((Road) road);
                     this.trafficGenerators.add(tg);
+                    tgCounter++;
                     LOG.log("Created a TrafficGenerator ('", tg.getID(), "').");
+                } else if( !tools.checkFwdLinksPresent(((Road) road).getBackwardSide())) {
+
+
                 }
             }
         }
@@ -246,5 +250,6 @@ public class GraphConstructor {
                         TrafficGenerator::getID,
                         Function.identity()))
         );
+        LOG.log_Debug("Created and placed ", tgCounter, " TrafficGenerator(s) on graph.");
     }
 }

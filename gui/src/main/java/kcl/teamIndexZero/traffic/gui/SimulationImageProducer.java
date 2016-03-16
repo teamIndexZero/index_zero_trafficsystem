@@ -91,6 +91,9 @@ public class SimulationImageProducer {
     }
 
     private void drawAllTrafficGenerators() {
+        if (!model.isShowTrafficGenerators()) {
+            return;
+        }
         map.getMapFeatures().values().forEach(feature -> {
             if (feature instanceof TrafficGenerator) {
                 TrafficGenerator junction = (TrafficGenerator) feature;

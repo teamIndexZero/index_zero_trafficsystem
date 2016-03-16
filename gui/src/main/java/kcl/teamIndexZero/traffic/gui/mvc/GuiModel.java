@@ -32,6 +32,7 @@ public class GuiModel implements ISimulationAware {
     private SimulationParams params;
     private List<ChangeListener> listeners = new ArrayList<>();
     private boolean showJunctions;
+    private boolean showTrafficGenerators;
 
 
     /**
@@ -145,7 +146,7 @@ public class GuiModel implements ISimulationAware {
     /**
      * Listeners will get notified as soon as there is a change in model to report to outside world.
      *
-     * @param listener an instance of listeren to add.
+     * @param listener an instance of listener to add.
      */
     public void addChangeListener(ChangeListener listener) {
         listeners.add(listener);
@@ -194,6 +195,15 @@ public class GuiModel implements ISimulationAware {
 
     public void setShowJunctions(boolean showJunctions) {
         this.showJunctions = showJunctions;
+        fireChangeEvent();
+    }
+
+    public boolean isShowTrafficGenerators() {
+        return this.showTrafficGenerators;
+    }
+
+    public void setShowTrafficGenerators(boolean showTrafficGenerators) {
+        this.showTrafficGenerators = showTrafficGenerators;
         fireChangeEvent();
     }
 

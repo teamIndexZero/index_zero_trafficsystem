@@ -98,6 +98,13 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         extraDelayBetweenTicksSlider.setPaintTicks(true);
         extraDelayBetweenTicksSlider.setPaintLabels(true);
 
+        JToggleButton showTrafficGenerators = new JCheckBox("Show Traffic Generators", model.isShowTrafficGenerators());
+        showTrafficGenerators.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) { model.setShowTrafficGenerators(showTrafficGenerators.isSelected());
+            }
+        });
+
         JToggleButton debugRoads = new JCheckBox("Debug roads", model.debugRoads());
         debugRoads.addActionListener(new ActionListener() {
             @Override
@@ -124,6 +131,7 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         extraDelayBetweenTicksSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         settingsPanel.add(debugRoads);
+        settingsPanel.add(showTrafficGenerators);
         settingsPanel.add(showJunctionsCheckbox);
         settingsPanel.add(delayLabel);
         settingsPanel.add(extraDelayBetweenTicksSlider);

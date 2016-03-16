@@ -45,6 +45,7 @@ public class Junction extends Feature {
         this.outflowLinks = new HashMap<>();
         this.trafficLight_flag = requiresTrafficLights;
         this.behaviour = new TrafficBehaviour(this);
+        LOG.log("Junction '", this.getID(), "' created.");
     }
 
     public GeoPoint getGeoPoint() {
@@ -146,8 +147,7 @@ public class Junction extends Feature {
             );
             return links;
         } catch (JunctionPathException e) {
-            LOG.log_Error("Either the inflow link ID doesn't exist or the there are no outflow links bound to it.");
-//            LOG.log_Exception(e);
+            LOG.log_Error("Junction[ ", this.getID(), " ] Either the inflow link ID doesn't exist or the there are no outflow links bound to it.");
             throw new JunctionPathException("Either the inflow link ID doesn't exist or the there are no outflow links bound to it.", e);
         }
     }
