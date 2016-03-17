@@ -75,109 +75,10 @@ public class GraphConstructor {
      * @throws MapIntegrityException when issues have come up during construction
      */
     private void createGraph(List<JunctionDescription> junction_descriptions, List<RoadDescription> road_descriptions) throws MapIntegrityException {
-        //try {
         createRoadFeatures(road_descriptions);
         if (!tools.checkEmpty(junction_descriptions))
             createJunctionsFeatures(junction_descriptions);
         addTrafficGenerators(); //DONE - CHECK
-        //checkGraphIntegrity(); //TODO checkGraphIntegrity() method implementation
-            /*
-        } catch (MapIntegrityException e) {
-            LOG.log_Error("Graph integrity is compromised. Aborting construction...");
-            throw e;
-        } catch (OrphanFeatureException e) {
-            LOG.log_Error("An orphan feature has been detected in the graph.");
-            throw new MapIntegrityException("An orphan feature has been found in the graph.", e);
-        }*/
-    }
-
-    /**
-     * Checks the integrity of the graph currently held in this GraphConstructor
-     *
-     * @throws OrphanFeatureException when a feature with no connection to anything is found
-     * @throws MapIntegrityException  when the graph integrity is compromised
-     */
-    private void checkGraphIntegrity() throws OrphanFeatureException, MapIntegrityException {
-        Map<ID, Boolean> visitedFeatures = new HashMap<>();
-        this.mapFeatures.keySet().forEach(id -> {
-            visitedFeatures.put(id, Boolean.FALSE);
-        });
-        Map<ID, Boolean> visitedLinks = new HashMap<>();
-        this.mapLinks.keySet().forEach(id -> {
-            visitedLinks.put(id, Boolean.FALSE);
-        });
-
-        this.trafficGenerators.forEach(trafficGenerator -> {
-            trafficGenerator.getOutgoingLinks().forEach(link -> {
-                try {
-                    if (_checkGraphIntegrity(visitedFeatures, visitedLinks, link)) {
-
-                    } else {
-
-                    }
-                } catch (BadLinkException e) {
-                    e.printStackTrace();
-                } catch (DeadEndFeatureException e) {
-                    e.printStackTrace();
-                }
-            });
-        });
-
-        //TODO check and count infinite loops
-        //TODO check the integrity of the graph (no orphan features and no infinite directed loops with no exit  -o)
-    }
-
-    private boolean _checkGraphIntegrity(Map<ID, Boolean> visitedFeatures, Map<ID, Boolean> visitedLinks, Link nextLink) throws BadLinkException, DeadEndFeatureException {
-        visitedLinks.put(nextLink.getID(), Boolean.TRUE);
-        LOG.log_Debug("¬ Visited Link: '", nextLink.getID(), "'");
-        if (nextLink.isDeadEnd()) {
-            LOG.log_Error("Link '", nextLink.getID(), "' is a dead-end.");
-            throw new BadLinkException("Dead end link found.");
-        }
-        if (visitedFeatures.get(nextLink.getNextFeature().getID()) == Boolean.TRUE) {
-            return true;
-        } else {
-            LOG.log_Debug("¬ Visiting Feature: '", nextLink.getNextFeature().getID(), "'");
-            if (nextLink.getNextFeature() instanceof Junction) {
-                boolean flag = true;
-                try {
-                    for (Link l : ((Junction) nextLink.getNextFeature()).getNextLinks(nextLink.getID())) {
-                        if (!_checkGraphIntegrity(visitedFeatures, visitedLinks, l))
-                            flag = false;
-                    }
-                    return flag;
-                } catch (JunctionPathException e) {
-                    LOG.log_Error("Path problem found in '", nextLink.getNextFeature().getID(), "'.");
-                    return false;
-                }
-            } else if (nextLink.getNextFeature() instanceof Lane) {
-                visitedFeatures.put(nextLink.getNextFeature().getID(), Boolean.TRUE);
-                if (!visitedFeatures.get(((Lane) nextLink.getNextFeature()).getRoadID()) == Boolean.TRUE) {
-                    boolean flag = true;
-                    for (Lane lane : ((Lane) nextLink.getNextFeature()).getRoad().getForwardSide().getLanes()) {
-                        if (!visitedFeatures.get(lane.getID())) {
-                            flag = false;
-                        }
-                    }
-                    for (Lane lane : ((Lane) nextLink.getNextFeature()).getRoad().getBackwardSide().getLanes()) {
-                        if (!visitedFeatures.get(lane.getID())) {
-                            flag = false;
-                        }
-                    }
-                    if (flag) {
-                        visitedFeatures.put(((Lane) nextLink.getNextFeature()).getRoadID(), Boolean.TRUE);
-                    }
-                }
-                return _checkGraphIntegrity(visitedFeatures, visitedLinks, ((Lane) nextLink.getNextFeature()).getNextLink());
-            } else if (nextLink.getNextFeature() instanceof TrafficGenerator) {
-                if (visitedFeatures.get(nextLink.getNextFeature().getID()) == Boolean.FALSE)
-                    visitedFeatures.put(nextLink.getNextFeature().getID(), Boolean.TRUE);
-                return true;
-            } else {
-                LOG.log_Fatal("Found an unrecognised object in the map at '", nextLink.getNextFeature().getID(), "'.");
-                return false;
-            }
-        }
     }
 
     /**
@@ -217,9 +118,10 @@ public class GraphConstructor {
             });
             if (junction.getOutflowCount() == 0) { //we need a TG to provide and receive outflow
                 TrafficGenerator tg = new TrafficGenerator(new ID("TF" + this.trafficGenerators.size()), desc.getGeoPoint());
-                tg.addJunctionLinks(junction.addTrafficGenerator(tg.getID()));
+                tg.linkJunction(junction, junction.getInflowCount(), 0);
+                junction.addTrafficGenerator(tg);
                 this.trafficGenerators.add(tg);
-                LOG.log_Debug("TrafficGenerator '", tg.getID(), "' created for Junction '", junction.getID(), "' as it had inflow links only.");
+                LOG.log("TrafficGenerator '", tg.getID(), "' created for Junction '", junction.getID(), "' {TG.IN: ", tg.getIncomingLinks().size(), ", TG.OUT: ", tg.getOutgoingLinks().size(), "}");
             }
             junction.computeAllPaths();
             this.mapFeatures.put(junction.getID(), junction);

@@ -96,12 +96,27 @@ public class TrafficGenerator extends Feature {
     }
 
     /**
-     * Adds incoming Junction links to the TG
+     * Links a Junction to the TrafficGenerator
      *
-     * @param incomingLink Inflow link to add
+     * @param junction       Junction to link to
+     * @param tgInflowPaths  Number of traffic inflow links to the TrafficGenerator
+     * @param tgOutflowPaths Number of traffic outflow links from the TrafficGenerator
      */
-    public void addJunctionLinks(JunctionLink incomingLink) {
-        this.incoming.add(incomingLink);
+    public void linkJunction(Junction junction, int tgInflowPaths, int tgOutflowPaths) {
+        for (int i = 0; i < tgInflowPaths; i++) {
+            ID link_ID = new ID(junction.getID() + "->" + this.getID());
+            JunctionLink link = new JunctionLink(link_ID, this, junction, geoPoint, JunctionLink.LinkType.OUTFLOW);
+            link.in = junction;
+            link.out = this;
+            this.incoming.add(link);
+        }
+        for (int i = 0; i < tgOutflowPaths; i++) {
+            ID link_ID = new ID(junction.getID() + "<-" + this.getID());
+            JunctionLink link = new JunctionLink(link_ID, this, junction, geoPoint, JunctionLink.LinkType.INFLOW);
+            link.in = this;
+            link.out = junction;
+            this.outgoing.add(link);
+        }
     }
 
     /**

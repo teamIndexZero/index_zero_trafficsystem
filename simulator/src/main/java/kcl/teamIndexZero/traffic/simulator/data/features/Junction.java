@@ -36,6 +36,7 @@ public class Junction extends Feature {
      *
      * @param id                    Feature ID tag
      * @param requiresTrafficLights States whether the junction uses traffic lights or not
+     * @param geoPoint              GeoPoint of the Junction
      */
     public Junction(ID id, boolean requiresTrafficLights, GeoPoint geoPoint) {
         super(id);
@@ -48,6 +49,11 @@ public class Junction extends Feature {
         LOG.log("Junction '", this.getID(), "' created.");
     }
 
+    /**
+     * Gets the GeoPoint for the Junction
+     *
+     * @return GeoPoint
+     */
     public GeoPoint getGeoPoint() {
         return geoPoint;
     }
@@ -108,20 +114,46 @@ public class Junction extends Feature {
     }
 
     /**
-     * Adds a TrafficGenerator for receiving traffic at the junction
+     * Adds a TrafficGenerator to the junction
      *
-     * @return The inflow link created
+     * @param tg TrafficGenerator to add
      */
-    public JunctionLink addTrafficGenerator(ID id) {
-        TrafficGenerator tg = new TrafficGenerator(id, this.getGeoPoint());
+    public void addTrafficGenerator(TrafficGenerator tg) {
+        List<Link> tgOutLinks = tg.getOutgoingLinks();
+        List<Link> tgInLinks = tg.getIncomingLinks();
+        tgOutLinks.forEach(link -> {
+            if (link instanceof JunctionLink)
+                this.addInflowLink((JunctionLink) link);
+            else
+                LOG.log_Error("Trying to add a Link ('", link.getID(), "') to the Junction '", this.getID(), "' from a TrafficGenerator ('", tg.getID(), "') - Link not a JunctionLink!");
+        });
+        tgInLinks.forEach(link -> {
+            if (link instanceof JunctionLink)
+                this.addOutflowLink((JunctionLink) link);
+            else
+                LOG.log_Error("Trying to add a Link ('", link.getID(), "') to the Junction '", this.getID(), "' from a TrafficGenerator ('", tg.getID(), "') - Link not a JunctionLink!");
+        });
         this.connectedFeatures.add(tg);
-        ID link_ID = new ID(this.getID() + "->" + tg.getID());
-        JunctionLink link = new JunctionLink(link_ID, tg, this, geoPoint, JunctionLink.LinkType.OUTFLOW);
-        link.in = this;
-        link.out = tg;
-        tg.addJunctionLinks(link);
-        return link;
     }
+
+    /**
+     * Adds an inflow link to the junction
+     *
+     * @param link Inflow link
+     */
+    private void addInflowLink(JunctionLink link) {
+        this.inflowLinks.put(link.getID(), link);
+    }
+
+    /**
+     * Adds an outflow link to the junction
+     *
+     * @param link Outflow link
+     */
+    private void addOutflowLink(JunctionLink link) {
+        this.outflowLinks.put(link.getID(), link);
+    }
+
 
     /**
      * From the current list of Links attached to the junction, computes paths.
