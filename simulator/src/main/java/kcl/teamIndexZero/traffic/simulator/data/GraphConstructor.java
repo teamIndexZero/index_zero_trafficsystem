@@ -206,19 +206,24 @@ public class GraphConstructor {
      * @param junction_descriptions Description of the all the Junctions to create
      */
     private void createJunctionsFeatures(List<JunctionDescription> junction_descriptions) {
-        junction_descriptions.forEach(junctionDescription -> {
-            Junction junction = new Junction(junctionDescription.getID(), junctionDescription.hasTrafficLight(),
-                    junctionDescription.getGeoPoint());
-            junctionDescription.getConnectedIDs().forEach((id, roadDirection) -> {
+        for (JunctionDescription desc : junction_descriptions) {
+            Junction junction = new Junction(desc.getID(), desc.hasTrafficLight(), desc.getGeoPoint());
+            desc.getConnectedIDs().forEach((id, roadDirection) -> {
                 try {
                     junction.addRoad((Road) this.mapFeatures.get(id), roadDirection);
                 } catch (AlreadyExistsException e) {
                     LOG.log_Warning("Trying to add Road '", id, "' to Junction '", junction.getID(), "' failed as it's already connected.");
                 }
             });
+            if (junction.getOutflowCount() == 0) { //we need a TG to provide and receive outflow
+                TrafficGenerator tg = new TrafficGenerator(new ID("TF" + this.trafficGenerators.size()), desc.getGeoPoint());
+                tg.addJunctionLinks(junction.addTrafficGenerator(tg.getID()));
+                this.trafficGenerators.add(tg);
+                LOG.log_Debug("TrafficGenerator '", tg.getID(), "' created for Junction '", junction.getID(), "' as it had inflow links only.");
+            }
             junction.computeAllPaths();
             this.mapFeatures.put(junction.getID(), junction);
-        });
+        }
     }
 
     /**

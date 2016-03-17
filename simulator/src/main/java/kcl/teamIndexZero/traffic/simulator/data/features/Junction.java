@@ -108,6 +108,22 @@ public class Junction extends Feature {
     }
 
     /**
+     * Adds a TrafficGenerator for receiving traffic at the junction
+     *
+     * @return The inflow link created
+     */
+    public JunctionLink addTrafficGenerator(ID id) {
+        TrafficGenerator tg = new TrafficGenerator(id, this.getGeoPoint());
+        this.connectedFeatures.add(tg);
+        ID link_ID = new ID(this.getID() + "->" + tg.getID());
+        JunctionLink link = new JunctionLink(link_ID, tg, this, geoPoint);
+        link.in = this;
+        link.out = tg;
+        tg.addJunctionLinks(link);
+        return link;
+    }
+
+    /**
      * From the current list of Links attached to the junction, computes paths.
      * Note: paths doing U-Turns on the same road are *not* added
      */
@@ -151,6 +167,24 @@ public class Junction extends Feature {
             LOG.log_Error("Junction[ ", this.getID(), " ] Either the inflow link ID doesn't exist or the there are no outflow links bound to it.");
             throw new JunctionPathException("Either the inflow link ID doesn't exist or the there are no outflow links bound to it.", e);
         }
+    }
+
+    /**
+     * Gets the number of inflow links
+     *
+     * @return Inflow link count
+     */
+    public int getInflowCount() {
+        return this.inflowLinks.size();
+    }
+
+    /**
+     * Gets the number of outflow links
+     *
+     * @return Outflow link count
+     */
+    public int getOutflowCount() {
+        return this.outflowLinks.size();
     }
 
     /**

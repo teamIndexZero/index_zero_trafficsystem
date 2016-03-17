@@ -6,6 +6,7 @@ import kcl.teamIndexZero.traffic.simulator.data.GraphTools;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
+import kcl.teamIndexZero.traffic.simulator.data.links.JunctionLink;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
@@ -92,6 +93,15 @@ public class TrafficGenerator extends Feature {
             this.outgoing.add(link);
             LOG.log("Linked: '", link.getID(), "'.");
         }
+    }
+
+    /**
+     * Adds incoming Junction links to the TG
+     *
+     * @param incomingLink Inflow link to add
+     */
+    public void addJunctionLinks(JunctionLink incomingLink) {
+        this.incoming.add(incomingLink);
     }
 
     /**

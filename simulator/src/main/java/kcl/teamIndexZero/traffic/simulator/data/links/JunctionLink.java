@@ -4,8 +4,10 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.features.TrafficGenerator;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.exceptions.JunctionPathException;
 
@@ -19,17 +21,33 @@ import java.util.List;
 public class JunctionLink extends Link {
     private static Logger_Interface LOG = Logger.getLoggerInstance(JunctionLink.class.getSimpleName());
     private Junction junction;
-    private Road road;
+    private Feature feature;
 
     /**
      * Constructor
      *
      * @param id       Link ID tag
+     * @param road     Lane's Road that connected to the link
      * @param junction Junction the link belongs to
+     * @param point    Geo point
      */
     public JunctionLink(ID id, Road road, Junction junction, GeoPoint point) {
         super(id, point);
-        this.road = road;
+        this.feature = road;
+        this.junction = junction;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id               Link ID tag
+     * @param trafficGenerator Traffic generator that is connected to the link
+     * @param junction         Junction the link belongs to
+     * @param point            Geo point
+     */
+    public JunctionLink(ID id, TrafficGenerator trafficGenerator, Junction junction, GeoPoint point) {
+        super(id, point);
+        this.feature = trafficGenerator;
         this.junction = junction;
     }
 
@@ -53,7 +71,7 @@ public class JunctionLink extends Link {
      * @return Parent road ID tag
      */
     public ID getRoadID() {
-        return this.road.getID();
+        return this.feature.getID();
     }
 
     /**
