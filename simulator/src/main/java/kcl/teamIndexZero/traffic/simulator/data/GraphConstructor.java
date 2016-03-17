@@ -237,7 +237,6 @@ public class GraphConstructor {
             if (road instanceof Road) {
                 int fwdCount = ((Road) road).getForwardLaneCount();
                 int bckCount = ((Road) road).getBackwardLaneCount();
-
                 //Checking the head of the road
                 if ((fwdCount > 0 && !tools.checkFwdLinksPresent(((Road) road).getForwardSide()))
                         || (bckCount > 0 && !tools.checkBckLinksPresent(((Road) road).getBackwardSide()))) {

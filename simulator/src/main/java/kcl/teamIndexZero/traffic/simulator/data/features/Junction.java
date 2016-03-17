@@ -80,7 +80,7 @@ public class Junction extends Feature {
                 ID link_ID = new ID(this.getID() + "<-" + l.getID());
                 if (!inflowLinks.containsKey(link_ID)) {
                     LOG.log("Adding inflow link '", link_ID, "' to Junction.");
-                    JunctionLink link = new JunctionLink(link_ID, road, this, geoPoint);
+                    JunctionLink link = new JunctionLink(link_ID, road, this, geoPoint, JunctionLink.LinkType.INFLOW);
                     link.in = l;
                     link.out = this;
                     l.connectNext(link);
@@ -95,7 +95,7 @@ public class Junction extends Feature {
                 ID link_ID = new ID(this.getID() + "->" + l.getID());
                 if (!outflowLinks.containsKey(link_ID)) {
                     LOG.log("Adding outflow link '", link_ID, "' to Junction.");
-                    JunctionLink link = new JunctionLink(link_ID, road, this, geoPoint);
+                    JunctionLink link = new JunctionLink(link_ID, road, this, geoPoint, JunctionLink.LinkType.OUTFLOW);
                     link.in = this;
                     link.out = l;
                     l.connectPrevious(link);
@@ -116,7 +116,7 @@ public class Junction extends Feature {
         TrafficGenerator tg = new TrafficGenerator(id, this.getGeoPoint());
         this.connectedFeatures.add(tg);
         ID link_ID = new ID(this.getID() + "->" + tg.getID());
-        JunctionLink link = new JunctionLink(link_ID, tg, this, geoPoint);
+        JunctionLink link = new JunctionLink(link_ID, tg, this, geoPoint, JunctionLink.LinkType.OUTFLOW);
         link.in = this;
         link.out = tg;
         tg.addJunctionLinks(link);

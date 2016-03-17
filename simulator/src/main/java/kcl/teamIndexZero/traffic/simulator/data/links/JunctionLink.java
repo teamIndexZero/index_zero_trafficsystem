@@ -23,6 +23,13 @@ public class JunctionLink extends Link {
     private Junction junction;
     private Feature feature;
 
+    public enum LinkType {
+        OUTFLOW,
+        INFLOW,
+    }
+
+    private LinkType type;
+
     /**
      * Constructor
      *
@@ -30,11 +37,13 @@ public class JunctionLink extends Link {
      * @param road     Lane's Road that connected to the link
      * @param junction Junction the link belongs to
      * @param point    Geo point
+     * @param type     Type of junction link
      */
-    public JunctionLink(ID id, Road road, Junction junction, GeoPoint point) {
+    public JunctionLink(ID id, Road road, Junction junction, GeoPoint point, JunctionLink.LinkType type) {
         super(id, point);
         this.feature = road;
         this.junction = junction;
+        this.type = type;
     }
 
     /**
@@ -44,11 +53,13 @@ public class JunctionLink extends Link {
      * @param trafficGenerator Traffic generator that is connected to the link
      * @param junction         Junction the link belongs to
      * @param point            Geo point
+     * @param type             Type of junction link
      */
-    public JunctionLink(ID id, TrafficGenerator trafficGenerator, Junction junction, GeoPoint point) {
+    public JunctionLink(ID id, TrafficGenerator trafficGenerator, Junction junction, GeoPoint point, JunctionLink.LinkType type) {
         super(id, point);
         this.feature = trafficGenerator;
         this.junction = junction;
+        this.type = type;
     }
 
     /**
@@ -81,6 +92,24 @@ public class JunctionLink extends Link {
      */
     public ID getJunctionID() {
         return this.junction.getID();
+    }
+
+    /**
+     * Checks if the link is an outflow link
+     *
+     * @return is Outflow state
+     */
+    public boolean isOutflowLink() {
+        return this.type == LinkType.OUTFLOW;
+    }
+
+    /**
+     * Checks if the link is an inflow link
+     *
+     * @return is Inflow state
+     */
+    public boolean isInflowLink() {
+        return this.type == LinkType.INFLOW;
     }
 
     /**

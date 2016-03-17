@@ -88,15 +88,18 @@ public class Vehicle extends MapObject {
                 LOG.log_Error("Car terminating its run. Seems to be dead end (map end).");
                 return;
             }
-            if (link instanceof JunctionLink) {
+            if (link instanceof JunctionLink && ((JunctionLink) link).isInflowLink()) {
                 driveOnJunction(tick, link);
+            } else if (link instanceof JunctionLink && ((JunctionLink) link).isOutflowLink()) {
+                driveIntoTrafficGenerator(tick, link);
             } else {
                 driveOnGenericLink(tick, link);
             }
         }
+
     }
 
-    private void driveOnGenericLink(SimulationTick tick, Link link) {
+    private void driveIntoTrafficGenerator(SimulationTick tick, Link link) {
         Feature f = link.getNextFeature();
         if (f instanceof TrafficGenerator) {
             TrafficGenerator tg = (TrafficGenerator) f;
@@ -104,6 +107,13 @@ public class Vehicle extends MapObject {
         } else {
             throw new IllegalStateException("Got a wrong type of link " + link.getClass().getName());
         }
+
+    }
+
+    private void driveOnGenericLink(SimulationTick tick, Link link) {
+        Feature f = link.getNextFeature();
+        if (f instanceof TrafficGenerator)
+            driveIntoTrafficGenerator(tick, link);
     }
 
     public void driveOnJunction(SimulationTick tick, Link link) {

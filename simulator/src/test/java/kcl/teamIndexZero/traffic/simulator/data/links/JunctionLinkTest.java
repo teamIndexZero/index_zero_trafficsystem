@@ -25,7 +25,7 @@ public class JunctionLinkTest {
     public void setUp() throws Exception {
         mockedRoad = mock(Road.class);
         mockedJunction = mock(Junction.class);
-        jl = new JunctionLink(new ID("JunctionLinkTest"), mockedRoad, mockedJunction, new GeoPoint(0, 0));
+        jl = new JunctionLink(new ID("JunctionLinkTest"), mockedRoad, mockedJunction, new GeoPoint(0, 0), JunctionLink.LinkType.INFLOW);
     }
 
     @After
