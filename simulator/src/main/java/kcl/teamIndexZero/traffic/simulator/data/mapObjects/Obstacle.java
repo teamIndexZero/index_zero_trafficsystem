@@ -3,6 +3,7 @@ package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.Simulator;
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 
@@ -17,7 +18,7 @@ public class Obstacle extends MapObject {
      * Constructor. See constructor in {@link MapObject}
      */
     public Obstacle(String name, Lane lane, float positionInLane) {
-        super(name, lane);
+        super(new ID("Obstacle::" + name + "@" + lane.getID()), name, lane);
     }
 
 

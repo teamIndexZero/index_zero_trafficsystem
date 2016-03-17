@@ -3,6 +3,7 @@ package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
@@ -33,8 +34,8 @@ public abstract class MapObject implements ISimulationAware {
     protected String name;
     protected double positionOnRoad = 0;
     protected SimulationMap map;
-    protected boolean pleaseRemoveMeFromSimulation = false;
     private Color color;
+    private ID id;
 
     /**
      * Map object constructor - not meant to be actually called from outside, only by subclasses as super(). Anyway as
@@ -43,9 +44,10 @@ public abstract class MapObject implements ISimulationAware {
      * @param name name of the object (to be shown in simulation maps)
      * @param lane lane to stay on initially
      */
-    public MapObject(String name, Lane lane) {
+    public MapObject(ID id, String name, Lane lane) {
         this.name = name;
         this.lane = lane;
+        this.id = id;
         this.color = MapObject.getRandomColor();
     }
 
@@ -60,8 +62,8 @@ public abstract class MapObject implements ISimulationAware {
                 (int) Math.round(Math.random() * COLORS.length))];
     }
 
-    public boolean isPleaseRemoveMeFromSimulation() {
-        return pleaseRemoveMeFromSimulation;
+    public ID getID() {
+        return this.id;
     }
 
     public Lane getLane() {

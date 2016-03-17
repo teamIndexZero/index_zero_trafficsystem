@@ -8,10 +8,7 @@ import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * An umbrella object containing map details for the simulation. Its responsibilities are clearly divided with Simulator:
@@ -38,7 +35,7 @@ public class SimulationMap implements ISimulationAware {
     public double heightMeters;
     private Map<ID, Feature> mapFeatures = new HashMap<>();
     private Map<ID, Link> mapLinks;
-    private List<MapObject> objectsOnSurface = new ArrayList<>();
+    private Map<ID, MapObject> objectsOnSurface = new HashMap<>();
 
     /**
      * Constructor.
@@ -77,7 +74,9 @@ public class SimulationMap implements ISimulationAware {
     }
 
     /**
-     * @return
+     * Gets all the links on the map
+     *
+     * @return Links of the map
      */
     public Map<ID, Link> getMapLinks() {
         return mapLinks;
@@ -95,8 +94,8 @@ public class SimulationMap implements ISimulationAware {
             mapLinks.forEach(
                     (id, link) -> link.tick(timeStep)
             );
-            objectsOnSurface.forEach(
-                    object -> object.tick(timeStep)
+            objectsOnSurface.forEach((id, mapObject) ->
+                    mapObject.tick(timeStep)
             );
         }
     }
@@ -122,16 +121,25 @@ public class SimulationMap implements ISimulationAware {
      */
     public void addMapObject(MapObject mapObject) {
         //todo check if this really does not occupy some other object's space on map
-        objectsOnSurface.add(mapObject);
+        objectsOnSurface.put(mapObject.getID(), mapObject);
         mapObject.setMap(this);
     }
 
     /**
-     * TODO - bad example, we're exposing the objects from map. It should be encapsulated.
+     * Removes a mapObject from the map
      *
-     * @return objects on map.
+     * @param id ID tag of map object
+     */
+    public void removeMapObject(ID id) {
+        objectsOnSurface.remove(id);
+    }
+
+    /**
+     * Gets all objects on the surface of the map
+     *
+     * @return Read-only collection of the objects
      */
     public List<MapObject> getObjectsOnSurface() {
-        return objectsOnSurface;
+        return Collections.unmodifiableList(new ArrayList<>(objectsOnSurface.values()));
     }
 }

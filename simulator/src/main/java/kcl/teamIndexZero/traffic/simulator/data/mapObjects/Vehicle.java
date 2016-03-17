@@ -1,5 +1,6 @@
 package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
 
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
@@ -28,6 +29,7 @@ public class Vehicle extends MapObject {
     private double speedMetersPerSecond;
     private double accelerationMetersPerSecondSecond;
     private boolean isOnReverseLane = false;
+    private boolean outsideMapScope = false;
 
 
     /**
@@ -36,13 +38,34 @@ public class Vehicle extends MapObject {
      * @param name used for identification in logs for example
      * @param lane Lane the vehicle is on
      */
-    public Vehicle(String name,
+    public Vehicle(ID id, String name,
                    Lane lane) {
-        super(name, lane);
+        super(id, name, lane);
         setLane(lane);
         this.speedMetersPerSecond = 5;
     }
 
+    /**
+     * Sets the vehicle to out of the scope of the map
+     */
+    public void setOutOfScopeFlag() {
+        this.outsideMapScope = true;
+    }
+
+    /**
+     * Gets the in map scope status of the vehicle
+     *
+     * @return Map scope status
+     */
+    public boolean isInMapScope() {
+        return !this.outsideMapScope;
+    }
+
+    /**
+     * Gets the vehicle's colour
+     *
+     * @return Colour
+     */
     @Override
     public Color getColor() {
         if (accelerationMetersPerSecondSecond > 0) {
@@ -59,16 +82,17 @@ public class Vehicle extends MapObject {
      */
     @Override
     public void tick(SimulationTick tick) {
-        Link link = lane.getNextLink();
-        if (link == null) {
-            LOG.log_Error("Car terminating its run. Seems to be dead end (map end).");
-            pleaseRemoveMeFromSimulation = true;
-            return;
-        }
-        if (link instanceof JunctionLink) {
-            driveOnJunction(tick, link);
-        } else {
-            driveOnGenericLink(tick, link);
+        if (isInMapScope()) {
+            Link link = lane.getNextLink();
+            if (link == null) {
+                LOG.log_Error("Car terminating its run. Seems to be dead end (map end).");
+                return;
+            }
+            if (link instanceof JunctionLink) {
+                driveOnJunction(tick, link);
+            } else {
+                driveOnGenericLink(tick, link);
+            }
         }
     }
 
@@ -129,7 +153,6 @@ public class Vehicle extends MapObject {
                 setLane(nextLane);
             } else {
                 LOG.log_Debug(String.format("Got end-link, car going to exit map soon. Link: %s", link.toString()));
-                pleaseRemoveMeFromSimulation = true;
             }
         }
     }

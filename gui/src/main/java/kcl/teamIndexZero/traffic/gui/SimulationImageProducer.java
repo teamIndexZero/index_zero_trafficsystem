@@ -104,17 +104,17 @@ public class SimulationImageProducer {
     }
 
     public void drawAllMapObjects() {
-        map.getObjectsOnSurface().forEach(object -> {
-            GeoPoint point = object.getPositionOnMap();
+        map.getObjectsOnSurface().forEach(mapObject -> {
+            GeoPoint point = mapObject.getPositionOnMap();
             if (point == null) {
                 return;
             }
 
-            primitives.drawCircle(point, 4, object.getColor(), true);
+            primitives.drawCircle(point, 4, mapObject.getColor(), true);
 
-            if (object.equals(model.getSelectedMapObject())) {
-                primitives.drawCircle(point, 15, object.getColor());
-                primitives.drawText(point, object.getNameAndRoad(), object.getColor());
+            if (mapObject.equals(model.getSelectedMapObject())) {
+                primitives.drawCircle(point, 15, mapObject.getColor());
+                primitives.drawText(point, mapObject.getNameAndRoad(), mapObject.getColor());
             }
         });
     }

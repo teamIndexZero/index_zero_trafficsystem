@@ -23,6 +23,7 @@ public class TrafficGenerator extends Feature {
     private int receiptCounter = 0;
     private java.util.List<Link> incoming = new ArrayList<>();
     private java.util.List<Link> outgoing = new ArrayList<>();
+    private List<Vehicle> vehiclesToDelete = new ArrayList<>();
 
     /**
      * Constructor
@@ -109,12 +110,9 @@ public class TrafficGenerator extends Feature {
      */
     public void terminateTravel(Vehicle vehicle) {
         LOG.log("TF[ '", this.getID(), "' ] Vehicle '", vehicle.getName(), "' terminated journey.");
-        /*
-        //TODO maybe a bit heavy as will be called every time a car exits..
-        //super.getMap().getObjectsOnSurface().removeIf(MapObject::isPleaseRemoveMeFromSimulation);
-        //TODO or maybe access via ID (means changing the surface object list to a map. quicker access time though and can still iterate)
+        vehicle.setOutOfScopeFlag();
+        this.vehiclesToDelete.add(vehicle);
         this.receiptCounter++;
-        */
     }
 
     /**
@@ -131,12 +129,20 @@ public class TrafficGenerator extends Feature {
      */
     @Override
     public void tick(SimulationTick tick) {
+        if (!this.vehiclesToDelete.isEmpty()) {
+            this.vehiclesToDelete.forEach(vehicle -> {
+                super.getMap().removeMapObject(vehicle.getID());
+            });
+            this.vehiclesToDelete.clear();
+        }
+
         if (this.getOutgoingLinks().size() > 0) {
             if (Math.random() > 0.04) {
                 return;
             }
-            Vehicle v = new Vehicle("Vehicle " + creationCounter++, getRandomLane());
+            Vehicle v = new Vehicle(new ID("Vehicle::" + this.getID() + "::" + creationCounter), "Vehicle " + creationCounter, getRandomLane());
             super.getMap().addMapObject(v);
+            creationCounter++;
             LOG.log_Trace("TrafficGenerator '", this.getID(), "' created '", v.getName(), "'.");
         }
     }

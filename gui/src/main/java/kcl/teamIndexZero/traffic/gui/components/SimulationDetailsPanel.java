@@ -101,7 +101,8 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         JToggleButton showTrafficGenerators = new JCheckBox("Show Traffic Generators", model.isShowTrafficGenerators());
         showTrafficGenerators.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) { model.setShowTrafficGenerators(showTrafficGenerators.isSelected());
+            public void actionPerformed(ActionEvent e) {
+                model.setShowTrafficGenerators(showTrafficGenerators.isSelected());
             }
         });
 
