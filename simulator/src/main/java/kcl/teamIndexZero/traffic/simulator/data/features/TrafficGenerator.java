@@ -54,21 +54,29 @@ public class TrafficGenerator extends Feature {
         GraphTools tools = new GraphTools();
         DirectedLanes incoming;
         DirectedLanes outgoing;
-        if (!tools.checkFwdLinksPresent(road.getForwardSide())) {
+        GeoPoint placement;
+        int fwdCount = road.getForwardLaneCount();
+        int bckCount = road.getBackwardLaneCount();
+        if ((fwdCount > 0 && !tools.checkFwdLinksPresent(road.getForwardSide()))
+                || (bckCount > 0 && !tools.checkBckLinksPresent(road.getBackwardSide()))) { //head
+            LOG.log_Trace("TG '", this.getID(), "' will link at the head of the road [FWD: ", road.getForwardLaneCount(), ", BCK: ", road.getBackwardLaneCount(), "]");
             incoming = road.getForwardSide();
             outgoing = road.getBackwardSide();
-        } else if (!tools.checkFwdLinksPresent(road.getBackwardSide())) {
+            placement = road.getPolyline().getFinishPoint();
+        } else if ((bckCount > 0 && !tools.checkFwdLinksPresent(road.getBackwardSide()))
+                || (fwdCount > 0 && !tools.checkBckLinksPresent(road.getForwardSide()))) { //tail
+            LOG.log_Trace("TG '", this.getID(), "' will link at the tail of the road [FWD: ", road.getBackwardLaneCount(), ", BCK: ", road.getForwardLaneCount(), "]");
             incoming = road.getBackwardSide();
             outgoing = road.getForwardSide();
+            placement = road.getPolyline().getStartPoint();
         } else {
             LOG.log_Warning("Detected attempt to link a fully linked road ('", road.getID(), "') to a traffic generator ('", this.getID(), "'). Nothing done.");
             return;
         }
-
         //Linking time!
         for (Lane lane : incoming.getLanes()) { //entering the generator
             ID id = new ID(lane.getID() + "->" + this.getID());
-            Link link = new Link(id, road.getPolyline().getStartPoint());
+            Link link = new Link(id, placement);
             link.in = lane;
             link.out = this;
             lane.connectNext(link);
@@ -77,9 +85,10 @@ public class TrafficGenerator extends Feature {
         }
         for (Lane lane : outgoing.getLanes()) { //leaving the generator
             ID id = new ID(lane.getID() + "<-" + this.getID());
-            Link link = new Link(id, road.getPolyline().getStartPoint());
+            Link link = new Link(id, placement);
             link.in = this;
             link.out = lane;
+            lane.connectPrevious(link);
             this.outgoing.add(link);
             LOG.log("Linked: '", link.getID(), "'.");
         }
@@ -153,8 +162,11 @@ public class TrafficGenerator extends Feature {
      * @return Description of the TrafficGenerator state
      */
     public String toString() {
-        String in = this.getIncomingLinks().size() > 0 ? "IN: " + Integer.toString(this.receiptCounter) : "IN: -";
-        String out = this.getOutgoingLinks().size() > 0 ? "OUT: " + Integer.toString(this.creationCounter) : "OUT: -";
-        return this.getID() + "[" + in + ", " + out + "]";
+        boolean inflowExists = this.getIncomingLinks().size() > 0;
+        boolean outflowExists = this.getOutgoingLinks().size() > 0;
+        String in = inflowExists ? "IN: " + Integer.toString(this.receiptCounter) : "";
+        String out = outflowExists ? "OUT: " + Integer.toString(this.creationCounter) : "";
+        String separator = inflowExists && outflowExists ? ", " : "";
+        return this.getID() + "[" + in + separator + out + "]";
     }
 }

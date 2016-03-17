@@ -14,6 +14,7 @@ public class Lane extends Feature {
     private final DirectedLanes lanes;
     private RoadSpecs roadSpecs;
     private Link nextLink;
+    private Link previousLink;
 
     /**
      * Constructor
@@ -82,12 +83,30 @@ public class Lane extends Feature {
     }
 
     /**
+     * Gets the previous link in the direction of the lane
+     *
+     * @return Previous link
+     */
+    public Link getPreviousLink() {
+        return this.previousLink;
+    }
+
+    /**
      * Connects the directed end of the lane to a link
      *
      * @param link Link to connectNext to
      */
     public void connectNext(Link link) {
         this.nextLink = link;
+    }
+
+    /**
+     * Connects the directed beginning of the lane to a link
+     *
+     * @param link Link to connectPrevious to
+     */
+    public void connectPrevious(Link link) {
+        this.previousLink = link;
     }
 
     /**
