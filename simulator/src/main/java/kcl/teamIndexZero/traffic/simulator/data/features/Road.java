@@ -55,6 +55,8 @@ public class Road extends Feature {
         this.roadSpecs.length = roadLength;
         this.forwardSide = new DirectedLanes(new ID(id, "F"), forwardLaneCount, roadSpecs, this);
         this.backwardSide = new DirectedLanes(new ID(id, "B"), backwardLaneCount, roadSpecs, this);
+        this.backwardSide.getLanes().forEach(Lane::constructPolyline);
+        this.forwardSide.getLanes().forEach(Lane::constructPolyline);
     }
 
     @Override
@@ -95,7 +97,7 @@ public class Road extends Feature {
      * @return road width in meters
      */
     public double getRoadWidth() {
-        return getForwardSide().getWidth() + getBackwardSide().getWidth();
+        return getForwardSide().getWidthMeters() + getBackwardSide().getWidthMeters();
     }
 
     /**

@@ -15,12 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Traffic Generator Feature that can be linked to dead-ends on the map to make traffic
+ * Traffic Generator Feature that can be linked to dead-ends on the map to make traffic.
  */
 public class TrafficGenerator extends Feature {
+    private static final int MAX_CARS_ON_SCREEN = 500;
     private static Logger_Interface LOG = Logger.getLoggerInstance(TrafficGenerator.class.getSimpleName());
+    // global counter, used to name the car properly
+    private static int globalCreationCounter = 0;
     private final GeoPoint geoPoint;
-    private int creationCounter = 0;
+    // local counter, used to know how many cars has this TG sent into the wild
+    private int thisGeneratorCreationCounter = 0;
     private int receiptCounter = 0;
     private java.util.List<Link> incoming = new ArrayList<>();
     private java.util.List<Link> outgoing = new ArrayList<>();
@@ -144,7 +148,6 @@ public class TrafficGenerator extends Feature {
      */
     public void terminateTravel(Vehicle vehicle) {
         LOG.log("TF[ '", this.getID(), "' ] Vehicle '", vehicle.getName(), "' terminated journey.");
-        vehicle.setOutOfScopeFlag();
         this.vehiclesToDelete.add(vehicle);
         this.receiptCounter++;
     }
@@ -163,6 +166,7 @@ public class TrafficGenerator extends Feature {
      */
     @Override
     public void tick(SimulationTick tick) {
+        // remove the cars which have 'arrived' into this TG
         if (!this.vehiclesToDelete.isEmpty()) {
             this.vehiclesToDelete.forEach(vehicle -> {
                 super.getMap().removeMapObject(vehicle.getID());
@@ -170,13 +174,20 @@ public class TrafficGenerator extends Feature {
             this.vehiclesToDelete.clear();
         }
 
+        // if we are over hard limit for cars, stop generating (until some of them get removed)
+        if (getMap().getObjectsOnSurface().size() > MAX_CARS_ON_SCREEN) {
+            return;
+        }
+
+        // maybe create a car.
         if (this.getOutgoingLinks().size() > 0) {
             if (Math.random() > 0.04) {
                 return;
             }
-            Vehicle v = new Vehicle(new ID("Vehicle::" + this.getID() + "::" + creationCounter), "Vehicle " + creationCounter, getRandomLane());
+            Vehicle v = new Vehicle(new ID("Vehicle::" + this.getID() + "::" + globalCreationCounter), "Vehicle " + globalCreationCounter, getRandomLane());
             super.getMap().addMapObject(v);
-            creationCounter++;
+            globalCreationCounter++;
+            thisGeneratorCreationCounter++;
             LOG.log_Trace("TrafficGenerator '", this.getID(), "' created '", v.getName(), "'.");
         }
     }
@@ -190,7 +201,7 @@ public class TrafficGenerator extends Feature {
         boolean inflowExists = this.getIncomingLinks().size() > 0;
         boolean outflowExists = this.getOutgoingLinks().size() > 0;
         String in = inflowExists ? "IN: " + Integer.toString(this.receiptCounter) : "";
-        String out = outflowExists ? "OUT: " + Integer.toString(this.creationCounter) : "";
+        String out = outflowExists ? "OUT: " + Integer.toString(this.thisGeneratorCreationCounter) : "";
         String separator = inflowExists && outflowExists ? ", " : "";
         return this.getID() + "[" + in + separator + out + "]";
     }

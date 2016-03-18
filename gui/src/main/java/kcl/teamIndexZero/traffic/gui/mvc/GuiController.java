@@ -58,7 +58,9 @@ public class GuiController {
         if (model.getStatus() == GuiModel.SimulationStatus.PAUSED) {
             simulator.resume();
         }
-        simulator.stop();
+        if (simulator != null) {
+            simulator.stop();
+        }
         model.reset();
         SimulatorGui.startOver();
         SimulationWindow.close();

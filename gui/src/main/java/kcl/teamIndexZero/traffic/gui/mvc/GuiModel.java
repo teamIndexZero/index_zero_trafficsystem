@@ -168,8 +168,12 @@ public class GuiModel implements ISimulationAware {
 
         GuiModel guiModel = (GuiModel) o;
 
-        if (debugRoads != guiModel.debugRoads) return false;
         if (delayBetweenTicks != guiModel.delayBetweenTicks) return false;
+        if (debugRoads != guiModel.debugRoads) return false;
+        if (showJunctions != guiModel.showJunctions) return false;
+        if (showTrafficGenerators != guiModel.showTrafficGenerators) return false;
+        if (viewport != null ? !viewport.equals(guiModel.viewport) : guiModel.viewport != null) return false;
+        if (map != null ? !map.equals(guiModel.map) : guiModel.map != null) return false;
         if (selectedMapObject != null ? !selectedMapObject.equals(guiModel.selectedMapObject) : guiModel.selectedMapObject != null)
             return false;
         if (tick != null ? !tick.equals(guiModel.tick) : guiModel.tick != null) return false;
@@ -180,12 +184,30 @@ public class GuiModel implements ISimulationAware {
 
     @Override
     public int hashCode() {
-        int result = (debugRoads ? 1 : 0);
+        int result = viewport != null ? viewport.hashCode() : 0;
+        result = 31 * result + (map != null ? map.hashCode() : 0);
+        result = 31 * result + (debugRoads ? 1 : 0);
         result = 31 * result + (selectedMapObject != null ? selectedMapObject.hashCode() : 0);
-        result = 31 * result + delayBetweenTicks;
         result = 31 * result + (tick != null ? tick.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (params != null ? params.hashCode() : 0);
+        result = 31 * result + (showJunctions ? 1 : 0);
+        result = 31 * result + (showTrafficGenerators ? 1 : 0);
+        return result;
+    }
+
+    /**
+     * Used for caching the image in simulation image producer - we need to know when things change to redraw that.
+     * We should only use for this hashcode things which relate to static map - that is, everything except map objects.
+     *
+     * @return
+     */
+    public int getViewHashCode() {
+        int result = viewport != null ? viewport.hashCode() : 0;
+        result = 31 * result + (debugRoads ? 1 : 0);
+        result = 31 * result + (selectedMapObject != null ? selectedMapObject.hashCode() : 0);
+        result = 31 * result + (showJunctions ? 1 : 0);
+        result = 31 * result + (showTrafficGenerators ? 1 : 0);
         return result;
     }
 

@@ -24,7 +24,7 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
     private final GuiModel model;
     private final GuiController controller;
     private JButton playButton;
-    private JButton stopButton;
+    private JButton resetButton;
     private JButton pauseButton;
 
 
@@ -53,8 +53,7 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
     public void onModelChanged() {
         // updating button status
         pauseButton.setEnabled(model.getStatus() == GuiModel.SimulationStatus.INPROGRESS);
-        stopButton.setEnabled(model.getStatus() == GuiModel.SimulationStatus.INPROGRESS
-                || model.getStatus() == GuiModel.SimulationStatus.PAUSED);
+        resetButton.setEnabled(true);
         playButton.setEnabled(model.getStatus() == GuiModel.SimulationStatus.OFF
                 || model.getStatus() == GuiModel.SimulationStatus.PAUSED);
 
@@ -79,12 +78,12 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
         );
         add(pauseButton);
 
-        stopButton = makeButton(
+        resetButton = makeButton(
                 "reload-3x",
                 "Restart from chooser",
                 "Restart",
                 controller::restart);
-        add(stopButton);
+        add(resetButton);
         addSeparator();
 
         JButton resetZoomButton = makeButton(

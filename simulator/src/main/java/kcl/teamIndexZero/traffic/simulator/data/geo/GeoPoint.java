@@ -31,21 +31,32 @@ public class GeoPoint {
      * @param point1 second point
      * @return distance in meters.
      */
-    public static double getDistance(GeoPoint point, GeoPoint point1) {
+    public static double getDistanceBetween(GeoPoint point, GeoPoint point1) {
         return Math.sqrt(
                 (point.xMeters - point1.xMeters) * (point.xMeters - point1.xMeters) +
                         (point.yMeters - point1.yMeters) * (point.yMeters - point1.yMeters));
     }
 
+    /**
+     * Get an ID of this point (useful for debugging and tracking back to the OSM files).
+     *
+     * @return id of this point.
+     */
     public ID getId() {
         return id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return String.format("{%.0f, %.0f}", xMeters, yMeters);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -58,6 +69,9 @@ public class GeoPoint {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int result;

@@ -2,15 +2,14 @@ package kcl.teamIndexZero.traffic.simulator.data.mapObjects;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
-import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
-import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
-import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
-import kcl.teamIndexZero.traffic.simulator.data.features.TrafficGenerator;
+import kcl.teamIndexZero.traffic.simulator.data.features.*;
 import kcl.teamIndexZero.traffic.simulator.data.links.JunctionLink;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * An active object on a map - a vehicle. Can be a car, or truck, or a bike (should check these subtypes later - if
@@ -29,7 +28,6 @@ public class Vehicle extends MapObject {
     private double speedMetersPerSecond;
     private double accelerationMetersPerSecondSecond;
     private boolean isOnReverseLane = false;
-    private boolean outsideMapScope = false;
 
 
     /**
@@ -43,22 +41,6 @@ public class Vehicle extends MapObject {
         super(id, name, lane);
         setLane(lane);
         this.speedMetersPerSecond = 5;
-    }
-
-    /**
-     * Sets the vehicle to out of the scope of the map
-     */
-    public void setOutOfScopeFlag() {
-        this.outsideMapScope = true;
-    }
-
-    /**
-     * Gets the in map scope status of the vehicle
-     *
-     * @return Map scope status
-     */
-    public boolean isInMapScope() {
-        return !this.outsideMapScope;
     }
 
     /**
@@ -82,19 +64,18 @@ public class Vehicle extends MapObject {
      */
     @Override
     public void tick(SimulationTick tick) {
-        if (isInMapScope()) {
-            Link link = lane.getNextLink();
-            if (link == null) {
-                LOG.log_Error("Car terminating its run. Seems to be dead end (map end).");
-                return;
-            }
-            if (link instanceof JunctionLink && ((JunctionLink) link).isInflowLink()) {
-                driveOnJunction(tick, link);
-            } else if (link instanceof JunctionLink && ((JunctionLink) link).isOutflowLink()) {
-                driveIntoTrafficGenerator(tick, link);
-            } else {
-                driveOnGenericLink(tick, link);
-            }
+//        if (isInMapScope()) {
+        Link link = lane.getNextLink();
+        if (link == null) {
+            LOG.log_Error("Car terminating its run. Seems to be dead end (map end).");
+            return;
+        }
+        if (link instanceof JunctionLink && ((JunctionLink) link).isInflowLink()) {
+            driveOnJunction(tick, link);
+        } else if (link instanceof JunctionLink && ((JunctionLink) link).isOutflowLink()) {
+            driveIntoTrafficGenerator(tick, link);
+        } else {
+            driveOnGenericLink(tick, link);
         }
 
     }
@@ -125,10 +106,9 @@ public class Vehicle extends MapObject {
         }
 
         double distanceToTheEndOfTheLane = isOnReverseLane ? positionOnRoad : getLane().getLength() - positionOnRoad;
-        if (
-                ((isThisLaneTerminatingAtCrossing && distanceToTheEndOfTheLane > 60) || !isThisLaneTerminatingAtCrossing)
-                        && Math.abs(speedMetersPerSecond) < (50 * 1000 / 3600)
-                        || Math.abs(speedMetersPerSecond) < 5 * 1000 / 3600) {
+        if (((isThisLaneTerminatingAtCrossing && distanceToTheEndOfTheLane > 60) || !isThisLaneTerminatingAtCrossing)
+                && Math.abs(speedMetersPerSecond) < (50 * 1000 / 3600)
+                || Math.abs(speedMetersPerSecond) < 5 * 1000 / 3600) {
             accelerationMetersPerSecondSecond = 0.7;
         } else if (isThisLaneTerminatingAtCrossing && distanceToTheEndOfTheLane < 50
                 && Math.abs(speedMetersPerSecond) > 10 * 1000 / 3600) {
@@ -145,25 +125,101 @@ public class Vehicle extends MapObject {
                 * tick.getTickDurationSeconds();
 
 
-        //TODO if end of road is reached then pass to next feature with the remaining travel length??
         //TODO maybe adapt behavior for the looking ahead distance based on projected stopping time at current speed?
         //TODO if looking ahead distance goes out of scope of the current feature then query link
         if (positionOnRoad < 0 || positionOnRoad >= lane.getLength()) {
             junction.incrementUsage();
+            // 1. decide on feature. Remove possible features which are on too steep angle
+            // 2. decide on lane of this feature. If the feature seems to be a continuation of an original road,
+            //    stick to the same lane, otherwise stick to the outermost one.
+            // 3. do a switch.
+            boolean turning = Math.random() > 0.6;
+
+            List<Feature> availableFeatures = junction.getConnectedFeatures()
+                    .stream()
+                    .filter(feature -> !feature.getID().equals(lane.getRoadID())).collect(Collectors.toList());
+            if (availableFeatures.isEmpty()) {
+                LOG.log_Error("Got to a dead end (as I think). Probably two outgoing roads ending in same point with no further way out.");
+                map.getAllCatcherTrafficGenerator().terminateTravel(this);
+                return;
+            }
+            double bearingNowNormalized = junction.getBearingForFeature(lane.getRoad()) % Math.toRadians(180);
 
             List<Link> nextLinks = j.getLinks();
-            if (nextLinks.size() > 0) {
-                // get random link
-                Link outLink = nextLinks.get((int) (Math.random() * nextLinks.size()));
-                Lane nextLane = (Lane) outLink.getNextFeature();
-                if (lane.getRoad().getName() != null && !lane.getRoad().getName().equals(nextLane.getRoad().getName())) {
-                    LOG.log(String.format("%s turning from %s to %s", getName(), lane.getRoad().getName(),
-                            nextLane.getRoad().getName()));
-                }
-                setLane(nextLane);
-            } else {
-                LOG.log_Debug(String.format("Got end-link, car going to exit map soon. Link: %s", link.toString()));
+            Set<Feature> possibleFeaturesByLink = nextLinks
+                    .stream()
+                    .map(aLink -> {
+                        if (aLink.getNextFeature() instanceof Lane) {
+                            return ((Lane) aLink.getNextFeature()).getRoad();
+                        }
+                        return aLink.getNextFeature();
+                    })
+                    .collect(Collectors.toSet());
+
+            // choose a feature to go to
+            Feature featureToGoTo = possibleFeaturesByLink
+                    .stream()
+                    // and depending on whether we want to turn or not, look at the angle between them
+                    .filter(feature -> {
+                        if (!(feature instanceof Road)) {
+                            // for all non-road features, allow them in result (for ex. traffic generator)
+                            return true;
+                        }
+                        // for simplicity, we don't care about direction forward or backward, just that we have
+                        double bearingAnother = junction.getBearingForFeature(feature) % Math.toRadians(180);
+                        if (turning) {
+                            // if we want to turn, we return all the features whose angle is rather different to incoming one
+                            // but we also make sure we omit too steep back turns
+                            return Math.abs(bearingAnother - bearingNowNormalized) > Math.toRadians(60);
+
+                        } else {
+                            // keeping in around the same lane. Now, we need to identify feature which has around the same angle.
+                            return Math.abs(bearingAnother - bearingNowNormalized) < Math.toRadians(15);
+                        }
+                    })
+                    .findAny()
+                    // in case none found, just default to any from the available
+                    .orElseGet(() -> availableFeatures.stream().filter(possibleFeaturesByLink::contains).findAny().orElse(null));
+            if (featureToGoTo == null) {
+                LOG.log_Error("Got to a dead end (as I think). Probably two outgoing roads ending in same point with no further way out.");
+                map.getAllCatcherTrafficGenerator().terminateTravel(this);
+                return;
             }
+            if (featureToGoTo instanceof TrafficGenerator) {
+                ((TrafficGenerator) featureToGoTo).terminateTravel(this);
+                return;
+            }
+            List<Link> linksToGivenFeature = nextLinks.stream()
+                    .filter(possibleLink -> {
+                        if (possibleLink.getNextFeature().equals(featureToGoTo)) {
+                            return true;
+                        } else if (featureToGoTo instanceof Road) {
+                            Road r = (Road) featureToGoTo;
+                            return r.getForwardSide().getLanes().contains(possibleLink.getNextFeature()) ||
+                                    r.getBackwardSide().getLanes().contains(possibleLink.getNextFeature());
+                        }
+                        throw new IllegalStateException("Linked not to a lane and not to a non-road. Weird.");
+                    })
+                    .collect(Collectors.toList());
+            Link nextLink = linksToGivenFeature
+                    .stream()
+                    // if we don't turn, try to stay in same lane.
+                    .filter(candidateLink -> {
+                        // stick to the outer lane.
+                        Lane otherLane = (Lane) candidateLink.getNextFeature();
+                        return otherLane.getLanes().getNumberOfLanes() - otherLane.getIndexInDirectedLanes()
+                                == lane.getLanes().getNumberOfLanes() - lane.getIndexInDirectedLanes();
+                    })
+                    .findAny()
+                    // if not found, select random
+                    .orElse(linksToGivenFeature.get(((int) (Math.random() * linksToGivenFeature.size())) % linksToGivenFeature.size()));
+            Lane nextLane = ((Lane) nextLink.getNextFeature());
+
+            if (lane.getRoad().getName() != null && !lane.getRoad().getName().equals(nextLane.getRoad().getName())) {
+                LOG.log(String.format("%s turning from %s to %s", getName(), lane.getRoad().getName(),
+                        nextLane.getRoad().getName()));
+            }
+            setLane(nextLane);
         }
     }
 
@@ -178,11 +234,11 @@ public class Vehicle extends MapObject {
                 accelerationMetersPerSecondSecond);
     }
 
-    public double getAccelerationMetersPerSecondSecond() {
+    public double getAccelerationKphH() {
         return accelerationMetersPerSecondSecond;
     }
 
-    public double getSpeedMetersPerSecond() {
+    public double getSpeedKph() {
         return speedMetersPerSecond;
     }
 

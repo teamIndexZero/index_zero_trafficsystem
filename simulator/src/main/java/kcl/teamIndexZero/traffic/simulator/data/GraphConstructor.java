@@ -4,9 +4,13 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.RoadDescription;
-import kcl.teamIndexZero.traffic.simulator.data.features.*;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
+import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.features.TrafficGenerator;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
-import kcl.teamIndexZero.traffic.simulator.exceptions.*;
+import kcl.teamIndexZero.traffic.simulator.exceptions.AlreadyExistsException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

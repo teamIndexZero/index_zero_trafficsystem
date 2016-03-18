@@ -7,7 +7,6 @@ import kcl.teamIndexZero.traffic.simulator.osm.OsmParseResult;
 import kcl.teamIndexZero.traffic.simulator.osm.OsmParser;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -28,11 +27,12 @@ public class ChooserDialog extends JFrame {
 
     private static final Map<String, String> filesAvailable =
             Arrays.stream(new String[][]{
-                    {"Strand area", "/sampleData/strand.osm"},
-                    {"Elephant and Castle strange roundabout", "/sampleData/elephant_and_castle.osm"},
-                    {"Buckingham Palace area", "/sampleData/buckingham_area.osm"},
-                    {"Paris, Arc de Triomphe", "/sampleData/paris_arc_de_triomphe_ways.osm"},
-                    {"Simple in-way square", "/sampleData/rectangle.osm"},
+                    {"Strand area", "/sampleData/strand.osm.xml"},
+                    {"Elephant and Castle strange roundabout", "/sampleData/elephant_and_castle.osm.xml"},
+                    {"Buckingham Palace area", "/sampleData/buckingham_area.osm.xml"},
+                    {"Paris, Arc de Triomphe", "/sampleData/paris_arc_de_triomphe_ways.osm.xml"},
+                    {"Simple one-way square", "/sampleData/rectangle.osm.xml"},
+                    {"Straight road with 6 lanes", "/sampleData/3_by_3_lanesRoad.osm.xml"},
             }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
     protected static Logger_Interface LOG = Logger.getLoggerInstance(ChooserDialog.class.getSimpleName());
     private Consumer<OsmParseResult> resultConsumer;
@@ -79,7 +79,6 @@ public class ChooserDialog extends JFrame {
 
         filesAvailable.forEach((caption, file) -> {
             JButton button = new JButton(caption);
-            button.setBackground(Color.RED);
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

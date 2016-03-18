@@ -5,16 +5,14 @@ import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
 import kcl.teamIndexZero.traffic.simulator.data.links.JunctionLink;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.trafficBehaviour.TrafficBehaviour;
 import kcl.teamIndexZero.traffic.simulator.exceptions.AlreadyExistsException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.JunctionPathException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Junction feature that connects roads and their links to direct traffic into each others
@@ -25,7 +23,7 @@ public class Junction extends Feature {
     private static Logger_Interface LOG = Logger.getLoggerInstance(Junction.class.getSimpleName());
     private final GeoPoint geoPoint;
     private TrafficBehaviour behaviour;
-    private List<Feature> connectedFeatures;
+    private Map<Feature, JunctionDescription.RoadDirection> connectedFeatures;
     private Map<ID, JunctionLink> inflowLinks;
     private Map<ID, JunctionLink> outflowLinks;
     private boolean trafficLight_flag;
@@ -41,7 +39,7 @@ public class Junction extends Feature {
     public Junction(ID id, boolean requiresTrafficLights, GeoPoint geoPoint) {
         super(id);
         this.geoPoint = geoPoint;
-        this.connectedFeatures = new ArrayList<>();
+        this.connectedFeatures = new HashMap<>();
         this.inflowLinks = new HashMap<>();
         this.outflowLinks = new HashMap<>();
         this.trafficLight_flag = requiresTrafficLights;
@@ -65,11 +63,11 @@ public class Junction extends Feature {
      * @param direction Direction of the road at connection point with the junction
      */
     public void addRoad(Road road, JunctionDescription.RoadDirection direction) throws AlreadyExistsException {
-        if (connectedFeatures.contains(road)) {
+        if (connectedFeatures.keySet().contains(road)) {
             LOG.log_Error("Road '", road.getName(), "' (ID: ", road.getID(), ") already exists in the list of connected features.");
             throw new AlreadyExistsException("Road already in connected features of Junction.");
         }
-        connectedFeatures.add(road);
+        connectedFeatures.put(road, direction);
         List<Lane> incoming;
         List<Lane> outgoing;
         if (direction == JunctionDescription.RoadDirection.INCOMING) {
@@ -133,7 +131,7 @@ public class Junction extends Feature {
             else
                 LOG.log_Error("Trying to add a Link ('", link.getID(), "') to the Junction '", this.getID(), "' from a TrafficGenerator ('", tg.getID(), "') - Link not a JunctionLink!");
         });
-        this.connectedFeatures.add(tg);
+        this.connectedFeatures.put(tg, JunctionDescription.RoadDirection.OUTGOING);
     }
 
     /**
@@ -175,8 +173,28 @@ public class Junction extends Feature {
      *
      * @return List of connected Features
      */
-    public List<Feature> getConnectedFeatures() {
-        return this.connectedFeatures;
+    public Collection<Feature> getConnectedFeatures() {
+        return this.connectedFeatures.keySet();
+    }
+
+    /**
+     * Gets the bearing for a feature - that is, on which angle it connects to a junction.
+     *
+     * @return incoming or outgoing.
+     */
+    public double getBearingForFeature(Feature f) {
+        JunctionDescription.RoadDirection direction = connectedFeatures.get(f);
+        if (!(f instanceof Road)) {
+            return 0;
+        }
+        Road r = (Road) f;
+        if (direction == JunctionDescription.RoadDirection.INCOMING) {
+            // reverse the last segment since we are incoming.
+            GeoSegment lastSegment = r.getPolyline().getLastSegment();
+            return new GeoSegment(lastSegment.end, lastSegment.start).getAngleToEastRadians();
+        } else {
+            return r.getPolyline().getFirstSegment().getAngleToEastRadians();
+        }
     }
 
     /**
@@ -252,5 +270,14 @@ public class Junction extends Feature {
     public String toString() {
         return this.getID() + "{ features: " + this.connectedFeatures.size() + " | "
                 + ", inflow: " + this.inflowLinks.size() + ", outflow: " + this.outflowLinks.size() + " }";
+    }
+
+    /**
+     * Check if this junction is a dead end - i.e. if there is no way to go somewhere after it is there.
+     *
+     * @return true if no outbound links.
+     */
+    public boolean isDeadEnd() {
+        return outflowLinks.size() == 0;
     }
 }

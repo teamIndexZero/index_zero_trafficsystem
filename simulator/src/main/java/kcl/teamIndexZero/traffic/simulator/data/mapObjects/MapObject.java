@@ -95,7 +95,6 @@ public abstract class MapObject implements ISimulationAware {
     }
 
     public GeoPoint getPositionOnMap() {
-        //TODO: add appropriate width shift
-        return lane.getRoad().getPolyline().getGeoPointAtDistanceFromStart(positionOnRoad);
+        return lane.getPolyline().getGeoPointAtDistanceFromStart(positionOnRoad);
     }
 }

@@ -30,6 +30,36 @@ public class ViewportModel {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ViewportModel that = (ViewportModel) o;
+
+        if (mapPanelWidthPixels != that.mapPanelWidthPixels) return false;
+        if (mapPanelHeightPixels != that.mapPanelHeightPixels) return false;
+        if (Double.compare(that.zoomCoefficient, zoomCoefficient) != 0) return false;
+        if (Double.compare(that.yMetersOffset, yMetersOffset) != 0) return false;
+        return Double.compare(that.xMetersOffset, xMetersOffset) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = mapPanelWidthPixels;
+        result = 31 * result + mapPanelHeightPixels;
+        temp = Double.doubleToLongBits(zoomCoefficient);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(yMetersOffset);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(xMetersOffset);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
     /**
      * Gets scale of 1 meter to pixels, taking into account current viewport zoom and map width/height.
      *

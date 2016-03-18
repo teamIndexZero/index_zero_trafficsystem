@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Es on 01/03/2016.
+ * A class representing group of lanes belonging to the same road, which run in same direction.
  */
 public class DirectedLanes {
     private static Logger_Interface LOG = Logger.getLoggerInstance(DirectedLanes.class.getSimpleName());
@@ -29,7 +29,7 @@ public class DirectedLanes {
         this.roadSpecs = road_specs;
         this.road = road;
         for (int i = 0; i < number_of_lanes; i++) {
-            lanes.add(new Lane(new ID(id, Integer.toString(i)), roadSpecs, this));
+            lanes.add(new Lane(new ID(id, Integer.toString(i)), roadSpecs, this, i));
         }
     }
 
@@ -93,7 +93,12 @@ public class DirectedLanes {
         return String.format("{DirLanes of %s}", road.toString());
     }
 
-    public double getWidth() {
+    /**
+     * Get width of the DirectedLanes in meters.
+     *
+     * @return sum of the widths of all lanes
+     */
+    public double getWidthMeters() {
         return roadSpecs.width * getNumberOfLanes();
     }
 }

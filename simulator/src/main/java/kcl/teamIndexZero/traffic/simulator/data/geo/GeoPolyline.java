@@ -121,4 +121,22 @@ public class GeoPolyline {
     public double getPolylineLength() {
         return segments.stream().map(GeoSegment::getLength).reduce(Double::sum).get();
     }
+
+    /**
+     * Get first and last segment of the polyline.
+     *
+     * @return first segment.
+     */
+    public GeoSegment getFirstSegment() {
+        return segments.get(0);
+    }
+
+    /**
+     * Get first and last segment of the polyline.
+     *
+     * @return last segment.
+     */
+    public GeoSegment getLastSegment() {
+        return segments.get(segments.size() - 1);
+    }
 }

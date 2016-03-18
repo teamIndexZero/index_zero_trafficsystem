@@ -48,7 +48,7 @@ public class JunctionTest {
         assertEquals(0, j.getConnectedFeatures().size());
         j.addRoad(r1, JunctionDescription.RoadDirection.INCOMING);
         assertEquals(1, j.getConnectedFeatures().size());
-        assertEquals(r1, j.getConnectedFeatures().get(0));
+        assertEquals(r1, j.getConnectedFeatures().iterator().next());
     }
 
     @Test(expected = AlreadyExistsException.class)
