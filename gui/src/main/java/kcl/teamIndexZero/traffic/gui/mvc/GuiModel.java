@@ -205,7 +205,6 @@ public class GuiModel implements ISimulationAware {
     public int getViewHashCode() {
         int result = viewport != null ? viewport.hashCode() : 0;
         result = 31 * result + (debugRoads ? 1 : 0);
-        result = 31 * result + (selectedMapObject != null ? selectedMapObject.hashCode() : 0);
         result = 31 * result + (showJunctions ? 1 : 0);
         result = 31 * result + (showTrafficGenerators ? 1 : 0);
         return result;

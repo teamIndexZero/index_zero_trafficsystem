@@ -196,7 +196,7 @@ class OsmSaxHandler extends DefaultHandler {
             this.isCurrentRoadOneWay = true;
         }
         if ("lanes".equals(key)) {
-            this.currentRoadLanes = Integer.valueOf(value);
+            this.currentRoadLanes = ((int) Math.floor(Double.valueOf(value)));
         }
     }
 
