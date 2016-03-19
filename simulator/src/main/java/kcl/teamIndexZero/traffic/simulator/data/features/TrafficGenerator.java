@@ -9,6 +9,8 @@ import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.links.JunctionLink;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
+import kcl.teamIndexZero.traffic.simulator.exceptions.DeadEndFeatureException;
+import kcl.teamIndexZero.traffic.simulator.exceptions.JunctionPathException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 
 import java.util.ArrayList;
@@ -107,15 +109,17 @@ public class TrafficGenerator extends Feature {
      * @param tgOutflowPaths Number of traffic outflow links from the TrafficGenerator
      */
     public void linkJunction(Junction junction, int tgInflowPaths, int tgOutflowPaths) {
+        int incoming_size = this.incoming.size();
         for (int i = 0; i < tgInflowPaths; i++) {
-            ID link_ID = new ID(junction.getID() + "->" + this.getID());
+            ID link_ID = new ID(junction.getID() + "->" + this.getID() + ".in" + (incoming_size + i));
             JunctionLink link = new JunctionLink(link_ID, this, junction, geoPoint, JunctionLink.LinkType.OUTFLOW);
             link.in = junction;
             link.out = this;
             this.incoming.add(link);
         }
+        int outgoing_size = this.outgoing.size();
         for (int i = 0; i < tgOutflowPaths; i++) {
-            ID link_ID = new ID(junction.getID() + "<-" + this.getID());
+            ID link_ID = new ID(junction.getID() + "<-" + this.getID() + ".out" + (outgoing_size + i));
             JunctionLink link = new JunctionLink(link_ID, this, junction, geoPoint, JunctionLink.LinkType.INFLOW);
             link.in = this;
             link.out = junction;
@@ -157,8 +161,20 @@ public class TrafficGenerator extends Feature {
      *
      * @return Random Lane
      */
-    public Lane getRandomLane() {
-        return (Lane) outgoing.get((int) (Math.random() * outgoing.size() - 1)).out;
+    public Lane getRandomLane() throws JunctionPathException, DeadEndFeatureException {
+        Link outboundLink = outgoing.get((int) (Math.random() * outgoing.size() - 1));
+        Feature f = outboundLink.out;
+        if (f instanceof Lane)
+            return (Lane) f;
+        if (f instanceof Junction) {
+            Feature fNextOnJunction = ((Junction) f).getRandomLink(outboundLink.getID()).out;
+            if (fNextOnJunction instanceof Lane)
+                return (Lane) fNextOnJunction;
+            else {
+                throw new DeadEndFeatureException("Could not get a lane out of the TrafficGenerator indirectly.");
+            }
+        }
+        throw new DeadEndFeatureException("Could not get a lane out of the TrafficGenerator directly.");
     }
 
     /**
@@ -184,7 +200,16 @@ public class TrafficGenerator extends Feature {
             if (Math.random() > 0.04) {
                 return;
             }
-            Vehicle v = new Vehicle(new ID("Vehicle::" + this.getID() + "::" + globalCreationCounter), "Vehicle " + globalCreationCounter, getRandomLane());
+            Vehicle v = null;
+            try {
+                v = new Vehicle(new ID("Vehicle::" + this.getID() + "::" + globalCreationCounter), "Vehicle " + globalCreationCounter, getRandomLane());
+            } catch (JunctionPathException e) {
+                LOG.log_Fatal("Trying to get a path to a lane to pass the new vehicle onto through the Junction failed.");
+                LOG.log_Exception(e);
+            } catch (DeadEndFeatureException e) {
+                LOG.log_Fatal("Trying to get a lane to pass the new vehicle onto out of the TrafficGenerator ('", this.getID(), "') failed.");
+                LOG.log_Exception(e);
+            }
             super.getMap().addMapObject(v);
             globalCreationCounter++;
             thisGeneratorCreationCounter++;

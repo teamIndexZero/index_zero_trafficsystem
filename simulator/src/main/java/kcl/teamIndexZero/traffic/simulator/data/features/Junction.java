@@ -140,6 +140,7 @@ public class Junction extends Feature {
      * @param link Inflow link
      */
     private void addInflowLink(JunctionLink link) {
+        LOG.log_Trace("Adding inflow link '", link.getID(), "'.");
         this.inflowLinks.put(link.getID(), link);
     }
 
@@ -149,6 +150,7 @@ public class Junction extends Feature {
      * @param link Outflow link
      */
     private void addOutflowLink(JunctionLink link) {
+        LOG.log_Trace("Adding outflow link '", link.getID(), "'.");
         this.outflowLinks.put(link.getID(), link);
     }
 
@@ -218,6 +220,18 @@ public class Junction extends Feature {
             LOG.log_Error("Junction[ ", this.getID(), " ] Either the inflow link ID doesn't exist or the there are no outflow links bound to it.");
             throw new JunctionPathException("Either the inflow link ID doesn't exist or the there are no outflow links bound to it.", e);
         }
+    }
+
+    /**
+     * Gets a single random exit point for an inflow link
+     *
+     * @param inflowLinkID ID of the inflow link
+     * @return Single random link
+     * @throws JunctionPathException when a path problem is raised
+     */
+    public Link getRandomLink(ID inflowLinkID) throws JunctionPathException {
+        List<Link> links = getNextLinks(inflowLinkID);
+        return links.get((int) (Math.random() * links.size() - 1));
     }
 
     /**
