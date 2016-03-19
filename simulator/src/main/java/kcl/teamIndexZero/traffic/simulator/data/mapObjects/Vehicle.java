@@ -140,7 +140,7 @@ public class Vehicle extends MapObject {
                     .filter(feature -> !feature.getID().equals(lane.getRoadID())).collect(Collectors.toList());
             if (availableFeatures.isEmpty()) {
                 LOG.log_Error("Got to a dead end (as I think). Probably two outgoing roads ending in same point with no further way out.");
-                map.getAllCatcherTrafficGenerator().terminateTravel(this);
+                //map.getAllCatcherTrafficGenerator().terminateTravel(this);
                 return;
             }
             double bearingNowNormalized = junction.getBearingForFeature(lane.getRoad()) % Math.toRadians(180);
@@ -182,7 +182,7 @@ public class Vehicle extends MapObject {
                     .orElseGet(() -> availableFeatures.stream().filter(possibleFeaturesByLink::contains).findAny().orElse(null));
             if (featureToGoTo == null) {
                 LOG.log_Error("Got to a dead end (as I think). Probably two outgoing roads ending in same point with no further way out.");
-                map.getAllCatcherTrafficGenerator().terminateTravel(this);
+                //map.getAllCatcherTrafficGenerator().terminateTravel(this);
                 return;
             }
             if (featureToGoTo instanceof TrafficGenerator) {

@@ -69,6 +69,13 @@ public class TrafficBehaviour {
     }
 
     /**
+     * Clears all paths
+     */
+    public void clearAllPaths() {
+        this.outflowPaths.clear();
+    }
+
+    /**
      * Gets the ID of the junction TrafficBehaviour is associated with
      *
      * @return Junction ID tag
