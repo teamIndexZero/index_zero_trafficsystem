@@ -28,7 +28,8 @@ public class ChooserDialog extends JFrame {
                     {"Strand area", "/sampleData/micro/strand.osm.xml"},
                     {"Elephant and Castle strange roundabout", "/sampleData/micro/elephant_and_castle.osm.xml"},
                     {"Buckingham Palace area", "/sampleData/micro/buckingham_area.osm.xml"},
-                    {"Paris, Arc de Triomphe", "/sampleData/micro/paris_arc_de_triomphe_ways.osm.xml"}
+                    {"Paris, Arc de Triomphe", "/sampleData/micro/paris_arc_de_triomphe_ways.osm.xml"},
+                    {"Manhattan/Battery Park", "/sampleData/micro/Manhattan_Battery_Park_Junction.osm.xml"}
             }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
 
     private static final Map<String, String> SYNTHETIC_MODEL_FILES =
@@ -124,7 +125,7 @@ public class ChooserDialog extends JFrame {
             });
             add(button);
         });
-        
+
         pack();
         setLocationRelativeTo(null); //center window
     }
