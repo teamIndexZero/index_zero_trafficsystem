@@ -154,8 +154,6 @@ public class SimulationImageProducer {
             roadGraphics.clearRect(0, 0, image.getWidth(), image.getHeight());
 
             drawAllRoads(roadGraphics);
-            drawAllJunctions(roadGraphics);
-            drawAllTrafficGenerators(roadGraphics);
             primitives.drawScaleOf30Meters(roadGraphics);
         }
         graphics.drawImage(roadsImage, 0, 0, null);
@@ -183,6 +181,9 @@ public class SimulationImageProducer {
      * Draw all dynamic objects - vehicles in this case.
      */
     public void drawAllDynamicObjects() {
+        drawAllJunctions(graphics);
+        drawAllTrafficGenerators(graphics);
+
         map.getObjectsOnSurface().forEach(mapObject -> {
             GeoPoint point = mapObject.getPositionOnMap();
             if (point == null) {
