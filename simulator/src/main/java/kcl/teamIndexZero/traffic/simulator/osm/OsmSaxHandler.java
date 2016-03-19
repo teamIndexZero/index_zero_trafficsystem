@@ -190,13 +190,21 @@ class OsmSaxHandler extends DefaultHandler {
             this.currentRoadName = value;
         }
         if ("layer".equals(key)) {
-            this.currentRoadLayer = Integer.valueOf(value);
+            try {
+                this.currentRoadLayer = Integer.valueOf(value);
+            } catch (NumberFormatException ex) {
+                LOG.log_Error("Got weird layer for the road: " + value);
+            }
         }
         if ("oneway".equals(key) && "yes".equals(value)) {
             this.isCurrentRoadOneWay = true;
         }
         if ("lanes".equals(key)) {
-            this.currentRoadLanes = ((int) Math.floor(Double.valueOf(value)));
+            try {
+                this.currentRoadLanes = ((int) Math.floor(Double.valueOf(value)));
+            } catch (NumberFormatException e) {
+                LOG.log_Error("Got weird number of lanes: " + value);
+            }
         }
     }
 
