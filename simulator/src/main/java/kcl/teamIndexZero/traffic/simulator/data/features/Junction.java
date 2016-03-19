@@ -158,6 +158,7 @@ public class Junction extends Feature {
      * Note: paths doing U-Turns on the same road are *not* added
      */
     public void computeAllPaths() {
+        behaviour.clearAllPaths();
         inflowLinks.values().forEach((in) ->
                 outflowLinks.values().forEach((out) -> {
                     if (in.getRoadID() != out.getRoadID()) {
@@ -217,6 +218,24 @@ public class Junction extends Feature {
             LOG.log_Error("Junction[ ", this.getID(), " ] Either the inflow link ID doesn't exist or the there are no outflow links bound to it.");
             throw new JunctionPathException("Either the inflow link ID doesn't exist or the there are no outflow links bound to it.", e);
         }
+    }
+
+    /**
+     * Gets a list of all inflow links currently on the junction
+     *
+     * @return List of inflow links
+     */
+    public List<JunctionLink> getInflowLinks() {
+        return Collections.unmodifiableList(new ArrayList<>(this.inflowLinks.values()));
+    }
+
+    /**
+     * Gets a list of all outflow links currently on the junction
+     *
+     * @return List of outflow links
+     */
+    public List<JunctionLink> getOutflowLinks() {
+        return Collections.unmodifiableList(new ArrayList<>(this.outflowLinks.values()));
     }
 
     /**

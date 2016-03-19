@@ -3,7 +3,10 @@ package kcl.teamIndexZero.traffic.simulator.data;
 import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.data.features.DirectedLanes;
+import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.features.Lane;
+import kcl.teamIndexZero.traffic.simulator.data.links.JunctionLink;
+import kcl.teamIndexZero.traffic.simulator.exceptions.JunctionPathException;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 
 import java.util.Collection;
@@ -65,11 +68,36 @@ public class GraphTools {
     }
 
     /**
+     * Checks for cases where a traffic generator is needed on a junction
+     * Case 1: Inflow only junctions
+     * Case 2: All roads except one are inflow only. Inflow on 2-way road has no where to go.
+     *
+     * @param junction Junction to check
+     * @return Requirement flag for a TrafficGenerator
+     */
+    public boolean isTrafficGeneratorNeeded(Junction junction) {
+        int outflows = 0;
+        junction.computeAllPaths();
+        for (JunctionLink link : junction.getInflowLinks()) {
+            try {
+                if (!junction.getNextLinks(link.getID()).isEmpty()) {
+                    outflows++;
+                }
+            } catch (JunctionPathException e) {
+                LOG.log_Warning("Inflow link '", link.getID(), "' has no outflow path on junction '", junction.getID(), "'. Junction needs a TrafficGenerator.");
+                return true;
+            }
+        }
+        return outflows == 0;
+    }
+
+    /**
      * Checks if collections is/are empty
      *
      * @param collections Collections to check
      * @return Status: 1+ Collections is empty
      */
+
     public boolean checkEmpty(Collection<?>... collections) {
         boolean empty_flag = false;
         for (Collection<?> c : collections) {

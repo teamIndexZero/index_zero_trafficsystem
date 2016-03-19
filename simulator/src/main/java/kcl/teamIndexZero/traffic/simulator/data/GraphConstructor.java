@@ -120,7 +120,9 @@ public class GraphConstructor {
                     LOG.log_Warning("Trying to add Road '", id, "' to Junction '", junction.getID(), "' failed as it's already connected.");
                 }
             });
-            if (junction.getOutflowCount() == 0) { //we need a TG to provide and receive outflow
+
+            //need to check if there is only inbound links save for one road where the in cannot do 180 onto the out
+            if (tools.isTrafficGeneratorNeeded(junction)) { //we need a TG to provide and receive outflow
                 TrafficGenerator tg = new TrafficGenerator(new ID("TF" + this.trafficGenerators.size()), desc.getGeoPoint());
                 tg.linkJunction(junction, junction.getInflowCount(), 0);
                 junction.addTrafficGenerator(tg);
