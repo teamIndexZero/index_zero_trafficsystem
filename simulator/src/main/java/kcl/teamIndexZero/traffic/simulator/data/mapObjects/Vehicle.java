@@ -64,7 +64,6 @@ public class Vehicle extends MapObject {
      */
     @Override
     public void tick(SimulationTick tick) {
-//        if (isInMapScope()) {
         Link link = lane.getNextLink();
         if (link == null) {
             LOG.log_Error("Car terminating its run. Seems to be dead end (map end).");
@@ -77,7 +76,6 @@ public class Vehicle extends MapObject {
         } else {
             driveOnGenericLink(tick, link);
         }
-
     }
 
     private void driveIntoTrafficGenerator(SimulationTick tick, Link link) {
@@ -140,7 +138,6 @@ public class Vehicle extends MapObject {
                     .filter(feature -> !feature.getID().equals(lane.getRoadID())).collect(Collectors.toList());
             if (availableFeatures.isEmpty()) {
                 LOG.log_Error("Got to a dead end (as I think). Probably two outgoing roads ending in same point with no further way out.");
-                //map.getAllCatcherTrafficGenerator().terminateTravel(this);
                 return;
             }
             double bearingNowNormalized = junction.getBearingForFeature(lane.getRoad()) % Math.toRadians(180);
@@ -182,7 +179,6 @@ public class Vehicle extends MapObject {
                     .orElseGet(() -> availableFeatures.stream().filter(possibleFeaturesByLink::contains).findAny().orElse(null));
             if (featureToGoTo == null) {
                 LOG.log_Error("Got to a dead end (as I think). Probably two outgoing roads ending in same point with no further way out.");
-                //map.getAllCatcherTrafficGenerator().terminateTravel(this);
                 return;
             }
             if (featureToGoTo instanceof TrafficGenerator) {

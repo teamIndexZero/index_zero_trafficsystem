@@ -4,8 +4,6 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
-import kcl.teamIndexZero.traffic.simulator.data.features.TrafficGenerator;
-import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
@@ -38,7 +36,6 @@ public class SimulationMap implements ISimulationAware {
     private Map<ID, Feature> mapFeatures = new HashMap<>();
     private Map<ID, Link> mapLinks;
     private Map<ID, MapObject> objectsOnSurface = new HashMap<>();
-    private TrafficGenerator allCatcherTrafficGenerator = new TrafficGenerator(new ID("ALL_CATCHER"), new GeoPoint(0, 0));
 
     /**
      * Constructor.
@@ -53,17 +50,7 @@ public class SimulationMap implements ISimulationAware {
         graph_constructor.getFeatures().forEach((id, feature) -> {
             addFeature(feature);
         });
-        addFeature(allCatcherTrafficGenerator);
         this.mapLinks = graph_constructor.getLinks();
-    }
-
-
-    //TODO fix map integrity, remove me. What happens, is when we have a situation with two roads both incoming into
-    // the same point (junction of two). One road is one-way, second one has both ways. if the car goes by the outgoing
-    // lane of the two-way road, it has nowhere to go! It can not do 180% turn, and it can not go anywhere else.
-    // to resolve this situation, we are using an all-catcher.
-    public TrafficGenerator getAllCatcherTrafficGenerator() {
-        return allCatcherTrafficGenerator;
     }
 
     /**
