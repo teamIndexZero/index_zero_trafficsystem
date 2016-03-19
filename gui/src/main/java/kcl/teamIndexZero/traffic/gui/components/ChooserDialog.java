@@ -9,14 +9,12 @@ import kcl.teamIndexZero.traffic.simulator.osm.OsmParser;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 
 /**
  * A map chooser dialog. Here, user can decide which one of the provided files to use as a map base for simulation.
@@ -25,15 +23,27 @@ import java.util.stream.Collectors;
  */
 public class ChooserDialog extends JFrame {
 
-    private static final Map<String, String> filesAvailable =
+    private static final Map<String, String> MICRO_MODEL_FILES =
             Arrays.stream(new String[][]{
-                    {"Strand area", "/sampleData/strand.osm.xml"},
-                    {"Elephant and Castle strange roundabout", "/sampleData/elephant_and_castle.osm.xml"},
-                    {"Buckingham Palace area", "/sampleData/buckingham_area.osm.xml"},
-                    {"Paris, Arc de Triomphe", "/sampleData/paris_arc_de_triomphe_ways.osm.xml"},
-                    {"Simple one-way square", "/sampleData/rectangle.osm.xml"},
-                    {"Straight road with 6 lanes", "/sampleData/3_by_3_lanesRoad.osm.xml"},
+                    {"Strand area", "/sampleData/micro/strand.osm.xml"},
+                    {"Elephant and Castle strange roundabout", "/sampleData/micro/elephant_and_castle.osm.xml"},
+                    {"Buckingham Palace area", "/sampleData/micro/buckingham_area.osm.xml"},
+                    {"Paris, Arc de Triomphe", "/sampleData/micro/paris_arc_de_triomphe_ways.osm.xml"},
+                    {"Manhattan/Battery Park", "/sampleData/micro/Manhattan_Battery_Park_Junction.osm.xml"}
             }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
+
+    private static final Map<String, String> SYNTHETIC_MODEL_FILES =
+            Arrays.stream(new String[][]{
+                    {"Simple one-way square", "/sampleData/synthetic/rectangle.osm.xml"},
+                    {"Straight road with 6 lanes", "/sampleData/synthetic/3_by_3_lanesRoad.osm.xml"},
+            }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
+
+    private static final Map<String, String> MACRO_MODEL_FILES =
+            Arrays.stream(new String[][]{
+                    {"Whole Greater London", "/sampleData/macro/greater-london-car-ways.osm.gz"},
+                    {"Whole Manhattan", "/sampleData/macro/Manhattan_Roads.osm.gz"}
+            }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
+
     protected static Logger_Interface LOG = Logger.getLoggerInstance(ChooserDialog.class.getSimpleName());
     private Consumer<OsmParseResult> resultConsumer;
 
@@ -74,20 +84,47 @@ public class ChooserDialog extends JFrame {
         });
         add(openFreeButton);
         add(new JSeparator());
+        add(new JLabel("Choose one of Micro-model samples:"));
 
-        add(new JLabel("Alternatively, choose one of the available presets for simulation area:"));
-
-        filesAvailable.forEach((caption, file) -> {
+        MICRO_MODEL_FILES.forEach((caption, file) -> {
             JButton button = new JButton(caption);
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    openOsmFile(caption, ChooserDialog.class.getResourceAsStream(file));
+                    openFile(file, caption);
                 }
             });
             add(button);
         });
 
+        add(new JSeparator());
+        JLabel slowWarningLabel = new JLabel("<html>Choose one of Macro-model samples:<font color='red'>(WARNING! MAY BE SLOW!)</font></html>");
+        add(slowWarningLabel);
+
+        MACRO_MODEL_FILES.forEach((caption, file) -> {
+            JButton button = new JButton(caption);
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    openFile(file, caption);
+                }
+            });
+            add(button);
+        });
+
+        add(new JSeparator());
+        add(new JLabel("(WARNING! MAY BE SLOW!) Choose one of Macro-model samples:"));
+
+        SYNTHETIC_MODEL_FILES.forEach((caption, file) -> {
+            JButton button = new JButton(caption);
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    openFile(file, caption);
+                }
+            });
+            add(button);
+        });
 
         pack();
         setLocationRelativeTo(null); //center window
@@ -100,6 +137,20 @@ public class ChooserDialog extends JFrame {
      */
     public static void showForOSMLoadResult(Consumer<OsmParseResult> resultConsumer) {
         new ChooserDialog(resultConsumer).setVisible(true);
+    }
+
+    public void openFile(String file, String caption) {
+        try {
+            InputStream stream;
+            if (file.endsWith(".gz")) {
+                stream = new GZIPInputStream(ChooserDialog.class.getResourceAsStream(file));
+            } else {
+                stream = ChooserDialog.class.getResourceAsStream(file);
+            }
+            openOsmFile(caption, stream);
+        } catch (IOException e1) {
+            throw new IllegalStateException(e1);
+        }
     }
 
     public void openOsmFile(String name, InputStream fileToOpen) {
