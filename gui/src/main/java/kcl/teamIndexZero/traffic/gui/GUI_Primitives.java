@@ -29,9 +29,35 @@ public class GUI_Primitives {
         drawLine(x, y, x1, y1, g);
         drawLine(x2, y2, x3, y3, g);
     }
-
+    public void drawTruck(int x3, int y3, double angleToXAxis, Graphics g)
+    {
+        //files taken from http://hdimagelib.com/trailer+truck+top+view
+        g.setColor(Color.black);
+        AffineTransform c;
+        Graphics2D h = (Graphics2D) g;
+        c = h.getTransform();
+        AffineTransform at = new AffineTransform();
+        at.rotate(angleToXAxis,x3,y3);
+        h.setTransform(at);
+        Image img = null;
+        InputStream i = null;
+        try {
+            i = new BufferedInputStream(new FileInputStream("gui/src/main/resources/sprites/8460_st0640_117.jpg"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            assert i != null;
+            img = ImageIO.read(i);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        h.drawImage(img,x3-18,y3-18,40,40,null);
+        h.setTransform(c);
+    }
     public void drawSmallCar(int x3, int y3, double angleToXAxis, Graphics g)
     {
+        // file taken from http://all-free-download.com/free-vector/car-vector-top-view-download.html
         g.setColor(Color.black);
         AffineTransform c;
         Graphics2D h = (Graphics2D) g;
