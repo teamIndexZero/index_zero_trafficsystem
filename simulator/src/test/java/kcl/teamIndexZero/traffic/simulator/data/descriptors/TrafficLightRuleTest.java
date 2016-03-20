@@ -1,5 +1,6 @@
 package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 
+import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLight;
 import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightController;
 import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightState;
@@ -18,32 +19,37 @@ import static org.junit.Assert.*;
 public class TrafficLightRuleTest {
 
     private TrafficLightRule model;
-    public List<TrafficLight> trafficLightSinglesList;
-    boolean flag = false;
+    private TrafficLight trafficLight;
+    private TrafficLightController controller;
+    private boolean flag = false;
+
 
     @Before
     public void setUp() throws Exception {
         model = new TrafficLightRule();
-        trafficLightSinglesList = new ArrayList<TrafficLight>();
+        controller= new TrafficLightController();
+        trafficLight = new TrafficLight(new ID("TrafficLightTest"));
     }
-
 
     @After
     public void tearDown() throws Exception {
         model = null;
+        controller = null;
+        trafficLight = null;
     }
 
     @Test
     public void testChangeStateofSingleTrafficLights() throws Exception {
 
-        model.changeStateofSingleTrafficLights(trafficLightSinglesList);
+        controller.addTrafficlight(trafficLight);
+        model.changeStateofSingleTrafficLights(controller.TrafficLightSinglesList);
 
-        for(TrafficLight tf : trafficLightSinglesList ) {
-            if(tf.currentState == TrafficLightState.GREEN){
+        for(TrafficLight tf : controller.TrafficLightSinglesList ) {
+            if(tf.currentState == TrafficLightState.RED){
                 flag = true;
             };
         }
-        assertEquals(flag, false);
+        assertEquals(flag, true);
 
     }
 }

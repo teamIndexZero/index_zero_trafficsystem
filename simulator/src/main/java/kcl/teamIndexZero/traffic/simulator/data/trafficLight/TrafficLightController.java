@@ -13,6 +13,7 @@ import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLight;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -34,6 +35,13 @@ public class TrafficLightController implements ISimulationAware {
         SimulationTick simulationTick;
         private static Logger_Interface LOG = Logger.getLoggerInstance(TrafficLightController.class.getSimpleName());
 
+        /**
+         * Constructor
+         */
+        public TrafficLightController(){
+            TrafficLightSinglesList = new ArrayList<TrafficLight>();
+            TrafficLightSetList = new ArrayList<TrafficLightInSet>();
+        }
 
         public long formatTimeToLong(LocalDateTime date) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
@@ -48,14 +56,14 @@ public class TrafficLightController implements ISimulationAware {
          */
         public void addTrafficlight(TrafficLight trafficLight){
 
-            if (trafficLight != null) {
+            if (!(trafficLight == null)) {
                 TrafficLightSinglesList.add(trafficLight);
                 LOG.log("Added the following traffic lights to the set of all single Traffic Lights: ", trafficLight.getTrafficLightID() );
             }
-
             else {
                 LOG.log_Error("Error while adding to TrafficLightLnSet to the set");
             }
+
         }
 
         /**
