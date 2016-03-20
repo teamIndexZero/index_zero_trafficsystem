@@ -52,6 +52,7 @@ public class SimulatorGui {
             map.widthMeters = result.boundingBox.end.xMeters;
             map.heightMeters = result.boundingBox.end.yMeters;
 
+            // that's where we reset model into default state - before the simulation is started.
             model = new GuiModel(map);
 
             SimulationImageProducer imageProducer = new SimulationImageProducer(map, model);
@@ -66,9 +67,6 @@ public class SimulatorGui {
                                 model)
                 );
             });
-
-            // that's where we reset model into default state - before the simulation is started.
-            model.reset();
 
             SimulationWindow window = new SimulationWindow(model, controller);
             imageProducer.setImageConsumer(window.getMapPanel());

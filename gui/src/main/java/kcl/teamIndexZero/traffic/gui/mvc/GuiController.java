@@ -61,7 +61,6 @@ public class GuiController {
         if (simulator != null) {
             simulator.stop();
         }
-        model.reset();
         SimulatorGui.startOver();
         SimulationWindow.close();
     }

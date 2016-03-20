@@ -185,19 +185,26 @@ public class Junction extends Feature {
      *
      * @return incoming or outgoing.
      */
-    public double getBearingForFeature(Feature f) {
-        JunctionDescription.RoadDirection direction = connectedFeatures.get(f);
-        if (!(f instanceof Road)) {
-            return 0;
+    public double getBearingForLane(Lane lane) {
+        JunctionDescription.RoadDirection direction = connectedFeatures.get(lane.getRoad());
+
+        GeoSegment segment;
+        switch (direction) {
+            case INCOMING:
+                segment = lane.getPolyline().getLastSegment();
+                break;
+            case OUTGOING:
+                segment = lane.getPolyline().getFirstSegment();
+                break;
+            default:
+                throw new IllegalStateException("Don't know what to do");
         }
-        Road r = (Road) f;
-        if (direction == JunctionDescription.RoadDirection.INCOMING) {
-            // reverse the last segment since we are incoming.
-            GeoSegment lastSegment = r.getPolyline().getLastSegment();
-            return new GeoSegment(lastSegment.end, lastSegment.start).getAngleToEastRadians();
+        if (lane.getRoad().getForwardSide().getLanes().contains(lane)) {
+            return segment.getAngleToEastRadians();
         } else {
-            return r.getPolyline().getFirstSegment().getAngleToEastRadians();
+            return new GeoSegment(segment.end, segment.start).getAngleToEastRadians();
         }
+
     }
 
     /**

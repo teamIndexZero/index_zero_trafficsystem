@@ -216,7 +216,8 @@ public class SimulationImageProducer {
                 primitives.drawText(graphics,
                         junction.getGeoPoint(),
                         String.format(
-                                "%dF, %dP" + (junction.isDeadEnd() ? " DEAD END" : ""),
+                                "%s %dF, %dP" + (junction.isDeadEnd() ? " DEAD END" : ""),
+                                junction.getID(),
                                 junction.getConnectedFeatures().size(),
                                 junction.getUsage()),
                         color);

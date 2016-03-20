@@ -4,15 +4,18 @@ import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import kcl.teamIndexZero.traffic.simulator.exceptions.AlreadyExistsException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -87,5 +90,31 @@ public class JunctionTest {
         assertTrue(j.hasTrafficLights());
         Junction j2 = new Junction(new ID("JunctionTest"), false, new GeoPoint(0, 0));
         assertFalse(j2.hasTrafficLights());
+    }
+
+    @Test
+    public void testBearingForLanes() throws AlreadyExistsException {
+        GeoPolyline poly = new GeoPolyline(Arrays.asList(
+                new GeoSegment(
+                        new GeoPoint(0, 0),
+                        new GeoPoint(1000, 0)
+                ),
+                new GeoSegment(
+                        new GeoPoint(1000, 0),
+                        new GeoPoint(1000, 1000)
+                )));
+        Road road = new Road(new ID("r1"), 1, 1, 10, poly, "Road1");
+        Junction j1 = new Junction(new ID("j1"), false, new GeoPoint(0, 0));
+        j1.addRoad(road, JunctionDescription.RoadDirection.OUTGOING);
+
+        assertThat(j1.getBearingForLane(road.getForwardSide().getLanes().get(0))).isEqualTo(0);
+        assertThat(j1.getBearingForLane(road.getBackwardSide().getLanes().get(0))).isEqualTo(Math.toRadians(180));
+
+        road = new Road(new ID("r1"), 1, 1, 10, poly, "Road1");
+        Junction j2 = new Junction(new ID("j1"), false, new GeoPoint(0, 0));
+        j2.addRoad(road, JunctionDescription.RoadDirection.INCOMING);
+        assertThat(j2.getBearingForLane(road.getForwardSide().getLanes().get(0))).isEqualTo(Math.toRadians(90));
+        assertThat(j2.getBearingForLane(road.getBackwardSide().getLanes().get(0))).isEqualTo(Math.toRadians(270));
+
     }
 }

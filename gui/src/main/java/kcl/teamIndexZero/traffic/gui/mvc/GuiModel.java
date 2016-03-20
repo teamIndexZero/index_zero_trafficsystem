@@ -22,8 +22,8 @@ public class GuiModel implements ISimulationAware {
     public static final int DELAY_MINIMAL = 10;
     public static final int DELAY_MAXIMAL = 400;
     private static final int DELAY_INITIAL = 100;
-    private final ViewportModel viewport;
     private final SimulationMap map;
+    private ViewportModel viewport;
     private int delayBetweenTicks = DELAY_INITIAL;
     private boolean debugRoads;
     private MapObject selectedMapObject;
@@ -43,8 +43,11 @@ public class GuiModel implements ISimulationAware {
     public GuiModel(SimulationMap map) {
         this.map = map;
         this.viewport = new ViewportModel(this);
-        reset();
-
+        tick = null;
+        status = SimulationStatus.OFF;
+        params = null;
+        this.viewport = new ViewportModel(this);
+        fireChangeEvent();
     }
 
     /**
@@ -64,16 +67,6 @@ public class GuiModel implements ISimulationAware {
     public void tick(SimulationTick tick) {
         this.tick = tick;
         SwingUtilities.invokeLater(this::fireChangeEvent);
-    }
-
-    /**
-     * Reset method gets model to the default state (same as it was right after running constructor.
-     */
-    public void reset() {
-        tick = null;
-        status = SimulationStatus.OFF;
-        params = null;
-        fireChangeEvent();
     }
 
     /**
