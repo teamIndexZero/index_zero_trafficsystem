@@ -31,6 +31,9 @@ import java.util.stream.Collectors;
  */
 public class Vehicle extends MapObject {
 
+    public static final Color ACCELERATING_COLOR = new Color(0, 200, 0);
+    public static final Color DECELERATING_COLOR = new Color(250, 0, 0);
+    public static final Color CONSTANT_SPEED_COLOR = Color.BLACK;
     private double speedMetersPerSecond;
     private double accelerationMetersPerSecondSecond;
     private boolean isOnReverseLane = false;
@@ -57,11 +60,11 @@ public class Vehicle extends MapObject {
     @Override
     public Color getColor() {
         if (accelerationMetersPerSecondSecond > 0) {
-            return Color.GREEN;
+            return ACCELERATING_COLOR;
         } else if (accelerationMetersPerSecondSecond < 0) {
-            return Color.RED;
+            return DECELERATING_COLOR;
         } else {
-            return Color.BLACK;
+            return CONSTANT_SPEED_COLOR;
         }
     }
 
@@ -141,7 +144,7 @@ public class Vehicle extends MapObject {
         // 2. decide on lane of this feature. If the feature seems to be a continuation of an original road,
         //    stick to the same lane, otherwise stick to the outermost one.
         // 3. do a switch.
-        boolean turning = Math.random() > 0.65;
+
 
         List<Feature> availableFeatures = junction.getConnectedFeatures()
                 .stream()
@@ -150,24 +153,23 @@ public class Vehicle extends MapObject {
             LOG.log_Error("Got to a dead end (as I think). Probably two outgoing roads ending in same point with no further way out.");
             return;
         }
-        double bearingNowNormalized = junction.getBearingForLane(lane);
+        double currentBearing = junction.getBearingForLane(lane);
 
         // get all possible links
         List<Link> nextLinks = junctionLink.getLinks();
 
-        // if not, start thinking about lanes.
         Map<Lane, Double> allOutgoingLanes = nextLinks
                 .stream()
                 .filter(link -> link.getNextFeature() instanceof Lane)
                 .map(link -> (Lane) link.getNextFeature())
                 .collect(Collectors.toMap(Function.identity(),
                         lane -> {
-                            double bearingAnother = junction.getBearingForLane(lane);
-                            return Math.abs(bearingAnother - bearingNowNormalized);
+                            double otherLaneBearing = junction.getBearingForLane(lane);
+                            return Math.abs(otherLaneBearing - currentBearing);
                         }));
 
         if (allOutgoingLanes.size() == 0) {
-            // if found trafficGenerator, terminate run.
+            // if nowhere to go, and also found Traffic Generator, terminate run.
             Optional<TrafficGenerator> maybeTG = nextLinks
                     .stream()
                     .map(Link::getNextFeature)
@@ -202,16 +204,23 @@ public class Vehicle extends MapObject {
                         .map(Map.Entry::getKey)
                         .collect(Collectors.toList());
         Lane nextLane;
+
+        boolean turning = Math.random() > 0.65;
         Collections.shuffle(lanesAllowedForTurn);
         Collections.shuffle(lanesAllowedForForward);
         if (!turning) {
+            // if we want to go forward, try to find a lane in 'go forward' list
             nextLane = lanesAllowedForForward
                     .stream()
                     .findAny()
                     .orElseGet(
+                            // if unable to go forward, try at least turn normally
                             () -> lanesAllowedForTurn.stream().findAny().orElseGet(
+                                    // just go anywhere possible
                                     () -> allOutgoingLanes.keySet().stream().findAny().get())
                     );
+            // same applies for 'want turn' branch - we first try to find one in turns zone, if impossible - go forward,
+            //
         } else {
             nextLane = lanesAllowedForTurn
                     .stream()

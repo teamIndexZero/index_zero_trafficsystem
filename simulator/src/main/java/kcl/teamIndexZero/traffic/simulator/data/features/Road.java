@@ -144,4 +144,13 @@ public class Road extends Feature {
     public GeoPolyline getPolyline() {
         return polyline;
     }
+
+    @Override
+    public String toHTMLString() {
+        return String.format(
+                "<html>" +
+                        "<font color='green'>-</font> " +
+                        "Road %s" +
+                        "</html>", getName());
+    }
 }

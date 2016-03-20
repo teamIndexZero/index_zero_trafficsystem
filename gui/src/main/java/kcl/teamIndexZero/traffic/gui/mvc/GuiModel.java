@@ -4,6 +4,7 @@ import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 
 import javax.swing.*;
@@ -33,6 +34,7 @@ public class GuiModel implements ISimulationAware {
     private List<ChangeListener> listeners = new ArrayList<>();
     private boolean showJunctions;
     private boolean showTrafficGenerators;
+    private Feature selectedFeature;
 
 
     /**
@@ -218,6 +220,15 @@ public class GuiModel implements ISimulationAware {
 
     public void setShowTrafficGenerators(boolean showTrafficGenerators) {
         this.showTrafficGenerators = showTrafficGenerators;
+        fireChangeEvent();
+    }
+
+    public Feature getSelectedFeature() {
+        return selectedFeature;
+    }
+
+    public void setSelectedFeature(Feature selectedFeature) {
+        this.selectedFeature = selectedFeature;
         fireChangeEvent();
     }
 

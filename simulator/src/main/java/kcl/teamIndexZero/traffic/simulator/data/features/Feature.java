@@ -26,6 +26,11 @@ public abstract class Feature implements ISimulationAware {
         this.id = id;
     }
 
+    /**
+     * Used to debug things.
+     */
+    public abstract String toHTMLString();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

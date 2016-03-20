@@ -5,6 +5,7 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.features.Road;
 import kcl.teamIndexZero.traffic.simulator.data.features.TrafficGenerator;
@@ -183,6 +184,7 @@ public class SimulationImageProducer {
     public void drawAllDynamicObjects() {
         drawAllJunctions(graphics);
         drawAllTrafficGenerators(graphics);
+        drawFeatureSelection(graphics);
 
         map.getObjectsOnSurface().forEach(mapObject -> {
             GeoPoint point = mapObject.getPositionOnMap();
@@ -197,6 +199,40 @@ public class SimulationImageProducer {
                 primitives.drawText(graphics, point, mapObject.getNameAndRoad(), mapObject.getColor());
             }
         });
+    }
+
+    private void drawFeatureSelection(Graphics2D graphics) {
+        if (model.getSelectedFeature() == null) {
+            return;
+        }
+        Feature f = model.getSelectedFeature();
+        if (f instanceof Junction) {
+            Junction j = (Junction) f;
+            primitives.drawCircle(graphics, j.getGeoPoint(), 30, Color.RED);
+            return;
+        }
+
+        if (f instanceof TrafficGenerator) {
+            TrafficGenerator j = (TrafficGenerator) f;
+            primitives.drawCircle(graphics, j.getGeoPoint(), 30, Color.BLUE);
+            return;
+        }
+
+        if (f instanceof Road) {
+            Road r = (Road) f;
+            double minx = Double.MAX_VALUE, miny = Double.MAX_VALUE, maxx = Double.MIN_VALUE, maxy = Double.MIN_VALUE;
+            for (GeoSegment segment : r.getPolyline().getSegments()) {
+                minx = Math.min(segment.start.xMeters, Math.min(minx, segment.end.xMeters));
+                miny = Math.min(segment.start.yMeters, Math.min(miny, segment.end.yMeters));
+                maxx = Math.max(segment.start.xMeters, Math.max(maxx, segment.end.xMeters));
+                maxy = Math.max(segment.start.yMeters, Math.max(maxy, segment.end.yMeters));
+            }
+            GeoPoint center = new GeoPoint(
+                    minx + (maxx - minx) / 2,
+                    miny + (maxy - miny) / 2);
+            double radiusMeters = Math.max(maxx - minx, maxy - miny) / 2;
+            primitives.drawCircle(graphics, center, 15 + (int) (model.getViewport().getPixelsInMeter() * radiusMeters), Color.GREEN);
+        }
     }
 
     /**
@@ -216,8 +252,7 @@ public class SimulationImageProducer {
                 primitives.drawText(graphics,
                         junction.getGeoPoint(),
                         String.format(
-                                "%s %dF, %dP" + (junction.isDeadEnd() ? " DEAD END" : ""),
-                                junction.getID(),
+                                "%dF, %dP" + (junction.isDeadEnd() ? " DEAD END" : ""),
                                 junction.getConnectedFeatures().size(),
                                 junction.getUsage()),
                         color);

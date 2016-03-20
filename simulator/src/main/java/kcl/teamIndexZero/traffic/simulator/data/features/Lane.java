@@ -107,6 +107,11 @@ public class Lane extends Feature {
         return this.roadSpecs.length;
     }
 
+    @Override
+    public String toHTMLString() {
+        return toString();
+    }
+
     /**
      * Gets the Lane's ID
      *

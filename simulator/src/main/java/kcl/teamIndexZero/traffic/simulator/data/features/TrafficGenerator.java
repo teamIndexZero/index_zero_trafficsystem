@@ -31,7 +31,6 @@ public class TrafficGenerator extends Feature {
     private java.util.List<Link> incoming = new ArrayList<>();
     private java.util.List<Link> outgoing = new ArrayList<>();
     private List<Vehicle> vehiclesToDelete = new ArrayList<>();
-
     /**
      * Constructor
      *
@@ -40,6 +39,14 @@ public class TrafficGenerator extends Feature {
     public TrafficGenerator(ID id, GeoPoint geoPoint) {
         super(id);
         this.geoPoint = geoPoint;
+    }
+
+    public int getReceiptCounter() {
+        return receiptCounter;
+    }
+
+    public int getThisGeneratorCreationCounter() {
+        return thisGeneratorCreationCounter;
     }
 
     /**
@@ -175,6 +182,15 @@ public class TrafficGenerator extends Feature {
             }
         }
         throw new DeadEndFeatureException("Could not get a lane out of the TrafficGenerator directly.");
+    }
+
+    @Override
+    public String toHTMLString() {
+        return String.format(
+                "<html>" +
+                        "<font color='blue'/><b>+</b></font>" +
+                        " TrafficGenerator %s" +
+                        "</html>", this.getID());
     }
 
     /**

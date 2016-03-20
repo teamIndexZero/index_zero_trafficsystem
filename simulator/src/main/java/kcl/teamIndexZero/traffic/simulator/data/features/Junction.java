@@ -320,4 +320,13 @@ public class Junction extends Feature {
     public boolean isDeadEnd() {
         return outflowLinks.size() == 0;
     }
+
+    @Override
+    public String toHTMLString() {
+        return String.format(
+                "<html>" +
+                        "<font color='red'>%s</font> " +
+                        "Junction %s" +
+                        "</html>", getConnectedFeatures().size() <= 2 ? "=" : "x", getID());
+    }
 }
