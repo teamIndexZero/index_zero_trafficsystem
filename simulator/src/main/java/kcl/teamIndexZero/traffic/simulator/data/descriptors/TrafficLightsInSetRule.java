@@ -14,19 +14,11 @@ public class TrafficLightsInSetRule {
     /**
      * Changes colours at trafficLights in one set
      *
-     * @param trafficLightList List of the traffic light in one set
+     * @param trafficLightList List of the traffic lights in one set
      */
     public static void changeStateofSet(List<TrafficLightInSet> trafficLightList){
-
-        int i = 0;
-
         for(TrafficLightInSet tf : trafficLightList ) {
-            if (i % 2 == 0){
                 tf.currentState = (tf.currentState == TrafficLightState.RED) ? TrafficLightState.GREEN : TrafficLightState.RED;
-                i++;
-            }
-            else
-                i++;
         }
     }
 }

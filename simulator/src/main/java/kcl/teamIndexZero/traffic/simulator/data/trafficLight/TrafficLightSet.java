@@ -21,7 +21,6 @@ public class TrafficLightSet implements ISimulationAware {
     public List<TrafficLightInSet> TrafficLightSetList;
     public List<TrafficLightInSet> InteriorListA;
     public List<TrafficLightInSet> InteriorListB;
-
     private static Logger_Interface LOG = Logger.getLoggerInstance(TrafficLightSet.class.getSimpleName());
 
     /**
@@ -31,6 +30,9 @@ public class TrafficLightSet implements ISimulationAware {
      */
     public TrafficLightSet(ID id) {
         this.id=id;
+        this.TrafficLightSetList =new ArrayList<TrafficLightInSet>();
+        this.InteriorListA =new ArrayList<TrafficLightInSet>();
+        this.InteriorListB =new ArrayList<TrafficLightInSet>();
     }
 
     /**
@@ -43,7 +45,7 @@ public class TrafficLightSet implements ISimulationAware {
         switch (type) {
             case('A'):
 
-                if (trafficLightLnSet != null) {
+                if (!(trafficLightLnSet == null)) {
                     LOG.log("Traffic Lights type is the first type");
                     TrafficLightSetList.add(trafficLightLnSet);
                     InteriorListA.add(trafficLightLnSet);
@@ -61,6 +63,18 @@ public class TrafficLightSet implements ISimulationAware {
                     InteriorListB.add(trafficLightLnSet);
 
                     LOG.log("Added the following traffic lights: ", trafficLightLnSet.getID(), " to the set: ", this.id);
+
+                    /* *********
+                    * changing initial states in the second group from GREEN to RED
+                    ********** */
+                    for(TrafficLightInSet tf : InteriorListB ) {
+                        tf.currentState = TrafficLightState.RED;
+                    }
+
+                    /* *********
+                    * end of changing initial states in the group B
+                    ********** */
+
                 } else {
                     LOG.log_Error("Error while adding to TrafficLightLnSet to the set");
                 }
