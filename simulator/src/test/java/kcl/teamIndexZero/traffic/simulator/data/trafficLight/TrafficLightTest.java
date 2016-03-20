@@ -3,8 +3,8 @@ package kcl.teamIndexZero.traffic.simulator.data.trafficLight;
 import javafx.scene.chart.StackedAreaChart;
 import kcl.teamIndexZero.traffic.simulator.data.ID;
 import kcl.teamIndexZero.traffic.simulator.data.IDTest;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight;
-import kcl.teamIndexZero.traffic.simulator.data.links.TrafficLight.State;
+import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLight;
+import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,12 @@ public class TrafficLightTest {
     }
 
     @Test
-    public void getState()throws Exception {
-        assertTrue(modelTrafficLight.getState() == State.GREEN);
+    public void testgetState()throws Exception {
+        assertTrue(modelTrafficLight.getState() == TrafficLightState.GREEN);
+    }
+
+    @Test
+    public void testgetTrafficLightID()throws Exception {
+        assertEquals(modelTrafficLight.getTrafficLightID(), new ID("TrafficLightTest"));
     }
 }

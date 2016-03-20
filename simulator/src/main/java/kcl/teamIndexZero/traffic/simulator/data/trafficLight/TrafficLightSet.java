@@ -19,6 +19,9 @@ import java.util.*;
 public class TrafficLightSet implements ISimulationAware {
     private ID id;
     public List<TrafficLightInSet> TrafficLightSetList;
+    public List<TrafficLightInSet> InteriorListA;
+    public List<TrafficLightInSet> InteriorListB;
+
     private static Logger_Interface LOG = Logger.getLoggerInstance(TrafficLightSet.class.getSimpleName());
 
     /**
@@ -35,16 +38,45 @@ public class TrafficLightSet implements ISimulationAware {
      *
      * @param trafficLightLnSet object to be added to the list
      */
-    public void addTrafficlight(TrafficLightInSet trafficLightLnSet){
+    public void addTrafficlight(TrafficLightInSet trafficLightLnSet, char type ){ // type: A or B, the type of the InteriorList
 
-       if (trafficLightLnSet != null) {
-           TrafficLightSetList.add(trafficLightLnSet);
-           LOG.log("Added the following traffic lights: ", trafficLightLnSet.getID()," to the set: ", this.id);
-       }
+        switch (type) {
+            case('A'):
 
-       else {
-           LOG.log_Error("Error while adding to TrafficLightLnSet to the set");
-       }
+                if (trafficLightLnSet != null) {
+                    LOG.log("Traffic Lights type is the first type");
+                    TrafficLightSetList.add(trafficLightLnSet);
+                    InteriorListA.add(trafficLightLnSet);
+
+                    LOG.log("Added the following traffic lights: ", trafficLightLnSet.getID(), " to the set: ", this.id);
+                } else {
+                    LOG.log_Error("Error while adding to TrafficLightLnSet to the set");
+                }
+                break;
+
+            case('B'):
+                if (trafficLightLnSet != null) {
+                    LOG.log("Traffic Lights type is the second type");
+                    TrafficLightSetList.add(trafficLightLnSet);
+                    InteriorListB.add(trafficLightLnSet);
+
+                    LOG.log("Added the following traffic lights: ", trafficLightLnSet.getID(), " to the set: ", this.id);
+                } else {
+                    LOG.log_Error("Error while adding to TrafficLightLnSet to the set");
+                }
+                break;
+
+            default:
+                if (trafficLightLnSet != null) {
+                    LOG.log("Traffic Lights type is not specified!!");
+                    TrafficLightSetList.add(trafficLightLnSet);
+                    InteriorListA.add(trafficLightLnSet);
+
+                    LOG.log("Added the following traffic lights: ", trafficLightLnSet.getID(), " to the set: ", this.id);
+                } else {
+                    LOG.log_Error("Error while adding to TrafficLightLnSet to the set");
+                }
+        }
      }
 
     /**
