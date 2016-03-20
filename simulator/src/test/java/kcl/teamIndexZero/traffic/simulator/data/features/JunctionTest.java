@@ -117,4 +117,69 @@ public class JunctionTest {
         assertThat(j2.getBearingForLane(road.getBackwardSide().getLanes().get(0))).isEqualTo(Math.toRadians(270));
 
     }
+
+    @Test
+    public void testGetGeoPoint() throws Exception {
+
+    }
+
+    @Test
+    public void testAddTrafficGenerator() throws Exception {
+
+    }
+
+    @Test
+    public void testGetBearingForLane() throws Exception {
+
+    }
+
+    @Test
+    public void testGetNextLinks() throws Exception {
+
+    }
+
+    @Test
+    public void testGetRandomLink() throws Exception {
+
+    }
+
+    @Test
+    public void testGetInflowLinks() throws Exception {
+
+    }
+
+    @Test
+    public void testGetOutflowLinks() throws Exception {
+
+    }
+
+    @Test
+    public void testGetInflowCount() throws Exception {
+
+    }
+
+    @Test
+    public void testGetOutflowCount() throws Exception {
+
+    }
+
+    @Test
+    public void testIncrementUsage() throws Exception {
+
+    }
+
+    @Test
+    public void testGetUsage() throws Exception {
+
+    }
+
+    @Test
+    public void testToString() throws Exception {
+
+    }
+
+    @Test
+    public void testIsDeadEnd() throws Exception {
+
+    }
 }
