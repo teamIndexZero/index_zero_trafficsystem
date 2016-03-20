@@ -1,9 +1,13 @@
 package kcl.teamIndexZero.traffic.gui;
 
+import com.sun.org.apache.xml.internal.resolver.helpers.PublicId;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.QuadCurve2D;
+import java.io.*;
 
 /**
  * Created by kumar awijeet on 2/24/2016. thanks for Working!!
@@ -36,8 +40,17 @@ public class GUI_Primitives {
         at.rotate(angleToXAxis,x3,y3);
         h.setTransform(at);
         Image img = null;
-        img = new ImageIcon("C:/Users/kumarawijeet/OneDrive/MSc/Group Project/bmw_z_top_view_clip_art_18132.jpg").getImage();
-        // file taken from http://all-free-download.com/free-vector/car-vector-top-view-download.html
+        InputStream i = null;
+        try {
+            i = new BufferedInputStream(new FileInputStream("gui/src/main/resources/sprites/bmw_z_top_view_clip_art_18132.jpg"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            img = ImageIO.read(i);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         h.drawImage(img,x3-18,y3-18,40,40,null);
         h.setTransform(c);
     }
