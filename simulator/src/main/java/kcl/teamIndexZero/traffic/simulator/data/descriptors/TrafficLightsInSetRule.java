@@ -1,5 +1,6 @@
 package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 
+import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLight;
 import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightInSet;
 import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightState;
 
@@ -17,15 +18,15 @@ public class TrafficLightsInSetRule {
      */
     public static void changeStateofSet(List<TrafficLightInSet> trafficLightList){
 
-        final int[] i = {0};
+        int i = 0;
 
-        trafficLightList.forEach(TrafficLight -> {
-            if (i[0] % 2 == 0){
-                TrafficLight.currentState = (TrafficLight.currentState == TrafficLightState.RED) ? TrafficLightState.GREEN : TrafficLightState.RED;
-                i[0]++;
+        for(TrafficLightInSet tf : trafficLightList ) {
+            if (i % 2 == 0){
+                tf.currentState = (tf.currentState == TrafficLightState.RED) ? TrafficLightState.GREEN : TrafficLightState.RED;
+                i++;
             }
-           else
-                i[0]++;
-        });
+            else
+                i++;
+        }
     }
 }
