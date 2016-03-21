@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class GeoPolyline {
 
-    // list of segments? or map of points/lenght?
+    // list of segments? or map of points/length?
     private List<GeoSegment> segments = new ArrayList<>();
 
     private GeoPoint lastPoint = null;
