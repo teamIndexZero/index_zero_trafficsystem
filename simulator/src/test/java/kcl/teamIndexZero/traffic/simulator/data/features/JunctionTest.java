@@ -11,6 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -120,66 +121,95 @@ public class JunctionTest {
 
     @Test
     public void testGetGeoPoint() throws Exception {
-
+        assertEquals(new GeoPoint(0, 0), j.getGeoPoint());
     }
 
     @Test
     public void testAddTrafficGenerator() throws Exception {
-
+        j.addRoad(r1, JunctionDescription.RoadDirection.INCOMING);
+        j.addRoad(r2, JunctionDescription.RoadDirection.INCOMING);
+        assertEquals(2, j.getInflowCount());
+        assertEquals(3, j.getOutflowCount());
+        TrafficGenerator tg = new TrafficGenerator(new ID("TrafficGenerator"), mock(GeoPoint.class));
+        tg.linkJunction(j, 5, 10);
+        j.addTrafficGenerator(tg);
+        j.computeAllPaths();
+        assertEquals(12, j.getInflowCount());
+        assertEquals(8, j.getOutflowCount());
     }
 
     @Test
     public void testGetBearingForLane() throws Exception {
-
+        //TODO
     }
 
     @Test
     public void testGetNextLinks() throws Exception {
-
+        j.addRoad(r1, JunctionDescription.RoadDirection.INCOMING); //1,1
+        j.addRoad(r2, JunctionDescription.RoadDirection.INCOMING); //1,2
+        j.computeAllPaths();
+        ID inID = r1.getForwardSide().getLanes().get(0).getNextLink().getID();
+        assertEquals(2, j.getNextLinks(inID).size());
+        assertEquals(j.getNextLinks(inID).get(0).getID(),
+                r2.getBackwardSide().getLanes().get(0).getPreviousLink().getID());
+        assertEquals(j.getNextLinks(inID).get(1).getID(),
+                r2.getBackwardSide().getLanes().get(1).getPreviousLink().getID());
     }
 
     @Test
     public void testGetRandomLink() throws Exception {
-
+        j.addRoad(r1, JunctionDescription.RoadDirection.INCOMING); //1,1
+        j.addRoad(r2, JunctionDescription.RoadDirection.INCOMING); //1,2
+        j.computeAllPaths();
+        ID inID = r1.getForwardSide().getLanes().get(0).getNextLink().getID();
+        List<ID> outLinks = new ArrayList<>();
+        outLinks.add(r2.getBackwardSide().getLanes().get(0).getPreviousLink().getID());
+        outLinks.add(r2.getBackwardSide().getLanes().get(1).getPreviousLink().getID());
+        assertTrue(outLinks.contains(j.getRandomLink(inID).getID()));
     }
 
     @Test
     public void testGetInflowLinks() throws Exception {
-
+        j.addRoad(r2, JunctionDescription.RoadDirection.INCOMING);
+        assertEquals(r2.getID(), j.getInflowLinks().get(0).getRoadID());
+        assertEquals(1, j.getInflowLinks().size());
     }
 
     @Test
     public void testGetOutflowLinks() throws Exception {
-
+        j.addRoad(r2, JunctionDescription.RoadDirection.INCOMING);
+        assertEquals(r2.getID(), j.getInflowLinks().get(0).getRoadID());
+        assertEquals(2, j.getOutflowLinks().size());
     }
 
     @Test
     public void testGetInflowCount() throws Exception {
-
+        j.addRoad(r2, JunctionDescription.RoadDirection.INCOMING);
+        assertEquals(1, j.getInflowCount());
     }
 
     @Test
     public void testGetOutflowCount() throws Exception {
-
+        j.addRoad(r2, JunctionDescription.RoadDirection.INCOMING);
+        assertEquals(2, j.getOutflowCount());
     }
 
     @Test
-    public void testIncrementUsage() throws Exception {
-
-    }
-
-    @Test
-    public void testGetUsage() throws Exception {
-
-    }
-
-    @Test
-    public void testToString() throws Exception {
-
+    public void testIncrementUsage_and_getUsage() throws Exception {
+        assertEquals(0, j.getUsage());
+        for (int i = 0; i < 10; i++) {
+            j.incrementUsage();
+            assertEquals(i + 1, j.getUsage());
+        }
     }
 
     @Test
     public void testIsDeadEnd() throws Exception {
-
+        j.addRoad(r3, JunctionDescription.RoadDirection.INCOMING);
+        j.computeAllPaths();
+        assertTrue(j.isDeadEnd());
+        j.addRoad(r2, JunctionDescription.RoadDirection.INCOMING);
+        j.computeAllPaths();
+        assertFalse(j.isDeadEnd());
     }
 }

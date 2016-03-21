@@ -196,7 +196,6 @@ public class Junction extends Feature {
      */
     public double getBearingForLane(Lane lane) {
         JunctionDescription.RoadDirection direction = connectedFeatures.get(lane.getRoad());
-
         GeoSegment segment;
         switch (direction) {
             case INCOMING:
