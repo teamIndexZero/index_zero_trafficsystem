@@ -29,33 +29,7 @@ public class GUI_Primitives {
         drawLine(x, y, x1, y1, g);
         drawLine(x2, y2, x3, y3, g);
     }
-    public void drawTruck(int x3, int y3, double angleToXAxis, Graphics g)
-    {
-        //files taken from http://hdimagelib.com/trailer+truck+top+view
-        g.setColor(Color.black);
-        AffineTransform c;
-        Graphics2D h = (Graphics2D) g;
-        c = h.getTransform();
-        AffineTransform at = new AffineTransform();
-        at.rotate(angleToXAxis,x3,y3);
-        h.setTransform(at);
-        Image img = null;
-        InputStream i = null;
-        try {
-            i = new BufferedInputStream(new FileInputStream("gui/src/main/resources/sprites/8460_st0640_117.jpg"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            assert i != null;
-            img = ImageIO.read(i);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        h.drawImage(img,x3-18,y3-18,40,40,null);
-        h.setTransform(c);
-    }
-    public void drawSmallCar(int x3, int y3, double angleToXAxis, Graphics g)
+    public void drawCar(int x3, int y3, double angleToXAxis, int choice, Graphics g)
     {
         // file taken from http://all-free-download.com/free-vector/car-vector-top-view-download.html
         g.setColor(Color.black);
@@ -67,72 +41,39 @@ public class GUI_Primitives {
         h.setTransform(at);
         Image img = null;
         InputStream i = null;
-        try {
-            i = new BufferedInputStream(new FileInputStream("gui/src/main/resources/sprites/bmw_z_top_view_clip_art_18132.jpg"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        switch(choice)
+        {
+            case 1:
+                try {
+                        i = new BufferedInputStream(new FileInputStream("gui/src/main/resources/sprites/bmw_z_top_view_clip_art_18132.jpg"));
+                } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                }
+                try {
+                        assert i != null;
+                        img = ImageIO.read(i);
+                } catch (IOException e) {
+                        e.printStackTrace();
+                }
+                    h.drawImage(img,x3-18,y3-18,40,40,null);
+                    h.setTransform(c);
+                break;
+            case 2:
+                try {
+                    i = new BufferedInputStream(new FileInputStream("gui/src/main/resources/sprites/8460_st0640_117.jpg"));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    assert i != null;
+                    img = ImageIO.read(i);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                h.drawImage(img,x3-18,y3-18,40,40,null);
+                h.setTransform(c);
         }
-        try {
-            assert i != null;
-            img = ImageIO.read(i);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        h.drawImage(img,x3-18,y3-18,40,40,null);
-        h.setTransform(c);
-    }
 
-    /*public void drawDoubleCrossRoad(int length, int width, int x, int y, int length2, int width2, int x1, int y1, Graphics g) {
-        /*
-        The x and y give the coordinates of the start point of the first road, x1 y1 give the start point of the second road.
-        The start and end points are of the bottom line in case of first road and left line in case of second road.
-        The length and width are respective of the road they represent.
-        */
-        /*int x2, x3, y2, y3;
-        x2 = x + length;
-        y2 = y + width;
-        /*
-        The first road coordinates are (x,y) (x2,y) (x,y2) (x2,y2)
-        Now we need to find the same for the second line.
-        */
-        /*
-        x3 = x1 + width2;
-        y3 = y1 + length2;
-        */
-        /*
-        The second road coordinates are (x1,y1) (x1,y3) (x3,y1) (x3,y3)
-        The next step is to find the coordinates of the intersection, the four center points.
-        */
-        /*
-        int d, xi, yi;
-        d = (x - x2) * (y1 - y3) - (y - y) * (x1 - x1);
-        xi = ((x1 - x1) * (x * y - y * x2) - (x - x2) * (x1 * y3 - y1 * x1)) / d;
-        yi = ((y1 - y3) * (x * y - y * x2) - (y - y) * (x1 * y3 - y1 * x1)) / d;
-        */
-        /*
-        Now we have got one intersection point so we can go ahead and draw the complete road.
-        */
-        /*
-        drawLine(xi, yi, x, y, g);
-        drawLine(xi, yi, x1, y3, g);
-        d = (x - x2) * (y1 - y3) - (y - y) * (x3 - x3);
-        xi = ((x3 - x3) * (x * y - y * x2) - (x - x2) * (x3 * y3 - y1 * x3)) / d;
-        yi = ((y1 - y3) * (x * y - y * x2) - (y - y) * (x3 * y3 - y1 * x3)) / d;
-        xi = xi+width2;
-        drawLine(xi, yi, x2, y, g);
-        drawLine(xi, yi, x3, y3, g);
-        d = (x - x2) * (y1 - y3) - (y2 - y2) * (x3 - x3);
-        xi = ((x3 - x3) * (x * y2 - y2 * x2) - (x - x2) * (x3 * y3 - y1 * x3)) / d;
-        yi = ((y1 - y3) * (x * y2 - y2 * x2) - (y2 - y2) * (x3 * y3 - y1 * x3)) / d;
-        yi= yi+width;
-        drawLine(xi, yi, x2, y2, g);
-        drawLine(xi, yi, x3, y1, g);
-        d = (x - x2) * (y1 - y3) - (y2 - y2) * (x1 - x1);
-        xi = ((x1 - x1) * (x * y2 - y2 * x2) - (x - x2) * (x1 * y3 - y1 * x1)) / d;
-        yi = ((y1 - y3) * (x * y2 - y2 * x2) - (y2 - y2) * (x1 * y3 - y1 * x1)) / d;
-        xi = xi-width2;
-        drawLine(xi, yi, x, y2, g);
-        drawLine(xi, yi, x1, y1, g);
-        }
-        */
+
+    }
 }
