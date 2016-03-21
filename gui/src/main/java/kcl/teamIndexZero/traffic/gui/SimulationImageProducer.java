@@ -18,10 +18,10 @@ import java.util.function.BiConsumer;
 public class SimulationImageProducer implements ISimulationAware {
 
     protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulationImageProducer.class.getSimpleName());
-    private SimulationMap map;
-    private BiConsumer<BufferedImage, SimulationTick> imageConsumer;
     private final BufferedImage image;
     private final Graphics2D graphics;
+    private SimulationMap map;
+    private BiConsumer<BufferedImage, SimulationTick> imageConsumer;
 
     /**
      * Constructor
@@ -37,18 +37,14 @@ public class SimulationImageProducer implements ISimulationAware {
 
     }
 
-    private double alpha = 0;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void tick(SimulationTick tick) {
-        alpha += 0.1;
         graphics.setBackground(Color.WHITE);
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
-        new GUI_Primitives().drawCar(70,70,alpha,1,graphics);
-        new GUI_Primitives().drawSingleRoad(10, 10, 200, 10, 10, 50, 200, 50, graphics);
 //        map.getObjectsOnMap().forEach(object -> {
 //            graphics.setColor(object.getColor());
 //            MapPosition pos = object.getPosition();
