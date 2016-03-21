@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.trafficLight;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.TrafficLightRule;
 import kcl.teamIndexZero.traffic.simulator.data.descriptors.TrafficLightsInSetRule;
 import org.junit.After;
@@ -27,10 +28,10 @@ public class TrafficLightControllerTest {
     private TrafficLightRule rule;
     private TrafficLightsInSetRule setRule;
     private TrafficLight trafficLight;
-    private TrafficLightInSet trafficLightInSet;
+    private TrafficLightInSet trafficLightInSetA;
+    private TrafficLightInSet trafficLightInSetB;
     private TrafficLightSet trafficLightSet;
-    private boolean flag = false;
-    private Date date;
+    private boolean flag;
 
 
     @Before
@@ -38,9 +39,10 @@ public class TrafficLightControllerTest {
         model = new TrafficLightController();
         rule = new TrafficLightRule();
         setRule = new TrafficLightsInSetRule();
-        trafficLightSet = new TrafficLightSet(new ID("TrafficLightSetTest"));
+        trafficLightSet = new TrafficLightSet(new ID("TrafficLightSetTestA"));
         trafficLight = new TrafficLight(new ID("TrafficLightTest"));
-        trafficLightInSet= new TrafficLightInSet(new ID("TrafficLightInSetTest"));
+        trafficLightInSetA = new TrafficLightInSet(new ID("TrafficLightInSetTestA"));
+        trafficLightInSetB = new TrafficLightInSet(new ID("TrafficLightInSetTestB"));
     }
 
     @After
@@ -50,7 +52,8 @@ public class TrafficLightControllerTest {
         setRule = null;
         trafficLightSet = null;
         trafficLight = null;
-        trafficLightInSet = null;
+        trafficLightInSetA = null;
+        trafficLightInSetB = null;
     }
 
     @Test
@@ -60,15 +63,53 @@ public class TrafficLightControllerTest {
 
     @Test
     public void testAddRuleSingleTF() {
+        flag = false;
         model.addTrafficlight(trafficLight);//At the beginning the State was GREEN
-        model.addRule(rule); //should be RED now
+        model.addRule(rule);                //Should be RED by now
 
         for (TrafficLight tf : model.TrafficLightSinglesList) {
             if (tf.currentState == TrafficLightState.RED) {
                 flag = true;
-            }
-            ;
+            };
         }
-        Assert.assertTrue(flag == true);
+        Assert.assertTrue(flag);
+    }
+
+    @Test
+    public void testAddRuleSetA() {
+        flag = false;
+        trafficLightSet.addTrafficlight(trafficLightInSetA, 'A');           //initially the State was GREEN
+        model.TrafficLightSetList = trafficLightSet.TrafficLightSetList;
+        model.addRule(setRule);                                             // Now should be RED
+
+        for (TrafficLightInSet tf : model.TrafficLightSetList) {
+            if (tf.currentState == TrafficLightState.RED) {
+                flag = true;
+            };
+        }
+        Assert.assertTrue(flag);
+    }
+
+    @Test
+    public void testAddRuleSetB() {
+        flag = false;
+        trafficLightSet.addTrafficlight(trafficLightInSetB, 'B');       //initially the State was RED
+        model.TrafficLightSetList = trafficLightSet.TrafficLightSetList;
+        model.addRule(setRule);                                          // Now should be GREEN
+
+        for (TrafficLightInSet tf : model.TrafficLightSetList) {
+            if (tf.currentState == TrafficLightState.GREEN) {
+                flag = true;
+            };
+        }
+        Assert.assertTrue(flag);
+    }
+
+    @Test
+    public void testFormatTimeToLong() {
+        LocalDateTime date = LocalDateTime.of(1984, 12, 16, 7, 45, 56); // 1 second = 1000 millisec. The "starting" date has 55 seconds in the end
+        long diff;
+        diff = model.formatTimeToLong(date);
+        Assert.assertTrue(diff == 1000L);
     }
 }

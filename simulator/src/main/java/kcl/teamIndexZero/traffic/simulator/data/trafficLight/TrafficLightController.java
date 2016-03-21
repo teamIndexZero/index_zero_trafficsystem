@@ -13,6 +13,7 @@ import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLight;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,16 +27,18 @@ public class TrafficLightController implements ISimulationAware {
         public long CurrentTime;
         public LocalDateTime Temporary;
         public long lastChange = 0;
-        public long timer;
+        public long timer = 5;
         public long delay;
+        public static LocalDateTime start = LocalDateTime.of(1984, 12, 16, 7, 45, 55);
         private TrafficLight model; //list this
         private TrafficLightInSet modelSet; //list this
+        private TrafficLightSet set;
         public List<TrafficLight> TrafficLightSinglesList;
         public List<TrafficLightInSet> TrafficLightSetList;
         SimulationTick simulationTick;
         private static Logger_Interface LOG = Logger.getLoggerInstance(TrafficLightController.class.getSimpleName());
 
-        /**
+       /**
          * Constructor
          */
         public TrafficLightController(){
@@ -44,12 +47,11 @@ public class TrafficLightController implements ISimulationAware {
         }
 
         public long formatTimeToLong(LocalDateTime date) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-            this.temp = date.format(formatter);
-            return Long.parseLong(temp, 10);
+            long milliseconds = ChronoUnit.MILLIS.between(start, date);
+            return milliseconds;
         }
 
-        /**
+       /**
          * Adds single traffic light to the List of all single traffic lights
          *
          * @param trafficLight object to be added to the list
@@ -76,7 +78,7 @@ public class TrafficLightController implements ISimulationAware {
          * {@inheritDoc}
          */
         @Override
-        public void tick(SimulationTick tick) {
+         public void tick(SimulationTick tick) {
             CurrentTime = formatTimeToLong(simulationTick.getSimulatedTime());
 
             /*when single traffic lights do not work in a synchronous way with the ticks*/
@@ -100,16 +102,16 @@ public class TrafficLightController implements ISimulationAware {
             }
         }
 
-        /**
+       /**
          * Adds rule to the one traffic light
          */
-        public void addRule(TrafficLightRule rule){
+         public void addRule(TrafficLightRule rule){
             rule.changeStateofSingleTrafficLights(TrafficLightSinglesList);
         }
-        /**
+       /**
          * Adds rule to the one traffic light set
          */
-        public void addRule(TrafficLightsInSetRule rule){
+         public void addRule(TrafficLightsInSetRule rule){
              rule.changeStateofSet(TrafficLightSetList);
         }
 
