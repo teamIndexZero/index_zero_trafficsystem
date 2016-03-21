@@ -54,4 +54,13 @@ public class JunctionDescriptionTest {
     }
 
 
+    @Test
+    public void testGetGeoPoint() throws Exception {
+        assertEquals(new GeoPoint(0, 0), jd.getGeoPoint());
+    }
+
+    @Test
+    public void testHasTrafficLight() throws Exception {
+        assertTrue(jd.hasTrafficLight());
+    }
 }
