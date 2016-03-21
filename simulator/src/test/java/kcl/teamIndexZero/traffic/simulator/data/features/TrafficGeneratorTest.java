@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -103,7 +104,10 @@ public class TrafficGeneratorTest {
 
     @Test
     public void testGetRandomLane() throws Exception {
+        junction.addRoad(r1, JunctionDescription.RoadDirection.INCOMING);
         tg.linkJunction(junction, 5, 10);
+        junction.addTrafficGenerator(tg);
+        junction.computeAllPaths();
         tg.getRandomLane();
     }
 
@@ -124,5 +128,27 @@ public class TrafficGeneratorTest {
         SimulationTick tick = mock(SimulationTick.class);
         for (int i = 0; i < 50; i++) tg.tick(tick);
         verify(map, atLeastOnce()).addMapObject(argument.capture());
+    }
+
+    @Test
+    public void testGetReceiptCounter() throws Exception {
+        assertEquals(0, tg.getReceiptCounter());
+        Vehicle v = mock(Vehicle.class);
+        tg.terminateTravel(v);
+        assertEquals(1, tg.getReceiptCounter());
+    }
+
+    @Test
+    public void testGetThisGeneratorCreationCounter() throws Exception {
+        SimulationMap map = mock(SimulationMap.class);
+        tg.setMap(map);
+        List<MapObject> list = new ArrayList<>();
+        when(map.getObjectsOnSurface()).thenReturn(list);
+        tg.linkRoad(r1);
+        SimulationTick tick = mock(SimulationTick.class);
+        for (int i = 0; i < 50; i++) {
+            tg.tick(tick);
+            assertTrue(tg.getThisGeneratorCreationCounter() >= 0);
+        }
     }
 }
