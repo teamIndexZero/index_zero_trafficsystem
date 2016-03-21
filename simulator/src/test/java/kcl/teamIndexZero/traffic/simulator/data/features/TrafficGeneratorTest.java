@@ -126,7 +126,7 @@ public class TrafficGeneratorTest {
         ArgumentCaptor<Vehicle> argument = ArgumentCaptor.forClass(Vehicle.class);
         tg.linkRoad(r1);
         SimulationTick tick = mock(SimulationTick.class);
-        for (int i = 0; i < 50; i++) tg.tick(tick);
+        for (int i = 0; i < 100; i++) tg.tick(tick);
         verify(map, atLeastOnce()).addMapObject(argument.capture());
     }
 
