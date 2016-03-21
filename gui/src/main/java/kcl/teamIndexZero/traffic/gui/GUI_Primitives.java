@@ -1,9 +1,6 @@
 package kcl.teamIndexZero.traffic.gui;
 
-import com.sun.org.apache.xml.internal.resolver.helpers.PublicId;
-
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.QuadCurve2D;
@@ -32,7 +29,6 @@ public class GUI_Primitives {
     public void drawCar(int x3, int y3, double angleToXAxis, int choice, Graphics g)
     {
         // file taken from http://all-free-download.com/free-vector/car-vector-top-view-download.html
-        g.setColor(Color.black);
         AffineTransform c;
         Graphics2D h = (Graphics2D) g;
         c = h.getTransform();
