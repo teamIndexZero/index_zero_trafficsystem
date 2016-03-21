@@ -80,7 +80,7 @@ public class Simulator {
     /**
      * Temporarily pause the simulation.
      * <p>
-     * TODO: as we move this to two threads at least it will start working. For now it is useless
+     * TODO: as we move this to out threads at least it will start working. For now it is useless
      */
     public void pause() {
         paused.set(true);
@@ -89,7 +89,7 @@ public class Simulator {
     /**
      * Terminate the simulation prematurely.
      * <p>
-     * TODO:as we add two threads, should have this working. For now useless.
+     * TODO:as we add out threads, should have this working. For now useless.
      */
     public void stop() {
         stopped.set(true);
@@ -115,9 +115,9 @@ public class Simulator {
     Internal loop of the simulator.
 
     Within the loop, we are:
-    1. Creating a next Tick object with the number=number+1, simulatedTime = prevSimulatedTime+(How many one tick means
+    1. Creating a next Tick object with the number=number+1, simulatedTime = prevSimulatedTime+(How many in tick means
         seconds)
-    2. Run the tick aware listeners one by one (whatever they are).
+    2. Run the tick aware listeners in by in (whatever they are).
      */
     private SimulationTick nextTick() {
         if (currentTick == null) {

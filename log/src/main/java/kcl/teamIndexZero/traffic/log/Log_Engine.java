@@ -4,7 +4,6 @@ import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
 import kcl.teamIndexZero.traffic.log.outputs.Output;
 
 /**
- * Created by Es on 27/01/2016.
  * Log engine
  */
 public class Log_Engine {
@@ -37,6 +36,8 @@ public class Log_Engine {
 
     /**
      * Constructor
+     *
+     * @param config LogConfig object to use
      */
     public Log_Engine(Log_Config config) {
         global_config = config;

@@ -1,5 +1,6 @@
 package kcl.teamIndexZero.traffic.gui;
 
+import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
 
@@ -9,22 +10,20 @@ import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
  */
 public class SimulationDelay implements ISimulationAware {
 
-    private int sleepTimeMillis;
+    private GuiModel model;
 
     /**
      * Constructor.
-     *
-     * @param sleepTimeMillis how long should we sleep each tick.
      */
-    public SimulationDelay(int sleepTimeMillis) {
-        this.sleepTimeMillis = sleepTimeMillis;
+    public SimulationDelay(GuiModel model) {
+        this.model = model;
     }
 
 
     @Override
     public void tick(SimulationTick tick) {
         try {
-            Thread.sleep(sleepTimeMillis);
+            Thread.sleep(model.getDelayBetweenTicks());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

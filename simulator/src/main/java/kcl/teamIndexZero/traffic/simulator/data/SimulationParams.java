@@ -16,7 +16,7 @@ public class SimulationParams {
      * Parameters for the simulation.
      *
      * @param simulatedTimeStart simulated time, not real time. I.e. we start our 'simulated' time on 12th of Feb 2013 18:00
-     * @param tickSeconds        how many seconds simulated time doe s one tick correspond to
+     * @param tickSeconds        how many seconds simulated time doe s in tick correspond to
      * @param durationInTicks    how many ticks should the simulation be run for
      */
     public SimulationParams(LocalDateTime simulatedTimeStart, int tickSeconds, int durationInTicks) {

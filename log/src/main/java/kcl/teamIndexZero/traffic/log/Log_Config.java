@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Es on 27/01/2016.
+ * Log Configuration class
  */
 public class Log_Config {
     private String global_file_name = "log"; //Default

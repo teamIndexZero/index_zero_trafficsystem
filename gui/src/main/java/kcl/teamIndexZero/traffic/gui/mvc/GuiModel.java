@@ -1,9 +1,12 @@
 package kcl.teamIndexZero.traffic.gui.mvc;
 
+import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 
-import java.awt.image.BufferedImage;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,41 +17,51 @@ import java.util.List;
  * care about their position. More generally, we don't care about map either - we're good to have a new image to draw which
  * is derived from map.
  */
-public class GuiModel {
+public class GuiModel implements ISimulationAware {
 
-    /**
-     * Model update interface. Other components want to implement it in order to receive updates from model when something
-     * important changes.
-     */
-    @FunctionalInterface
-    public interface ChangeListener {
-        /**
-         * Callback interface, invoked by model when its internals change.
-         */
-        void onModelChanged();
-    }
-
-    /**
-     * Status of the simulation process.
-     */
-    public enum SimulationStatus {
-        OFF,
-        PAUSED,
-        INPROGRESS
-    }
-
-    private List<ChangeListener> listeners = new ArrayList<>();
-
+    public static final int DELAY_MINIMAL = 10;
+    public static final int DELAY_MAXIMAL = 100;
+    private static final int DELAY_INITIAL = 50;
+    private final ViewportModel viewport;
+    private final SimulationMap map;
+    private int delayBetweenTicks = DELAY_INITIAL;
+    private boolean showSegmentEnds;
+    private MapObject selectedMapObject;
     private SimulationTick tick;
     private SimulationStatus status;
     private SimulationParams params;
-    private BufferedImage lastImage;
+    private List<ChangeListener> listeners = new ArrayList<>();
+
 
     /**
      * Default constructor.
+     *
+     * @param map simulation map factory; can provide/create a map on demand.
      */
-    public GuiModel() {
+    public GuiModel(SimulationMap map) {
+        this.map = map;
+        this.viewport = new ViewportModel(this);
         reset();
+
+    }
+
+    /**
+     * Get a Viewport related to current simulation. Viewport is a part of the model basically related to the coordinates,
+     * their conversion, window size, proportions, zoom in/out etc.
+     * <p>
+     * It could have been placed here, but due to the extensive amount of specific logic looks like it deserves a
+     * special class.
+     *
+     * @return current viewport model.
+     */
+    public ViewportModel getViewport() {
+        return viewport;
+    }
+
+    @Override
+    public void tick(SimulationTick tick) {
+        this.tick = tick;
+        SwingUtilities.invokeLater(this::fireChangeEvent);
     }
 
     /**
@@ -57,19 +70,57 @@ public class GuiModel {
     public void reset() {
         tick = null;
         status = SimulationStatus.OFF;
-        lastImage = null;
         params = null;
         fireChangeEvent();
     }
 
-    public BufferedImage getLastImage() {
-        return lastImage;
+    /**
+     * Whether to display little crossings at segment ends - green at start and red at end
+     *
+     * @return current setting.
+     */
+    public boolean isShowSegmentEnds() {
+        return this.showSegmentEnds;
     }
 
-    public void setLastSimulationTickAndImage(BufferedImage lastImage, SimulationTick tick) {
-        this.lastImage = lastImage;
-        this.tick = tick;
+    /**
+     * Setter for showSegmentEnds
+     *
+     * @param showSegmentEnds set
+     */
+    public void setShowSegmentEnds(boolean showSegmentEnds) {
+        this.showSegmentEnds = showSegmentEnds;
         fireChangeEvent();
+    }
+
+    /**
+     * Returns an object which is currently selected (either on map, or in the list). On map this object should be drawn
+     * with the special symbol to designate it as selected.
+     *
+     * @return selected object
+     */
+    public MapObject getSelectedMapObject() {
+        if (map.getObjectsOnSurface().contains(selectedMapObject)) {
+            return selectedMapObject;
+        }
+        return null;
+    }
+
+    public void setSelectedMapObject(MapObject selectedMapObject) {
+        this.selectedMapObject = selectedMapObject;
+        fireChangeEvent();
+    }
+
+    public int getDelayBetweenTicks() {
+        return delayBetweenTicks;
+    }
+
+    public void setDelayBetweenTicks(int delayBetweenTicks) {
+        this.delayBetweenTicks = delayBetweenTicks;
+    }
+
+    public SimulationMap getMap() {
+        return map;
     }
 
     public SimulationTick getTick() {
@@ -85,25 +136,27 @@ public class GuiModel {
         fireChangeEvent();
     }
 
-    public SimulationParams getParams() {
-        return params;
-    }
-
     public void setParams(SimulationParams params) {
         this.params = params;
         fireChangeEvent();
     }
 
+    /**
+     * Listeners will get notified as soon as there is a change in model to report to outside world.
+     *
+     * @param listener an instance of listeren to add.
+     */
     public void addChangeListener(ChangeListener listener) {
         listeners.add(listener);
     }
 
-    public void removeChangeListener(ChangeListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireChangeEvent() {
-        listeners.forEach(ChangeListener::onModelChanged);
+    /*
+    Notify all listeners: something has changed.
+     */
+    void fireChangeEvent() {
+        synchronized (map) {
+            listeners.forEach(ChangeListener::onModelChanged);
+        }
     }
 
     @Override
@@ -113,19 +166,45 @@ public class GuiModel {
 
         GuiModel guiModel = (GuiModel) o;
 
+        if (showSegmentEnds != guiModel.showSegmentEnds) return false;
+        if (delayBetweenTicks != guiModel.delayBetweenTicks) return false;
+        if (selectedMapObject != null ? !selectedMapObject.equals(guiModel.selectedMapObject) : guiModel.selectedMapObject != null)
+            return false;
         if (tick != null ? !tick.equals(guiModel.tick) : guiModel.tick != null) return false;
         if (status != guiModel.status) return false;
-        if (params != null ? !params.equals(guiModel.params) : guiModel.params != null) return false;
-        return lastImage != null ? lastImage.equals(guiModel.lastImage) : guiModel.lastImage == null;
+        return params != null ? params.equals(guiModel.params) : guiModel.params == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = tick != null ? tick.hashCode() : 0;
+        int result = (showSegmentEnds ? 1 : 0);
+        result = 31 * result + (selectedMapObject != null ? selectedMapObject.hashCode() : 0);
+        result = 31 * result + delayBetweenTicks;
+        result = 31 * result + (tick != null ? tick.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (params != null ? params.hashCode() : 0);
-        result = 31 * result + (lastImage != null ? lastImage.hashCode() : 0);
         return result;
+    }
+
+    /**
+     * Status of the simulation process.
+     */
+    public enum SimulationStatus {
+        OFF,
+        PAUSED,
+        INPROGRESS
+    }
+
+    /**
+     * Model update interface. Other components want to implement it in order to receive updates from model when something
+     * important changes.
+     */
+    @FunctionalInterface
+    public interface ChangeListener {
+        /**
+         * Callback interface, invoked by model when its internals change.
+         */
+        void onModelChanged();
     }
 }

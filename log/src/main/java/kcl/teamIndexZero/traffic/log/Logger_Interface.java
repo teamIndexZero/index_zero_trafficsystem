@@ -1,7 +1,7 @@
 package kcl.teamIndexZero.traffic.log;
 
 /**
- * Created by Es on 27/01/2016.
+ * Interface for the Logger
  */
 public interface Logger_Interface {
     /**

@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * Created by Es on 06/02/2016.
  * MicroLogger
  * A 'lite' file logger
  */

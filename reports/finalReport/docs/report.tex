@@ -9,11 +9,26 @@
 \section{Review}
 %Describe related work.
 
+\begin{itemize}
+    \item SUMO
+\end{itemize}
+
 \section{Requirements and Design}
 %Describe the requirements you set for your project at the beginning and the design you have taken for your project. Focus on why you decided to tackle the problem in the way you did, and what effects that had on the design. You may also wish to mention the impact of team-working on your requirements and design.
 
 \section{Implementation} 
 %Describe the most significant implementation details, focussing on those where unusual or detailed solutions were required. Quote code fragments where necessary, but remember that the full source code will be included as an appendix. Explain how you tested your software (e.g. unit testing) and the extent to which you tested it. If relevant to your project, explain performance issues and how you tackled them.
+\begin{itemize}
+    \item Log module
+    \begin{itemize}
+        \item explain why and usage scenarios
+        \item add basic arch. uml here
+        \item Log config option injection
+        \item Output formats
+    \end{itemize}
+\end{itemize}
+
+
 \begin{itemize}
   \item serialization
   \item desirealization
@@ -25,6 +40,26 @@
 
 \section{Evaluation}
 %Critically evaluate your project: what worked well, and what didn’t? How did you do relative to your plan? what changes were the result of improved thinking and what changes were forced upon you? how did your team work together? etc. Note that you need to show that you understand the weaknesses in your work as well as its strengths. You may wish to identify relevant future work that could be done on your project.
+
+\begin{itemize}
+    \item Map construction
+    \begin{itemize}
+        \item OSM xml import (lane directions and such)
+        \item SUMO has that capability but implements its own tags and does some guess work
+    \end{itemize}
+
+    \item Log module
+    \begin{itemize}
+        \item coloured terminal window if more time,
+        \item >easier to read
+        \item >segregated from the console
+        \item Custom Filters
+        \item >filtering based on class name (origin)
+        \item >filtering based on selection of multiple non-sequential log levels instead of everything below the set global level (granular control)
+    \end{itemize}
+\end{itemize}
+
+
 
 \section{Peer Assessment}
 %In a simple table, allocate the 100 ‘points’ you are given to each team member. Valid values range from 0 to 100 inclusive. You may assign decimal values, but the entire points must add up to precisely 100.
