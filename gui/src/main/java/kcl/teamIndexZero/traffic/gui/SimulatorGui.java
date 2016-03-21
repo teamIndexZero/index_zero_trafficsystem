@@ -32,21 +32,12 @@ public class SimulatorGui {
     private final MapPanel mapPanel;
 
     /**
-     * Entry point.
-     *
-     * @param args CLI parameters
-     */
-    public static void main(String[] args) {
-        new SimulatorGui();
-    }
-
-    /**
      * Default constructor.
      */
     public SimulatorGui() {
         model = new GuiModel();
         controller = new GuiController(model, () -> {
-            SimulationMap map = new SimulationMap(300, 300);
+            SimulationMap map = new SimulationMap(300, 6);
             SimulationImageProducer imageProducer = new SimulationImageProducer(
                     map,
                     (image, tick) -> {
@@ -91,6 +82,15 @@ public class SimulatorGui {
 
         // that's where we reset model into default state - before the simulation is started.
         model.reset();
+    }
+
+    /**
+     * Entry point.
+     *
+     * @param args CLI parameters
+     */
+    public static void main(String[] args) {
+        new SimulatorGui();
     }
 
 }
