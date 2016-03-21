@@ -139,11 +139,6 @@ public class JunctionTest {
     }
 
     @Test
-    public void testGetBearingForLane() throws Exception {
-        //TODO
-    }
-
-    @Test
     public void testGetNextLinks() throws Exception {
         j.addRoad(r1, JunctionDescription.RoadDirection.INCOMING); //1,1
         j.addRoad(r2, JunctionDescription.RoadDirection.INCOMING); //1,2
