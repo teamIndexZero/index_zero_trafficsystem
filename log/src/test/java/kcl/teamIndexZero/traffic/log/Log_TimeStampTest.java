@@ -32,7 +32,7 @@ public class Log_TimeStampTest extends TestCase {
         hours = String.format("%02d", date_time.getHour());
         mns = String.format("%02d", date_time.getMinute());
         secs = String.format("%02d", date_time.getSecond());
-        nano = Integer.toString(date_time.getNano() / 1).substring(0, 1);
+        nano = Integer.toString(date_time.getNano()).substring(0, 1);
         String time = hours + ":" + mns + ":" + secs + "." + nano;
         System.out.println("Expected: " + time);
         assertEquals(timeStamp_test.getTime(), time);

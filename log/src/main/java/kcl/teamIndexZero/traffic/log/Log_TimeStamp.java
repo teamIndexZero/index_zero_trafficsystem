@@ -42,7 +42,9 @@ public class Log_TimeStamp {
      * @return time of time stamp
      */
     public String getTime() {
-        return now.format(DateTimeFormatter.ofPattern("HH:mm:ss.S"));
+        String nano = now.format(DateTimeFormatter.ofPattern("n")).substring(0, 1);
+        String time = now.format(DateTimeFormatter.ofPattern("HH:mm:ss."));
+        return time + nano;
     }
 
     /**
