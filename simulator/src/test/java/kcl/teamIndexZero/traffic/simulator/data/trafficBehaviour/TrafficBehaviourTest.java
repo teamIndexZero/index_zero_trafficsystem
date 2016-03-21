@@ -97,4 +97,18 @@ public class TrafficBehaviourTest {
         assertTrue(this.tb.getAllPossibleExitPoints(in2).contains(out2));
         assertEquals(1, this.tb.getAllPossibleExitPoints(in2).size());
     }
+
+    @Test(expected = JunctionPathException.class)
+    public void testClearAllPaths() throws Exception {
+        ID in1 = new ID("In1");
+        ID in2 = new ID("In2");
+        ID out1 = new ID("Out1");
+        ID out2 = new ID("Out2");
+        this.tb.addPath(in1, out1);
+        this.tb.addPath(in1, out2);
+        this.tb.addPath(in2, out2);
+        assertEquals(2, this.tb.getAllPossibleExitPoints(in1).size());
+        this.tb.clearAllPaths();
+        tb.getAllPossibleExitPoints(in1).size();
+    }
 }
