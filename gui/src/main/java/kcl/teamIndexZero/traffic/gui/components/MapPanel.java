@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.gui.components;
 
 import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
+import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 
 import javax.swing.*;
@@ -110,6 +111,30 @@ public class MapPanel extends JComponent implements Consumer<BufferedImage>, Mou
                 })
                 .findAny()
                 .ifPresent(model::setSelectedMapObject);
+        // If we have 'show junctions' checkbox selected, then we can click them to select.
+        if (model.isShowJunctions()) {
+            model.getMap()
+                    .getMapFeatures()
+                    .values()
+                    .stream()
+                    .filter(obj -> {
+                        if (!(obj instanceof Junction)) {
+                            return false;
+                        }
+                        GeoPoint point = ((Junction) obj).getGeoPoint();
+                        if (point == null) {
+                            return false;
+                        }
+                        int xPoint = model.getViewport().convertXMetersToPixels(point.xMeters);
+                        int yPoint = model.getViewport().convertYMetersToPixels(point.yMeters);
+
+                        return Math.sqrt((xPoint - e.getX()) * (xPoint - e.getX())
+                                + (yPoint - e.getY()) * (yPoint - e.getY()))
+                                < MOUSE_CLICK_SELECTION_SENSITIVITY;
+                    })
+                    .findAny()
+                    .ifPresent(model::setSelectedFeature);
+        }
     }
 
     @Override

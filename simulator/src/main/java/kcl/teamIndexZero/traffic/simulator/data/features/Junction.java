@@ -135,6 +135,15 @@ public class Junction extends Feature {
     }
 
     /**
+     * Now we are able to check if feature is incoming or outgoing
+     *
+     * @return direction for road.
+     */
+    public JunctionDescription.RoadDirection getDirectionForFeature(Feature feature) {
+        return connectedFeatures.get(feature);
+    }
+
+    /**
      * Adds an inflow link to the junction
      *
      * @param link Inflow link

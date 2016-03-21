@@ -5,10 +5,8 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
-import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
-import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
-import kcl.teamIndexZero.traffic.simulator.data.features.Road;
-import kcl.teamIndexZero.traffic.simulator.data.features.TrafficGenerator;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
+import kcl.teamIndexZero.traffic.simulator.data.features.*;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
 
@@ -208,7 +206,21 @@ public class SimulationImageProducer {
         Feature f = model.getSelectedFeature();
         if (f instanceof Junction) {
             Junction j = (Junction) f;
-            primitives.drawCircle(graphics, j.getGeoPoint(), 30, Color.RED);
+            primitives.drawCircle(graphics, j.getGeoPoint(), 8, Color.WHITE, true);
+            primitives.drawCircle(graphics, j.getGeoPoint(), 9, Color.BLACK);
+            primitives.drawCircle(graphics, j.getGeoPoint(), 2, Color.BLACK, true);
+
+            j.getConnectedFeatures().stream().filter(feature -> feature instanceof Road).forEach(feature -> {
+                Road r = (Road) feature;
+                for (Lane lane : r.getForwardSide().getLanes()) {
+                    drawJunctionConnectionVector(graphics, j, lane);
+
+                }
+
+                for (Lane lane : r.getBackwardSide().getLanes()) {
+                    drawJunctionConnectionVector(graphics, j, lane);
+                }
+            });
             return;
         }
 
@@ -232,6 +244,58 @@ public class SimulationImageProducer {
                     miny + (maxy - miny) / 2);
             double radiusMeters = Math.max(maxx - minx, maxy - miny) / 2;
             primitives.drawCircle(graphics, center, 15 + (int) (model.getViewport().getPixelsInMeter() * radiusMeters), Color.GREEN);
+        }
+    }
+
+    private void drawJunctionConnectionVector(Graphics2D graphics, Junction j, Lane lane) {
+        Road r = lane.getRoad();
+        int radius = 140;
+        int startX = model.getViewport().convertXMetersToPixels(j.getGeoPoint().xMeters);
+        int startY = model.getViewport().convertYMetersToPixels(j.getGeoPoint().yMeters);
+
+        boolean isLaneOutgoing = (j.getDirectionForFeature(r) == JunctionDescription.RoadDirection.INCOMING
+                && r.getBackwardSide().getLanes().contains(lane))
+
+                || (j.getDirectionForFeature(r) == JunctionDescription.RoadDirection.OUTGOING &&
+                r.getForwardSide().getLanes().contains(lane));
+
+        double alpha = j.getBearingForLane(lane);
+        String angleDetails = String.format("%.1f˚", Math.toDegrees(alpha));
+        graphics.setStroke(new BasicStroke(2));
+        if (isLaneOutgoing) {
+            angleDetails = "OUT: " + angleDetails;
+            int xEnd = (int) (startX + Math.cos(alpha) * radius);
+            int yEnd = (int) (startY - Math.sin(alpha) * radius);
+            graphics.setColor(Color.RED);
+            graphics.drawLine(startX,
+                    startY,
+                    xEnd,
+                    yEnd);
+            graphics.drawChars(
+                    angleDetails.toCharArray(),
+                    0,
+                    angleDetails.length(),
+                    xEnd - 7,
+                    yEnd - 7
+            );
+        } else {
+            int xEnd = (int) (startX - Math.cos(alpha) * radius);
+            int yEnd = (int) (startY + Math.sin(alpha) * radius);
+            angleDetails = "IN: " + angleDetails;
+            graphics.setColor(Color.BLUE);
+            graphics.drawLine(
+                    xEnd,
+                    yEnd,
+                    startX,
+                    startY);
+            graphics.drawChars(
+                    angleDetails.toCharArray(),
+                    0,
+                    angleDetails.length(),
+                    xEnd + 7,
+                    yEnd + 7
+            );
+
         }
     }
 

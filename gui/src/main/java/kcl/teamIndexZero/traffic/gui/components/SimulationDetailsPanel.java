@@ -40,6 +40,7 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
     private JPanel settingsPanel = new JPanel();
     private JPanel carsPanel = new JPanel();
     private JPanel featuresPanel = new JPanel();
+    private JList<Feature> featureList;
 
     /**
      * Constructor.
@@ -78,7 +79,7 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
                 .stream()
                 .filter(f -> !(f instanceof Lane))
                 .collect(Collectors.toList());
-        JList<Feature> featureList = new JList<>(features.toArray(new Feature[features.size()]));
+        featureList = new JList<>(features.toArray(new Feature[features.size()]));
 
         featureList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         featureList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
@@ -210,6 +211,7 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         if (model.getSelectedFeature() != null) {
             featureDetailsLabel.setText(createFeatureDetailsText(model.getSelectedFeature()));
             featureDetailsLabel.setVisible(true);
+            featureList.setSelectedValue(model.getSelectedFeature(), true);
         } else {
             featureDetailsLabel.setVisible(false);
         }
