@@ -1,20 +1,44 @@
 package kcl.teamIndexZero.traffic.simulator.data.trafficLight;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
-
-import java.util.Date;
+import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.trafficLight.TrafficLightState;
 
 /**
  * Traffic Light part of a synchronous set
  */
 public class TrafficLightInSet {
-    long CurrentDate = (new Date().getTime()) / 1000;
-    long lastChange = CurrentDate;
-    long timer;
-    private TrafficLight model;
-    private TrafficLightSet modelSet;
 
-    public TrafficLightInSet(ID linkId) {
-        //TODO Fix construction?
+    private ID id;
+    public long TrafficLightInSetDelay;
+    public TrafficLightState currentState;
+
+    /**
+     * Constructor
+     *
+     * @param id TrafficLightInSet ID tag
+     */
+    public TrafficLightInSet(ID id) {
+
+        this.id=id;
+        this.currentState = TrafficLightState.GREEN;
+
+    }
+
+    /**
+     *  Returns the current state of the TrafficLightInSet
+     */
+    public TrafficLightState getState(){
+        return this.currentState;
+    }
+
+    /**
+     *  Returns the current state of the TrafficLightInSet
+     */
+    public ID getID() { return this.id;}
+
+    //@Override
+    public void tick(SimulationTick tick) {
+
     }
 }
