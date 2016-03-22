@@ -42,7 +42,7 @@ public class VehicleMovementTest {
         when(road.getID()).thenReturn(roadId);
         when(forwardSide.getLanes()).thenReturn(Collections.singletonList(lane));
 
-        vehicle = spy(new Vehicle(new ID("Test"), "TestName", lane));
+        vehicle = spy(Vehicle.createPassengerCar(new ID("Test"), "TestName", lane));
 
         tick = new SimulationTick(10, LocalDateTime.now(), 1);
 
@@ -65,9 +65,9 @@ public class VehicleMovementTest {
         vehicle.tick(tick);
 
         // then
-        verify(vehicle, never()).driveOnJunction(any(), any());
-        verify(vehicle, never()).driveIntoTrafficGenerator(any(), any());
-        verify(vehicle, never()).driveOnGenericLink(any(), any());
+        verify(vehicle, never()).driveOnJunction(any());
+        verify(vehicle, never()).driveIntoTrafficGenerator(any());
+        verify(vehicle, never()).driveOnGenericLink(any());
 
         assertThat(vehicle.getSpeedKph()).isGreaterThan(0);
         assertThat(vehicle.getAccelerationKphH()).isGreaterThan(0);
@@ -91,9 +91,9 @@ public class VehicleMovementTest {
         vehicle.tick(tick);
 
         // then
-        verify(vehicle, never()).driveOnJunction(any(), any());
-        verify(vehicle, never()).driveIntoTrafficGenerator(any(), any());
-        verify(vehicle, never()).driveOnGenericLink(any(), any());
+        verify(vehicle, never()).driveOnJunction(any());
+        verify(vehicle, never()).driveIntoTrafficGenerator(any());
+        verify(vehicle, never()).driveOnGenericLink(any());
 
         assertThat(vehicle.getSpeedKph()).isGreaterThan(0);
         assertThat(vehicle.getAccelerationKphH()).isGreaterThan(0);
@@ -118,9 +118,9 @@ public class VehicleMovementTest {
         vehicle.tick(tick);
 
         // then
-        verify(vehicle, never()).driveOnJunction(any(), any());
-        verify(vehicle, never()).driveIntoTrafficGenerator(any(), any());
-        verify(vehicle, never()).driveOnGenericLink(any(), any());
+        verify(vehicle, never()).driveOnJunction(any());
+        verify(vehicle, never()).driveIntoTrafficGenerator(any());
+        verify(vehicle, never()).driveOnGenericLink(any());
 
         assertThat(vehicle.getSpeedKph()).isGreaterThan(0);
         assertThat(vehicle.getAccelerationKphH()).isLessThanOrEqualTo(0);

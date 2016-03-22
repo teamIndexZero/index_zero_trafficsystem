@@ -220,11 +220,14 @@ public class TrafficGenerator extends Feature {
             }
             try {
                 Lane l = getRandomLane();
-                boolean hasLaneFreeSpace = l.isClearAhead(l.isForwardLane() ? 0 : l.getLength(), 10);
+                boolean hasLaneFreeSpace = l.isClearAhead(null, l.isForwardLane() ? 0 : l.getLength(), 10);
                 if (!hasLaneFreeSpace) {
                     return;
                 }
-                Vehicle v = new Vehicle(new ID("Vehicle::" + this.getID() + "::" + globalCreationCounter), "Vehicle " + globalCreationCounter, getRandomLane());
+                Vehicle v = Math.random() > 0.7
+                        ? Vehicle.createTruck(new ID("Truck::" + this.getID() + "::" + globalCreationCounter), "Truck " + globalCreationCounter, getRandomLane())
+                        : Vehicle.createPassengerCar(new ID("Car::" + this.getID() + "::" + globalCreationCounter), "Car " + globalCreationCounter, getRandomLane());
+
                 super.getMap().addMapObject(v);
                 globalCreationCounter++;
                 thisGeneratorCreationCounter++;

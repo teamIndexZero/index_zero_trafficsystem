@@ -275,7 +275,7 @@ public class Lane extends Feature {
      * @param end   segment end
      * @return set of vehicles on that segment.
      */
-    public Collection<Vehicle> getVehiclesAtSegment(double start, double end) {
+    public Collection<Vehicle> getVehiclesAtSegment(final Vehicle self, double start, double end) {
         // just in case the start and end are swapped, swap them back.
         if (start > end) {
             double t = end;
@@ -286,7 +286,16 @@ public class Lane extends Feature {
         final double e = end;
         return carsOnThisLane
                 .stream()
-                .filter(vehicle -> vehicle.getPositionOnLane() < e && vehicle.getPositionOnLane() > s)
+                .filter(vehicle -> {
+                    if (vehicle.equals(self))
+                        return false;
+                    double vehicleFront = vehicle.getPositionOnLane();
+                    double vehicleBack = isForwardLane()
+                            ? vehicleFront - vehicle.getLengthMeters()
+                            : vehicleFront + vehicle.getLengthMeters();
+                    return (vehicleFront < e && vehicleFront > s)
+                            || (vehicleBack < e && vehicleFront > s);
+                })
                 .collect(Collectors.toSet());
     }
 
@@ -297,9 +306,9 @@ public class Lane extends Feature {
      * @param metersAhead how far ahead to look.
      * @return true if there is no other vehicle
      */
-    public boolean isClearAhead(double position, double metersAhead) {
+    public boolean isClearAhead(Vehicle self, double position, double metersAhead) {
         double endSegment = position + (isForwardLane() ? 1 : -1) * metersAhead;
-        return getVehiclesAtSegment(position, endSegment).isEmpty();
+        return getVehiclesAtSegment(self, position, endSegment).isEmpty();
     }
 
     /**
@@ -309,8 +318,24 @@ public class Lane extends Feature {
      * @param metersBehind meters to check behind
      * @return true if no one is there behind.
      */
-    public boolean isClearBehind(double position, double metersBehind) {
+    public boolean isClearBehind(Vehicle self, double position, double metersBehind) {
         double endSegment = position + (isForwardLane() ? -1 : 1) * metersBehind;
-        return getVehiclesAtSegment(position, endSegment).isEmpty();
+        return getVehiclesAtSegment(self, position, endSegment).isEmpty();
     }
+
+    /**
+     * Get bearing on the point in lane. It comes from polyline, but for the case of reversed lane, bearing should be
+     * reversed too.
+     *
+     * @param distanceFromStart distance from start of lane.
+     * @return bearing (angle to base vector of 1, 0
+     */
+    public double getBearingAtDistanceFromStart(double distanceFromStart) {
+        double angle = polyline.getBearingAtDistanceFromStart(distanceFromStart);
+        if (isBackwardLane()) {
+            angle = (angle + Math.PI) % (Math.PI * 2);
+        }
+        return angle;
+    }
+
 }
