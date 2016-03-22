@@ -70,4 +70,9 @@ public class RoadDescriptionTest {
     public void testGetRoadName() throws Exception {
         assertEquals(this.rname, this.rd.getRoadName());
     }
+
+    @Test
+    public void testGetLayer() throws Exception {
+        assertEquals(0, rd.getLayer());
+    }
 }

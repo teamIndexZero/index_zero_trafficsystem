@@ -4,6 +4,7 @@ import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationTick;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
 import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 
 import javax.swing.*;
@@ -20,17 +21,20 @@ import java.util.List;
 public class GuiModel implements ISimulationAware {
 
     public static final int DELAY_MINIMAL = 10;
-    public static final int DELAY_MAXIMAL = 100;
-    private static final int DELAY_INITIAL = 50;
-    private final ViewportModel viewport;
+    public static final int DELAY_MAXIMAL = 400;
+    private static final int DELAY_INITIAL = 100;
     private final SimulationMap map;
+    private ViewportModel viewport;
     private int delayBetweenTicks = DELAY_INITIAL;
-    private boolean showSegmentEnds;
+    private boolean debugRoads;
     private MapObject selectedMapObject;
     private SimulationTick tick;
     private SimulationStatus status;
     private SimulationParams params;
     private List<ChangeListener> listeners = new ArrayList<>();
+    private boolean showJunctions;
+    private boolean showTrafficGenerators;
+    private Feature selectedFeature;
 
 
     /**
@@ -41,8 +45,11 @@ public class GuiModel implements ISimulationAware {
     public GuiModel(SimulationMap map) {
         this.map = map;
         this.viewport = new ViewportModel(this);
-        reset();
-
+        tick = null;
+        status = SimulationStatus.OFF;
+        params = null;
+        this.viewport = new ViewportModel(this);
+        fireChangeEvent();
     }
 
     /**
@@ -65,31 +72,21 @@ public class GuiModel implements ISimulationAware {
     }
 
     /**
-     * Reset method gets model to the default state (same as it was right after running constructor.
-     */
-    public void reset() {
-        tick = null;
-        status = SimulationStatus.OFF;
-        params = null;
-        fireChangeEvent();
-    }
-
-    /**
      * Whether to display little crossings at segment ends - green at start and red at end
      *
      * @return current setting.
      */
-    public boolean isShowSegmentEnds() {
-        return this.showSegmentEnds;
+    public boolean debugRoads() {
+        return this.debugRoads;
     }
 
     /**
-     * Setter for showSegmentEnds
+     * Setter for debugRoads
      *
-     * @param showSegmentEnds set
+     * @param debugRoads set
      */
-    public void setShowSegmentEnds(boolean showSegmentEnds) {
-        this.showSegmentEnds = showSegmentEnds;
+    public void setDebugRoads(boolean debugRoads) {
+        this.debugRoads = debugRoads;
         fireChangeEvent();
     }
 
@@ -144,7 +141,7 @@ public class GuiModel implements ISimulationAware {
     /**
      * Listeners will get notified as soon as there is a change in model to report to outside world.
      *
-     * @param listener an instance of listeren to add.
+     * @param listener an instance of listener to add.
      */
     public void addChangeListener(ChangeListener listener) {
         listeners.add(listener);
@@ -166,8 +163,12 @@ public class GuiModel implements ISimulationAware {
 
         GuiModel guiModel = (GuiModel) o;
 
-        if (showSegmentEnds != guiModel.showSegmentEnds) return false;
         if (delayBetweenTicks != guiModel.delayBetweenTicks) return false;
+        if (debugRoads != guiModel.debugRoads) return false;
+        if (showJunctions != guiModel.showJunctions) return false;
+        if (showTrafficGenerators != guiModel.showTrafficGenerators) return false;
+        if (viewport != null ? !viewport.equals(guiModel.viewport) : guiModel.viewport != null) return false;
+        if (map != null ? !map.equals(guiModel.map) : guiModel.map != null) return false;
         if (selectedMapObject != null ? !selectedMapObject.equals(guiModel.selectedMapObject) : guiModel.selectedMapObject != null)
             return false;
         if (tick != null ? !tick.equals(guiModel.tick) : guiModel.tick != null) return false;
@@ -178,13 +179,57 @@ public class GuiModel implements ISimulationAware {
 
     @Override
     public int hashCode() {
-        int result = (showSegmentEnds ? 1 : 0);
+        int result = viewport != null ? viewport.hashCode() : 0;
+        result = 31 * result + (map != null ? map.hashCode() : 0);
+        result = 31 * result + (debugRoads ? 1 : 0);
         result = 31 * result + (selectedMapObject != null ? selectedMapObject.hashCode() : 0);
-        result = 31 * result + delayBetweenTicks;
         result = 31 * result + (tick != null ? tick.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (params != null ? params.hashCode() : 0);
+        result = 31 * result + (showJunctions ? 1 : 0);
+        result = 31 * result + (showTrafficGenerators ? 1 : 0);
         return result;
+    }
+
+    /**
+     * Used for caching the image in simulation image producer - we need to know when things change to redraw that.
+     * We should only use for this hashcode things which relate to static map - that is, everything except map objects.
+     *
+     * @return
+     */
+    public int getViewHashCode() {
+        int result = viewport != null ? viewport.hashCode() : 0;
+        result = 31 * result + (debugRoads ? 1 : 0);
+        result = 31 * result + (showJunctions ? 1 : 0);
+        result = 31 * result + (showTrafficGenerators ? 1 : 0);
+        return result;
+    }
+
+    public boolean isShowJunctions() {
+        return showJunctions;
+    }
+
+    public void setShowJunctions(boolean showJunctions) {
+        this.showJunctions = showJunctions;
+        fireChangeEvent();
+    }
+
+    public boolean isShowTrafficGenerators() {
+        return this.showTrafficGenerators;
+    }
+
+    public void setShowTrafficGenerators(boolean showTrafficGenerators) {
+        this.showTrafficGenerators = showTrafficGenerators;
+        fireChangeEvent();
+    }
+
+    public Feature getSelectedFeature() {
+        return selectedFeature;
+    }
+
+    public void setSelectedFeature(Feature selectedFeature) {
+        this.selectedFeature = selectedFeature;
+        fireChangeEvent();
     }
 
     /**

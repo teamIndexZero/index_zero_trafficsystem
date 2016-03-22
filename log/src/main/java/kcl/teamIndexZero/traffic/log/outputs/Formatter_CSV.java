@@ -34,7 +34,7 @@ public class Formatter_CSV implements Formatter_Interface {
         );
         String msg = "";
         for (Object o : objects) {
-            msg += o.toString();
+            msg += o;
         }
         msg = msg.replaceAll(";", "¬");
         return desc + msg + System.lineSeparator();

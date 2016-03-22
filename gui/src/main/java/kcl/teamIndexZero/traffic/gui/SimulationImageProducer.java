@@ -5,31 +5,58 @@ import kcl.teamIndexZero.traffic.log.Logger;
 import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
-import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
-import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
+import kcl.teamIndexZero.traffic.simulator.data.features.*;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
  * An implementation of {@link ISimulationAware} which outputs a buffered image of the map size in respose to every
  * tick. This image can then be either packed into the video stream or directly shown on the window frame to show
  * live representation.
+ * <p>
+ * This version of ImageProducer has some important optimizations, explicitly:
+ * <p>
+ * 1. It skips frames in case the last frame was produced recently (frame rate limit)
+ * 2. It caches static image of map in another image, and uses it to stamp to resulting image. The cached image is
+ * invalidated and re-created when some UI parameters change (scroll, zoom, selected an object, enabled debug, etc.)
  */
 public class SimulationImageProducer {
 
+    public static final String THIRTY_METERS_TEXT = "30m";
+    public static final int MAX_FRAME_RATE = 25;
+    /* Random color selection*/
+    public static final Color[] COLORS = {
+            new Color(140, 200, 200),
+            new Color(140, 200, 140),
+            new Color(140, 140, 200),
+            new Color(170, 170, 170),
+            new Color(200, 140, 140),
+            new Color(200, 200, 140),
+    };
+    private static final Stroke BASIC_STROKE = new BasicStroke(1);
     protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulationImageProducer.class.getSimpleName());
     private final SimulationMap map;
     private final GuiModel model;
     private final Primitives primitives;
+    Map<Integer, Stroke> strokeCache = new HashMap<>();
     private Consumer<BufferedImage> imageConsumer;
-
-
     private BufferedImage image = null;
+    private BufferedImage roadsImage = null;
     private Graphics2D graphics;
+
+    //helper variable used to cycle colors when debugging road - helpful to spot issues in distribution.
+    private int debugRoadsColorCounter;
+
+    // performance optimization.
+    private int lastViewportHashcode = 0;
+    private long lastDrawnTimestamp = 0;
 
     /**
      * Constructor
@@ -47,10 +74,22 @@ public class SimulationImageProducer {
         });
     }
 
+    /**
+     * Sets whom to send the ready image to
+     *
+     * @param imageConsumer addressee of the created image.
+     */
     public void setImageConsumer(Consumer<BufferedImage> imageConsumer) {
         this.imageConsumer = imageConsumer;
     }
 
+    /**
+     * Sets the size of the drawing pane in pixels. Should be invoked from resizeSomething method. We need to know it to
+     * create image of appropriate width and height.
+     *
+     * @param width  pixel width of target area
+     * @param height pixel height of target area.
+     */
     private void setPixelSize(int width, int height) {
         if (width == 0 && height == 0) {
             return;
@@ -61,51 +100,31 @@ public class SimulationImageProducer {
         }
 
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        roadsImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         graphics = (Graphics2D) image.getGraphics();
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
     }
 
+    /**
+     * Produce a new image.
+     */
     public void redraw() {
+        // we don't want to redraw the screen more often that at MAX_FRAME_RATE - framerate optimization.
+        if (System.currentTimeMillis() - lastDrawnTimestamp < 1000 / MAX_FRAME_RATE) {
+            LOG.log_Warning("Received frame too early, skipping drawing because of FPS limitation.");
+        }
+        lastDrawnTimestamp = System.currentTimeMillis();
         if (image == null) {
             return;
         }
 
         graphics.setBackground(Color.WHITE);
         graphics.clearRect(0, 0, image.getWidth(), image.getHeight());
-        primitives.drawMapBounds();
 
-        map.getMapFeatures().values().forEach(feature -> {
-            if (feature instanceof Road) {
-                Road road = ((Road) feature);
-                road.getPolyline().getSegments().forEach(segment -> {
-                    primitives.drawSegment(segment, getColorForLayer(road.getLayer()));
-                });
-
-                if (model.isShowSegmentEnds()) {
-                    // for debug purposes, we want to draw road segment start/ends.
-                    if (road.getPolyline().getSegments().size() > 0) {
-                        GeoPoint startPoint = road.getPolyline().getSegments().get(0).start;
-                        GeoPoint endPoint = road.getPolyline().getSegments().get(road.getPolyline().getSegments().size() - 1).end;
-                        primitives.drawCross(startPoint, Color.GREEN);
-                        primitives.drawCross(endPoint, Color.RED);
-                    }
-                }
-            }
-        });
-
-        map.getObjectsOnSurface().forEach(object -> {
-            GeoPoint point = object.getPositionOnMap();
-            if (point == null) {
-                return;
-            }
-
-            primitives.drawCross(point, object.getColor(), primitives.CAR_STROKE);
-
-            if (object.equals(model.getSelectedMapObject())) {
-                primitives.drawCircle(point, 15, object.getColor());
-                primitives.drawText(point, object.getNameAndRoad(), object.getColor());
-            }
-        });
+        // draw all static objects on map (junctions, roads, traffic gens etc). It will try to cache its work.
+        drawAllStaticObjects();
+        drawAllDynamicObjects();
 
         if (imageConsumer == null) {
             LOG.log_Fatal("Image consumer not present. Can not draw.");
@@ -114,10 +133,274 @@ public class SimulationImageProducer {
         }
     }
 
-    private Color getColorForLayer(int layer) {
-        return Feature.COLORS[Math.abs(layer + 3) % Feature.COLORS.length];
+    /**
+     * Draws all static objects on screen onto resulting image. Worth noting, this method will try to cache its work by
+     * using another image buffer, which saves static objects, and if things didnt' change from static object standpoints
+     * (zoom, scale, etc) it will just copy over that cached image to result.
+     * <p>
+     * However, if things have changed, it will draw that anew.
+     */
+    private void drawAllStaticObjects() {
+        if (lastViewportHashcode != model.getViewHashCode()) {
+            lastViewportHashcode = model.getViewHashCode();
+            Graphics2D roadGraphics = (Graphics2D) roadsImage.getGraphics();
+
+            roadGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            roadGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+            roadGraphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+
+            roadGraphics.setBackground(Color.WHITE);
+            roadGraphics.clearRect(0, 0, image.getWidth(), image.getHeight());
+
+            drawAllRoads(roadGraphics);
+            primitives.drawScaleOf30Meters(roadGraphics);
+        }
+        graphics.drawImage(roadsImage, 0, 0, null);
     }
 
+    /**
+     * Maybe draw all traffic generators. Switch is in model (UI checkbox).
+     *
+     * @param graphics graphics to draw on
+     */
+    private void drawAllTrafficGenerators(Graphics2D graphics) {
+        if (!model.isShowTrafficGenerators()) {
+            return;
+        }
+        map.getMapFeatures().values().forEach(feature -> {
+            if (feature instanceof TrafficGenerator) {
+                TrafficGenerator trafficGen = (TrafficGenerator) feature;
+                primitives.drawCircle(graphics, trafficGen.getGeoPoint(), 7, Color.BLUE);
+                primitives.drawText(graphics, trafficGen.getGeoPoint(), trafficGen.toString(), Color.BLUE);
+            }
+        });
+    }
+
+    /**
+     * Draw all dynamic objects - vehicles in this case.
+     */
+    public void drawAllDynamicObjects() {
+        drawAllJunctions(graphics);
+        drawAllTrafficGenerators(graphics);
+        drawFeatureSelection(graphics);
+
+        map.getObjectsOnSurface().forEach(mapObject -> {
+            GeoPoint point = mapObject.getPositionOnMap();
+            if (point == null) {
+                return;
+            }
+
+            primitives.drawCircle(graphics, point, 4, mapObject.getColor(), true);
+
+            if (mapObject.equals(model.getSelectedMapObject())) {
+                primitives.drawCircle(graphics, point, 15, mapObject.getColor());
+                primitives.drawText(graphics, point, mapObject.getNameAndRoad(), mapObject.getColor());
+            }
+        });
+    }
+
+    private void drawFeatureSelection(Graphics2D graphics) {
+        if (model.getSelectedFeature() == null) {
+            return;
+        }
+        Feature f = model.getSelectedFeature();
+        if (f instanceof Junction) {
+            Junction j = (Junction) f;
+            primitives.drawCircle(graphics, j.getGeoPoint(), 8, Color.WHITE, true);
+            primitives.drawCircle(graphics, j.getGeoPoint(), 9, Color.BLACK);
+            primitives.drawCircle(graphics, j.getGeoPoint(), 2, Color.BLACK, true);
+
+            j.getConnectedFeatures().stream().filter(feature -> feature instanceof Road).forEach(feature -> {
+                Road r = (Road) feature;
+                for (Lane lane : r.getForwardSide().getLanes()) {
+                    drawJunctionConnectionVector(graphics, j, lane);
+
+                }
+
+                for (Lane lane : r.getBackwardSide().getLanes()) {
+                    drawJunctionConnectionVector(graphics, j, lane);
+                }
+            });
+            return;
+        }
+
+        if (f instanceof TrafficGenerator) {
+            TrafficGenerator j = (TrafficGenerator) f;
+            primitives.drawCircle(graphics, j.getGeoPoint(), 30, Color.BLUE);
+            return;
+        }
+
+        if (f instanceof Road) {
+            Road r = (Road) f;
+            double minx = Double.MAX_VALUE, miny = Double.MAX_VALUE, maxx = Double.MIN_VALUE, maxy = Double.MIN_VALUE;
+            for (GeoSegment segment : r.getPolyline().getSegments()) {
+                minx = Math.min(segment.start.xMeters, Math.min(minx, segment.end.xMeters));
+                miny = Math.min(segment.start.yMeters, Math.min(miny, segment.end.yMeters));
+                maxx = Math.max(segment.start.xMeters, Math.max(maxx, segment.end.xMeters));
+                maxy = Math.max(segment.start.yMeters, Math.max(maxy, segment.end.yMeters));
+            }
+            GeoPoint center = new GeoPoint(
+                    minx + (maxx - minx) / 2,
+                    miny + (maxy - miny) / 2);
+            double radiusMeters = Math.max(maxx - minx, maxy - miny) / 2;
+            primitives.drawCircle(graphics, center, 15 + (int) (model.getViewport().getPixelsInMeter() * radiusMeters), Color.GREEN);
+        }
+    }
+
+    private void drawJunctionConnectionVector(Graphics2D graphics, Junction j, Lane lane) {
+        Road r = lane.getRoad();
+        int radius = 140;
+        int startX = model.getViewport().convertXMetersToPixels(j.getGeoPoint().xMeters);
+        int startY = model.getViewport().convertYMetersToPixels(j.getGeoPoint().yMeters);
+
+        boolean isLaneOutgoing = (j.getDirectionForFeature(r) == JunctionDescription.RoadDirection.INCOMING
+                && r.getBackwardSide().getLanes().contains(lane))
+
+                || (j.getDirectionForFeature(r) == JunctionDescription.RoadDirection.OUTGOING &&
+                r.getForwardSide().getLanes().contains(lane));
+
+        double alpha = j.getBearingForLane(lane);
+        String angleDetails = String.format("%.1f˚", Math.toDegrees(alpha));
+        graphics.setStroke(new BasicStroke(2));
+        if (isLaneOutgoing) {
+            angleDetails = "OUT: " + angleDetails;
+            int xEnd = (int) (startX + Math.cos(alpha) * radius);
+            int yEnd = (int) (startY - Math.sin(alpha) * radius);
+            graphics.setColor(Color.RED);
+            graphics.drawLine(startX,
+                    startY,
+                    xEnd,
+                    yEnd);
+            graphics.drawChars(
+                    angleDetails.toCharArray(),
+                    0,
+                    angleDetails.length(),
+                    xEnd - 7,
+                    yEnd - 7
+            );
+        } else {
+            int xEnd = (int) (startX - Math.cos(alpha) * radius);
+            int yEnd = (int) (startY + Math.sin(alpha) * radius);
+            angleDetails = "IN: " + angleDetails;
+            graphics.setColor(Color.BLUE);
+            graphics.drawLine(
+                    xEnd,
+                    yEnd,
+                    startX,
+                    startY);
+            graphics.drawChars(
+                    angleDetails.toCharArray(),
+                    0,
+                    angleDetails.length(),
+                    xEnd + 7,
+                    yEnd + 7
+            );
+
+        }
+    }
+
+    /**
+     * Draw all junctions (if enabled in UI as a checkbox).
+     *
+     * @param graphics graphics to draw on
+     */
+    public void drawAllJunctions(Graphics2D graphics) {
+        if (!model.isShowJunctions()) {
+            return;
+        }
+        map.getMapFeatures().values().forEach(feature -> {
+            if (feature instanceof Junction) {
+                Junction junction = (Junction) feature;
+                primitives.drawCircle(graphics, junction.getGeoPoint(), 7, Color.GRAY);
+                Color color = (junction.isDeadEnd() || junction.getConnectedFeatures().size() < 2) ? Color.RED : Color.black;
+                primitives.drawText(graphics,
+                        junction.getGeoPoint(),
+                        String.format(
+                                "%dF, %dP" + (junction.isDeadEnd() ? " DEAD END" : ""),
+                                junction.getConnectedFeatures().size(),
+                                junction.getUsage()),
+                        color);
+            }
+        });
+    }
+
+    /**
+     * Draw all roads.
+     *
+     * @param graphics graphics to draw on.
+     */
+    public void drawAllRoads(Graphics2D graphics) {
+        debugRoadsColorCounter = 0;
+        map.getMapFeatures().values().forEach(feature -> {
+            if (feature instanceof Road) {
+                Road road = ((Road) feature);
+                road.getForwardSide().getLanes().forEach(lane -> {
+                    debugRoadsColorCounter++;
+                    lane.getPolyline().getSegments().forEach(segment -> {
+                        primitives.drawSegment(
+                                graphics,
+                                segment,
+                                model.debugRoads()
+                                        ? COLORS[debugRoadsColorCounter % COLORS.length]
+                                        : lane.getColor(),
+                                getStrokeByWidth(lane.getWidth())
+                        );
+                    });
+                });
+                road.getBackwardSide().getLanes().forEach(lane -> {
+                    debugRoadsColorCounter++;
+                    lane.getPolyline().getSegments().forEach(segment -> {
+                        primitives.drawSegment(
+                                graphics,
+                                segment,
+                                model.debugRoads()
+                                        ? COLORS[debugRoadsColorCounter % COLORS.length]
+                                        : lane.getColor(),
+                                getStrokeByWidth(lane.getWidth())
+                        );
+                    });
+                });
+
+
+                if (model.debugRoads()) {
+                    // for debug purposes, we want to draw road segment start/ends.
+                    if (road.getPolyline().getSegments().size() > 0) {
+                        GeoPoint startPoint = road.getPolyline().getSegments().get(0).start;
+                        GeoPoint endPoint = road.getPolyline().getSegments().get(road.getPolyline().getSegments().size() - 1).end;
+                        primitives.drawCross(graphics, startPoint, Color.GREEN);
+                        primitives.drawCross(graphics, endPoint, Color.RED);
+                    }
+                    road.getPolyline().getSegments().forEach(segment -> {
+                        primitives.drawSegment(
+                                graphics,
+                                segment,
+                                Color.BLACK,
+                                BASIC_STROKE);
+                    });
+
+                }
+            }
+        });
+    }
+
+    /**
+     * Cache method for strokes.
+     *
+     * @param roadWidth road width in meters.
+     * @return cached, or newly created stroke.
+     */
+    private Stroke getStrokeByWidth(double roadWidth) {
+        int strokeWidth = (int) Math.ceil(model.getViewport().getPixelsInMeter() * roadWidth);
+        if (!strokeCache.containsKey(strokeWidth)) {
+            strokeCache.put(strokeWidth,
+                    new BasicStroke(
+                            strokeWidth,
+                            BasicStroke.CAP_ROUND,
+                            BasicStroke.JOIN_ROUND
+                    ));
+        }
+        return strokeCache.get(strokeWidth);
+    }
 
     /**
      * Inner class for primitive drawing.
@@ -125,7 +408,6 @@ public class SimulationImageProducer {
      */
     private class Primitives {
         public final BasicStroke THIN_STROKE = new BasicStroke(1);
-        public final BasicStroke CAR_STROKE = new BasicStroke(3);
 
         /**
          * Segment, draws a geo segment - line between two points.
@@ -133,8 +415,8 @@ public class SimulationImageProducer {
          * @param segment segment to draw
          * @param color   color to draw with
          */
-        public void drawSegment(GeoSegment segment, Color color) {
-            graphics.setStroke(THIN_STROKE);
+        public void drawSegment(Graphics2D graphics, GeoSegment segment, Color color, Stroke stroke) {
+            graphics.setStroke(stroke);
             graphics.setColor(color);
             graphics.drawLine(
                     model.getViewport().convertXMetersToPixels(segment.start.xMeters),
@@ -144,14 +426,30 @@ public class SimulationImageProducer {
             );
         }
 
+        public void drawScaleOf30Meters(Graphics2D graphics) {
+            graphics.setStroke(BASIC_STROKE);
+            graphics.setColor(Color.BLACK);
+            int endCoord = (int) (10 + 30 * model.getViewport().getPixelsInMeter());
+            graphics.drawLine(
+                    10, 10,
+                    (int) (10 + 30 * model.getViewport().getPixelsInMeter()),
+                    10
+            );
+            graphics.drawLine(10, 8, 10, 12);
+            graphics.drawLine(endCoord, 8, endCoord, 12);
+
+
+            graphics.drawChars(THIRTY_METERS_TEXT.toCharArray(), 0, THIRTY_METERS_TEXT.length(), 10, 30);
+        }
+
         /**
          * Draw a little cross. Defaults to thin stroke.
          *
          * @param startPoint where
          * @param color      in which color
          */
-        public void drawCross(GeoPoint startPoint, Color color) {
-            drawCross(startPoint, color, THIN_STROKE);
+        public void drawCross(Graphics2D graphics, GeoPoint startPoint, Color color) {
+            drawCross(graphics, startPoint, color, THIN_STROKE);
         }
 
         /**
@@ -161,7 +459,7 @@ public class SimulationImageProducer {
          * @param color      in which color
          * @param stroke     what stroke
          */
-        public void drawCross(GeoPoint startPoint, Color color, Stroke stroke) {
+        public void drawCross(Graphics2D graphics, GeoPoint startPoint, Color color, Stroke stroke) {
             int size = 10;
             graphics.setColor(color);
             graphics.setStroke(stroke);
@@ -171,21 +469,34 @@ public class SimulationImageProducer {
             graphics.drawLine(x, y - size / 2, x, y + size / 2);
         }
 
+        public void drawCircle(Graphics2D graphics, GeoPoint startPoint, int pixelRadius, Color color) {
+            drawCircle(graphics, startPoint, pixelRadius, color, false);
+        }
+
         /**
          * Draw a little circle around a point.
          *
          * @param startPoint  center
          * @param pixelRadius radius
          * @param color       color
+         * @param fill        whether to fill the cirle
          */
-        public void drawCircle(GeoPoint startPoint, int pixelRadius, Color color) {
+        public void drawCircle(Graphics2D graphics, GeoPoint startPoint, int pixelRadius, Color color, boolean fill) {
+            if (startPoint == null) {
+                LOG.log_Error("Got null trying to draw geo point. Debug me.");
+                return;
+            }
             graphics.setStroke(THIN_STROKE);
             graphics.setColor(color);
 
             int x = model.getViewport().convertXMetersToPixels(startPoint.xMeters);
             int y = model.getViewport().convertYMetersToPixels(startPoint.yMeters);
 
-            graphics.drawOval(x - pixelRadius, y - pixelRadius, pixelRadius * 2, pixelRadius * 2);
+            if (fill) {
+                graphics.fillOval(x - pixelRadius, y - pixelRadius, pixelRadius * 2, pixelRadius * 2);
+            } else {
+                graphics.drawOval(x - pixelRadius, y - pixelRadius, pixelRadius * 2, pixelRadius * 2);
+            }
         }
 
         /**
@@ -195,32 +506,17 @@ public class SimulationImageProducer {
          * @param text       string to draw
          * @param color      color
          */
-        public void drawText(GeoPoint startPoint, String text, Color color) {
+        public void drawText(Graphics2D graphics, GeoPoint startPoint, String text, Color color) {
+            if (startPoint == null) {
+                LOG.log_Error("Got null trying to draw geo point. Debug me.");
+                return;
+            }
             graphics.setStroke(THIN_STROKE);
             graphics.setColor(color);
 
             int x = model.getViewport().convertXMetersToPixels(startPoint.xMeters);
             int y = model.getViewport().convertYMetersToPixels(startPoint.yMeters);
             graphics.drawChars(text.toCharArray(), 0, text.length(), x + 15, y + 15);
-        }
-
-        /**
-         * Knowing a map bounds and current coordinate transformation (check out {@link kcl.teamIndexZero.traffic.gui.mvc.ViewportModel}),
-         * draw a green rectangle bounding the map area (for ease of identification).
-         */
-        private void drawMapBounds() {
-            graphics.setStroke(THIN_STROKE);
-            graphics.setColor(Color.GREEN);
-            int xStart = model.getViewport().convertXMetersToPixels(0);
-            int yStart = model.getViewport().convertYMetersToPixels(0);
-            int xEnd = model.getViewport().convertXMetersToPixels(map.widthMeters);
-            int yEnd = model.getViewport().convertYMetersToPixels(map.heightMeters);
-
-            graphics.drawLine(xStart, yStart, xStart, yEnd);
-            graphics.drawLine(xStart, yStart, xEnd, yStart);
-            graphics.drawLine(xEnd, yEnd, xStart, yEnd);
-            graphics.drawLine(xEnd, yEnd, xEnd, yStart);
-
         }
     }
 }
