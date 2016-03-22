@@ -9,6 +9,7 @@ import kcl.teamIndexZero.traffic.simulator.data.descriptors.JunctionDescription;
 import kcl.teamIndexZero.traffic.simulator.data.features.*;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -193,7 +194,11 @@ public class SimulationImageProducer {
             primitives.drawCircle(graphics, point, 4, mapObject.getColor(), true);
 
             if (mapObject.equals(model.getSelectedMapObject())) {
-                primitives.drawCircle(graphics, point, 15, mapObject.getColor());
+                primitives.drawCircle(graphics,
+                        point,
+                        (int) (model.getViewport().getPixelsInMeter()
+                                * ((Vehicle) model.getSelectedMapObject()).getDistanceToKeepToNextObject()),
+                        mapObject.getColor());
                 primitives.drawText(graphics, point, mapObject.getNameAndRoad(), mapObject.getColor());
             }
         });
@@ -253,11 +258,9 @@ public class SimulationImageProducer {
         int startX = model.getViewport().convertXMetersToPixels(j.getGeoPoint().xMeters);
         int startY = model.getViewport().convertYMetersToPixels(j.getGeoPoint().yMeters);
 
-        boolean isLaneOutgoing = (j.getDirectionForFeature(r) == JunctionDescription.RoadDirection.INCOMING
-                && r.getBackwardSide().getLanes().contains(lane))
-
-                || (j.getDirectionForFeature(r) == JunctionDescription.RoadDirection.OUTGOING &&
-                r.getForwardSide().getLanes().contains(lane));
+        boolean isLaneOutgoing =
+                (j.getDirectionForFeature(r) == JunctionDescription.RoadDirection.INCOMING && lane.isBackwardLane())
+                        || (j.getDirectionForFeature(r) == JunctionDescription.RoadDirection.OUTGOING && lane.isForwardLane());
 
         double alpha = j.getBearingForLane(lane);
         String angleDetails = String.format("%.1f˚", Math.toDegrees(alpha));

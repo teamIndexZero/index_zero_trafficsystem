@@ -207,7 +207,7 @@ public class Junction extends Feature {
             default:
                 throw new IllegalStateException("Don't know what to do");
         }
-        if (lane.getRoad().getForwardSide().getLanes().contains(lane)) {
+        if (lane.isForwardLane()) {
             return segment.getAngleToEastRadians();
         } else {
             return new GeoSegment(segment.end, segment.start).getAngleToEastRadians();
