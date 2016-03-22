@@ -41,9 +41,15 @@ public class SimulationWindow extends JFrame {
         setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
+
+        JPanel detailsPanel = new SimulationDetailsPanel(model, controller);
+        detailsPanel.setMaximumSize(new java.awt.Dimension(400, 32767));
+        detailsPanel.setMinimumSize(new java.awt.Dimension(400, 100));
+        detailsPanel.setPreferredSize(new java.awt.Dimension(400, 300));
+
         add(mainToolBar, BorderLayout.PAGE_START);
         add(mapPanel, BorderLayout.CENTER);
-        add(new SimulationDetailsPanel(model, controller), BorderLayout.WEST);
+        add(detailsPanel, BorderLayout.WEST);
         pack();
 
         mapPanel.addComponentListener(new ComponentAdapter() {

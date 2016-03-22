@@ -1,7 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.features;
 
 /**
- * Created by Es on 01/03/2016.
+ * Describes the specification of a road with its lane width
  */
 public class RoadSpecs {
     double length;

@@ -20,7 +20,7 @@ public class SimulationTick {
 
     private int tickNumber;
     private LocalDateTime simulatedTime;
-    private int tickDurationSeconds;
+    private double tickDurationSeconds;
 
     /**
      * Constructor for tick.
@@ -29,7 +29,7 @@ public class SimulationTick {
      * @param simulatedTime       time this tick represents within a simulation run (i.e. date)
      * @param tickDurationSeconds duration of single tick in simulated time
      */
-    public SimulationTick(int tickNumber, LocalDateTime simulatedTime, int tickDurationSeconds) {
+    public SimulationTick(int tickNumber, LocalDateTime simulatedTime, double tickDurationSeconds) {
         this.tickNumber = tickNumber;
         this.simulatedTime = simulatedTime;
         this.tickDurationSeconds = tickDurationSeconds;
@@ -43,7 +43,7 @@ public class SimulationTick {
         return String.format("{Tick #%d %s}", tickNumber, simulatedTime.format(DATE_TIME_FORMAT));
     }
 
-    public int getTickDurationSeconds() {
+    public double getTickDurationSeconds() {
         return tickDurationSeconds;
     }
 

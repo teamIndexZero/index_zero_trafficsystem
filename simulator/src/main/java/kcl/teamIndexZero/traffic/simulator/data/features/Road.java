@@ -55,6 +55,13 @@ public class Road extends Feature {
         this.roadSpecs.length = roadLength;
         this.forwardSide = new DirectedLanes(new ID(id, "F"), forwardLaneCount, roadSpecs, this);
         this.backwardSide = new DirectedLanes(new ID(id, "B"), backwardLaneCount, roadSpecs, this);
+        this.backwardSide.getLanes().forEach(Lane::constructPolyline);
+        this.forwardSide.getLanes().forEach(Lane::constructPolyline);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{Road %s {id:%s}}", getName(), getID());
     }
 
     /**
@@ -85,12 +92,21 @@ public class Road extends Feature {
     }
 
     /**
+     * Get roads metric width.
+     *
+     * @return road width in meters
+     */
+    public double getRoadWidth() {
+        return getForwardSide().getWidthMeters() + getBackwardSide().getWidthMeters();
+    }
+
+    /**
      * Gets the number of incoming lanes
      *
      * @return Number of left lanes
      */
     public int getForwardLaneCount() {
-        return this.backwardSide.getNumberOfLanes();
+        return this.forwardSide.getNumberOfLanes();
     }
 
     /**
@@ -99,7 +115,7 @@ public class Road extends Feature {
      * @return Number of right lanes
      */
     public int getBackwardLaneCount() {
-        return this.forwardSide.getNumberOfLanes();
+        return this.backwardSide.getNumberOfLanes();
     }
 
     /**
@@ -127,5 +143,14 @@ public class Road extends Feature {
      */
     public GeoPolyline getPolyline() {
         return polyline;
+    }
+
+    @Override
+    public String toHTMLString() {
+        return String.format(
+                "<html>" +
+                        "<font color='green'>-</font> " +
+                        "Road %s" +
+                        "</html>", getName());
     }
 }

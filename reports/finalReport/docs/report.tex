@@ -41,10 +41,73 @@
 \section{Evaluation}
 %Critically evaluate your project: what worked well, and what didn’t? How did you do relative to your plan? what changes were the result of improved thinking and what changes were forced upon you? how did your team work together? etc. Note that you need to show that you understand the weaknesses in your work as well as its strengths. You may wish to identify relevant future work that could be done on your project.
 
+\subsection{Performance}
+
+Alex: probably worth making these numbers up to a nice table, wdyt?
+
+Test machine: OS X, Intel Core I7-4770HQ, 2.2 GHz, 16GB RAM, SSD
+
+Opening sample Paris, Arc de Triomphe
+Loaded 284 road and 168 junction descriptions in 118 millis
+Constructed graph of 1145 mapFeatures, 57 mapLinks, 35 traffic generators in 68 millis
+Drawn all static objects (no debug details) in 70 millis
+Drawn dynamic objects in 0 millis
+
+Opening sample Manhattan/Battery Park
+Loaded 212 road and 148 junction descriptions in 11 millis
+Constructed graph of 829 mapFeatures, 81 mapLinks, 40 traffic generators in 5 millis
+Drawn all static objects (no debug details) in 29 millis
+Drawn dynamic objects in 0 millis
+
+Opening sample Elephant and Castle strange roundabout
+Loaded 101 road and 80 junction descriptions in 37 millis
+Constructed graph of 454 mapFeatures, 18 mapLinks, 12 traffic generators in 4 millis
+Drawn all static objects (no debug details) in 8 millis
+Drawn dynamic objects in 0 millis
+
+
+Opening sample Strand area
+Loaded 781 road and 530 junction descriptions in 62 millis
+Constructed graph of 2998 mapFeatures, 196 mapLinks, 105 traffic generators in 19 millis
+Drawn all static objects (no debug details) in 41 millis
+Drawn dynamic objects in 0 millis
+
+
+Opening sample Straight road with 6 lanes
+Loaded 1 road and 0 junction descriptions in 4 millis
+Constructed graph of 9 mapFeatures, 12 mapLinks, 2 traffic generators in 0 millis
+Drawn all static objects (no debug details) in 2 millis
+Drawn dynamic objects in 0 millis
+
+Opening sample Simple one-way square
+Loaded 1 road and 1 junction descriptions in 3 millis
+Constructed graph of 6 mapFeatures, 2 mapLinks, 2 traffic generators in 0 millis
+Drawn all static objects (no debug details) in 1 millis
+Drawn dynamic objects in 0 millis
+
+Opening sample Buckingham Palace area
+Loaded 275 road and 176 junction descriptions in 28 millis
+Constructed graph of 1032 mapFeatures, 68 mapLinks, 41 traffic generators in 8 millis
+Drawn all static objects (no debug details) in 21 millis
+Drawn dynamic objects in 0 millis
+
+Opening sample Whole Manhattan
+Loaded 14763 road and 10429 junction descriptions in 13607 millis
+Constructed graph of 58394 mapFeatures, 1055 mapLinks, 596 traffic generators in 468 millis
+Drawn all static objects (no debug details) in 531 millis
+Drawn dynamic objects in 0 millis
+
+Opening sample Whole Greater London
+Loaded 31101 road and 24314 junction descriptions in 32911 millis
+Constructed graph of 120672 mapFeatures, 547 mapLinks, 391 traffic generators in 644 millis
+Drawn all static objects (no debug details) in 1087 millis
+
+
 \begin{itemize}
     \item Map construction
     \begin{itemize}
         \item OSM xml import (lane directions and such)
+        \itme mention specifically the issue with the loosely coupled data/inaccurate data (human error, multiple representations etc.). We had to 'cut edges' to get it there.
         \item SUMO has that capability but implements its own tags and does some guess work
     \end{itemize}
 

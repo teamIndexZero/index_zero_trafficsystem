@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.gui.components;
 
 import kcl.teamIndexZero.traffic.gui.mvc.GuiModel;
+import kcl.teamIndexZero.traffic.simulator.data.features.Junction;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 
 import javax.swing.*;
@@ -16,6 +17,7 @@ import java.util.function.Consumer;
  * not used.
  */
 public class MapPanel extends JComponent implements Consumer<BufferedImage>, MouseWheelListener, MouseListener, MouseMotionListener {
+    public static final int MOUSE_CLICK_SELECTION_SENSITIVITY = 10;
     private final GuiModel model;
     private Cursor DEFAULT_CURSOR = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
     private Cursor MOVING_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
@@ -90,7 +92,49 @@ public class MapPanel extends JComponent implements Consumer<BufferedImage>, Mou
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        // we search for an object which is visible under the click coordinates
+        // and try to select it in model (though there is a good threshold)
+        model.getMap()
+                .getObjectsOnSurface()
+                .stream()
+                .filter(obj -> {
+                    GeoPoint point = obj.getPositionOnMap();
+                    if (point == null) {
+                        return false;
+                    }
+                    int xPoint = model.getViewport().convertXMetersToPixels(point.xMeters);
+                    int yPoint = model.getViewport().convertYMetersToPixels(point.yMeters);
 
+                    return Math.sqrt((xPoint - e.getX()) * (xPoint - e.getX())
+                            + (yPoint - e.getY()) * (yPoint - e.getY()))
+                            < MOUSE_CLICK_SELECTION_SENSITIVITY;
+                })
+                .findAny()
+                .ifPresent(model::setSelectedMapObject);
+        // If we have 'show junctions' checkbox selected, then we can click them to select.
+        if (model.isShowJunctions()) {
+            model.getMap()
+                    .getMapFeatures()
+                    .values()
+                    .stream()
+                    .filter(obj -> {
+                        if (!(obj instanceof Junction)) {
+                            return false;
+                        }
+                        GeoPoint point = ((Junction) obj).getGeoPoint();
+                        if (point == null) {
+                            return false;
+                        }
+                        int xPoint = model.getViewport().convertXMetersToPixels(point.xMeters);
+                        int yPoint = model.getViewport().convertYMetersToPixels(point.yMeters);
+
+                        return Math.sqrt((xPoint - e.getX()) * (xPoint - e.getX())
+                                + (yPoint - e.getY()) * (yPoint - e.getY()))
+                                < MOUSE_CLICK_SELECTION_SENSITIVITY;
+                    })
+                    .findAny()
+                    .ifPresent(model::setSelectedFeature);
+        }
     }
 
     @Override

@@ -70,7 +70,7 @@ public class Simulator {
                 SimulationTick tick = nextTick();
                 LOG.log(String.format(">>> %s Started", tick));
                 iSimulationAwares.forEach(simulationAware -> simulationAware.tick(tick));
-                LOG.log(String.format(">>> %s done\n", tick));
+                LOG.log(String.format(">>> %s Done", tick));
             }
         } finally {
             onSimulationFinish();
@@ -125,7 +125,7 @@ public class Simulator {
         } else {
             currentTick = new SimulationTick(
                     currentTick.getTickNumber() + 1,
-                    currentTick.getSimulatedTime().plus(simParams.tickSeconds, ChronoUnit.SECONDS),
+                    currentTick.getSimulatedTime().plus((int) (1000 * simParams.tickSeconds), ChronoUnit.MILLIS),
                     simParams.tickSeconds);
         }
         return currentTick;
