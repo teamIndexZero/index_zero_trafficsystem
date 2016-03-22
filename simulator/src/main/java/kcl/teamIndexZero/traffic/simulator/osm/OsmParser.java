@@ -25,14 +25,12 @@ public class OsmParser {
      */
     public OsmParseResult parse(String sourceName, InputStream streamSource) throws MapParseException {
         try {
-            OsmParseResult result = new OsmParseResult();
-
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = factory.newSAXParser();
+            OsmSaxHandler handler = new OsmSaxHandler();
+            saxParser.parse(streamSource, handler);
 
-            saxParser.parse(streamSource, new OsmSaxHandler(result));
-
-            return result;
+            return handler.collectResult();
         } catch (Exception e) {
             throw new MapParseException("Error loading from source " + sourceName, e);
         }

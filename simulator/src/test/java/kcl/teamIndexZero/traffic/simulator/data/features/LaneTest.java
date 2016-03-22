@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.features;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 import org.junit.Test;
@@ -18,7 +19,7 @@ public class LaneTest {
     public void testGetWidth() throws Exception {
         RoadSpecs rs = new RoadSpecs();
         rs.width = 8.5;
-        Lane l = new Lane(new ID("LaneTest"), rs, mock(DirectedLanes.class));
+        Lane l = new Lane(new ID("LaneTest"), rs, mock(DirectedLanes.class), 1);
         assertEquals(8.5, l.getWidth());
     }
 
@@ -26,7 +27,7 @@ public class LaneTest {
     public void testGetLength() throws Exception {
         RoadSpecs rs = new RoadSpecs();
         rs.length = 10;
-        Lane l = new Lane(new ID("LaneTest"), rs, mock(DirectedLanes.class));
+        Lane l = new Lane(new ID("LaneTest"), rs, mock(DirectedLanes.class), 1);
         assertEquals(10f, l.getLength(), 0.0001);
     }
 
@@ -34,7 +35,7 @@ public class LaneTest {
     public void testGetID() throws Exception {
         RoadSpecs rs = new RoadSpecs();
         ID testID = new ID("LaneTest");
-        Lane l = new Lane(testID, rs, mock(DirectedLanes.class));
+        Lane l = new Lane(testID, rs, mock(DirectedLanes.class), 1);
         assertEquals(testID, l.getID());
     }
 
@@ -42,7 +43,7 @@ public class LaneTest {
     public void testGetRoadID() throws Exception {
         RoadSpecs rs = new RoadSpecs();
         DirectedLanes mocked_dl = mock(DirectedLanes.class);
-        Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl);
+        Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl, 1);
         when(mocked_dl.getRoad()).thenReturn(new Road(new ID("TestRoad"), 2, 2, 2000, new GeoPolyline(), "Awesome Rd."));
         assertEquals("TestRoad", l.getRoadID().toString());
     }
@@ -51,7 +52,7 @@ public class LaneTest {
     public void testGetRoad() throws Exception {
         RoadSpecs rs = new RoadSpecs();
         DirectedLanes mocked_dl = mock(DirectedLanes.class);
-        Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl);
+        Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl, 1);
         when(mocked_dl.getRoad()).thenReturn(new Road(new ID("TestRoad"), 2, 2, 2000, new GeoPolyline(), "Awesome Rd."));
         assertEquals("Awesome Rd.", l.getRoad().getName());
     }
@@ -60,9 +61,9 @@ public class LaneTest {
     public void testGetNextLink() throws Exception {
         RoadSpecs rs = new RoadSpecs();
         DirectedLanes mocked_dl = mock(DirectedLanes.class);
-        Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl);
-        Link link = new Link(new ID("LinkID"));
-        l.connect(link);
+        Lane l = new Lane(new ID("LaneTest"), rs, mocked_dl, 1);
+        Link link = new Link(new ID("LinkID"), new GeoPoint(0, 0));
+        l.connectNext(link);
         assertEquals(link, l.getNextLink());
     }
 }
