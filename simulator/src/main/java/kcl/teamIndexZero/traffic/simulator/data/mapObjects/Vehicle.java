@@ -10,10 +10,8 @@ import kcl.teamIndexZero.traffic.simulator.data.links.JunctionLink;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
 
 import java.awt.*;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,12 +29,14 @@ import java.util.stream.Collectors;
  */
 public class Vehicle extends MapObject {
 
-    public static final Color ACCELERATING_COLOR = new Color(0, 200, 0);
-    public static final Color DECELERATING_COLOR = new Color(250, 0, 0);
-    public static final Color CONSTANT_SPEED_COLOR = Color.BLACK;
-    private double speedMetersPerSecond;
-    private double accelerationMetersPerSecondSecond;
-    private boolean isOnReverseLane = false;
+    public static final int SPEED_THRESHOLD_TO_START_BRAKING_BEFORE_CROSSING = 10 * 1000 / 3600;
+    private static HashMap<Integer, Color> allColoursCache = new HashMap<>();
+
+    public double minSpeedMetersPerSec = (Math.random() * 4 + 4) * 1000 / 3600;
+    public double maxAccelerationMetersPerSecSec = 0.4 + Math.random() * 0.4;
+    public double maxSpeedMetersPerSec = (30 + 30 * Math.random()) * 1000 / 3600;
+    private double currentSpeedMetersPerSec;
+    private double currentAccelerationMetersPerSecondSecond;
 
 
     /**
@@ -48,8 +48,8 @@ public class Vehicle extends MapObject {
     public Vehicle(ID id, String name,
                    Lane lane) {
         super(id, name, lane);
-        setLane(lane);
-        this.speedMetersPerSecond = 5;
+        setLane(lane, false);
+        this.currentSpeedMetersPerSec = 0;
     }
 
     /**
@@ -59,13 +59,11 @@ public class Vehicle extends MapObject {
      */
     @Override
     public Color getColor() {
-        if (accelerationMetersPerSecondSecond > 0) {
-            return ACCELERATING_COLOR;
-        } else if (accelerationMetersPerSecondSecond < 0) {
-            return DECELERATING_COLOR;
-        } else {
-            return CONSTANT_SPEED_COLOR;
+        int colourScale = (int) (currentSpeedMetersPerSec / maxSpeedMetersPerSec * 10);
+        if (!allColoursCache.containsKey(colourScale)) {
+            allColoursCache.put(colourScale, Color.getHSBColor((float) (0.65 + 0.35 * colourScale / 10), 1, 0.95f));
         }
+        return allColoursCache.get(colourScale);
     }
 
     /**
@@ -73,38 +71,11 @@ public class Vehicle extends MapObject {
      */
     @Override
     public void tick(SimulationTick tick) {
-        Link link = lane.getNextLink();
-        if (link == null) {
-            LOG.log_Error("Car terminating its run. Seems to be dead end (map end).");
-            return;
-        }
-
-        boolean isThisLaneTerminatingAtCrossing = false;
-        if ((link.getNextFeature() instanceof Junction) && ((Junction) link.getNextFeature()).getConnectedFeatures().size() > 2) {
-            isThisLaneTerminatingAtCrossing = true;
-        }
-
-        double distanceToTheEndOfTheLane = isOnReverseLane ? positionOnRoad : getLane().getLength() - positionOnRoad;
-        if (((isThisLaneTerminatingAtCrossing && distanceToTheEndOfTheLane > 60) || !isThisLaneTerminatingAtCrossing)
-                && Math.abs(speedMetersPerSecond) < (50 * 1000 / 3600)
-                || Math.abs(speedMetersPerSecond) < 5 * 1000 / 3600) {
-            accelerationMetersPerSecondSecond = 0.7;
-        } else if (isThisLaneTerminatingAtCrossing && distanceToTheEndOfTheLane < 50
-                && Math.abs(speedMetersPerSecond) > 10 * 1000 / 3600) {
-            accelerationMetersPerSecondSecond = (Math.abs(speedMetersPerSecond) > 40 ? -0.7 : -0.15) * Math.abs(speedMetersPerSecond);
-        } else {
-            accelerationMetersPerSecondSecond = 0;
-        }
-
-        speedMetersPerSecond =
-                speedMetersPerSecond + accelerationMetersPerSecondSecond * tick.getTickDurationSeconds();
-
-        positionOnRoad += (isOnReverseLane ? -1 : 1)
-                * speedMetersPerSecond
-                * tick.getTickDurationSeconds();
+        Link link = driveOnLane(tick);
+        if (link == null) return;
 
         // if we have terminated our lane, decide what to do next.
-        if (positionOnRoad < 0 || positionOnRoad >= lane.getLength()) {
+        if (positionOnLane < 0 || positionOnLane >= lane.getLength()) {
             if (link instanceof JunctionLink && ((JunctionLink) link).isInflowLink()) {
                 driveOnJunction(tick, link);
             } else if (link instanceof JunctionLink && ((JunctionLink) link).isOutflowLink()) {
@@ -115,15 +86,83 @@ public class Vehicle extends MapObject {
         }
     }
 
+    public Link driveOnLane(SimulationTick tick) {
+        Link link = lane.getNextLink();
+        if (link == null) {
+            LOG.log_Error("Car terminating its run. Seems to be dead end (map end).");
+            return null;
+        }
+
+        boolean isThisLaneTerminatingAtCrossing = false;
+        if ((link.getNextFeature() instanceof Junction) && ((Junction) link.getNextFeature()).getConnectedFeatures().size() > 2) {
+            isThisLaneTerminatingAtCrossing = true;
+        }
+        boolean shouldAccelerate = false;
+        boolean shouldBrake = false;
+
+        double distanceToKeep = getDistanceToKeepToNextObject();
+        if (!lane.isClearAhead(positionOnLane, distanceToKeep)) {
+            Lane outerLane = lane.tryGetLaneToOuterSide();
+            Lane innerLane = lane.tryGetLaneToInnerSide();
+            if (outerLane != null
+                    && outerLane.isClearAhead(positionOnLane, distanceToKeep)) {
+                // switch to outerLane;
+                setLane(outerLane, true);
+            } else if (innerLane != null
+                    && innerLane.isClearAhead(positionOnLane, distanceToKeep)) {
+                // switch to inner lane
+                setLane(innerLane, true);
+            } else {
+                shouldBrake = true;
+            }
+        }
+
+        double distanceToTheEndOfTheLane = lane.isBackwardLane() ? positionOnLane : getLane().getLength() - positionOnLane;
+        if (!shouldBrake
+                && ((isThisLaneTerminatingAtCrossing && distanceToTheEndOfTheLane > getDistanceToKeepToNextObject())
+                || !isThisLaneTerminatingAtCrossing)
+                && Math.abs(currentSpeedMetersPerSec) < maxSpeedMetersPerSec
+                || Math.abs(currentSpeedMetersPerSec) < minSpeedMetersPerSec) {
+            shouldAccelerate = true;
+        } else if (isThisLaneTerminatingAtCrossing && distanceToTheEndOfTheLane < getDistanceToKeepToNextObject()
+                && Math.abs(currentSpeedMetersPerSec) > SPEED_THRESHOLD_TO_START_BRAKING_BEFORE_CROSSING) {
+            shouldBrake = true;
+        } else {
+            currentAccelerationMetersPerSecondSecond = 0;
+        }
+
+        if (shouldAccelerate && !shouldBrake) {
+            currentAccelerationMetersPerSecondSecond = maxAccelerationMetersPerSecSec;
+        }
+        if (shouldBrake) {
+            currentAccelerationMetersPerSecondSecond = -currentSpeedMetersPerSec / 2.8;
+        }
+
+        currentSpeedMetersPerSec =
+                Math.max(0, currentSpeedMetersPerSec + currentAccelerationMetersPerSecondSecond * tick.getTickDurationSeconds());
+        if (!lane.isClearAhead(positionOnLane, 3)) {
+            currentSpeedMetersPerSec = 0;
+        }
+
+        positionOnLane += (lane.isBackwardLane() ? -1 : 1)
+                * currentSpeedMetersPerSec
+                * tick.getTickDurationSeconds();
+        return link;
+    }
+
+    public double getDistanceToKeepToNextObject() {
+        return 3 + currentSpeedMetersPerSec * 2.2;
+    }
+
     void driveIntoTrafficGenerator(SimulationTick tick, Link link) {
         Feature f = link.getNextFeature();
         if (f instanceof TrafficGenerator) {
             TrafficGenerator tg = (TrafficGenerator) f;
+            lane.removeVehicle(this);
             tg.terminateTravel(this);
         } else {
             throw new IllegalStateException("Got a wrong type of link " + link.getClass().getName());
         }
-
     }
 
     void driveOnGenericLink(SimulationTick tick, Link link) {
@@ -136,7 +175,6 @@ public class Vehicle extends MapObject {
         JunctionLink junctionLink = (JunctionLink) outLink;
         Junction junction = (Junction) map.getMapFeatures().get(((JunctionLink) outLink).getJunctionID());
 
-
         //TODO maybe adapt behavior for the looking ahead distance based on projected stopping time at current speed?
         //TODO if looking ahead distance goes out of scope of the current feature then query link
         junction.incrementUsage();
@@ -144,7 +182,6 @@ public class Vehicle extends MapObject {
         // 2. decide on lane of this feature. If the feature seems to be a continuation of an original road,
         //    stick to the same lane, otherwise stick to the outermost one.
         // 3. do a switch.
-
 
         List<Feature> availableFeatures = junction.getConnectedFeatures()
                 .stream()
@@ -165,7 +202,8 @@ public class Vehicle extends MapObject {
                 .collect(Collectors.toMap(Function.identity(),
                         lane -> {
                             double otherLaneBearing = junction.getBearingForLane(lane);
-                            return Math.abs(otherLaneBearing - currentBearing);
+                            return Math.min(2 * Math.PI - Math.abs(otherLaneBearing - currentBearing),
+                                    Math.abs(otherLaneBearing - currentBearing));
                         }));
 
         if (allOutgoingLanes.size() == 0) {
@@ -210,33 +248,70 @@ public class Vehicle extends MapObject {
         Collections.shuffle(lanesAllowedForForward);
         if (!turning) {
             // if we want to go forward, try to find a lane in 'go forward' list
-            nextLane = lanesAllowedForForward
-                    .stream()
-                    .findAny()
-                    .orElseGet(
-                            // if unable to go forward, try at least turn normally
-                            () -> lanesAllowedForTurn.stream().findAny().orElseGet(
-                                    // just go anywhere possible
-                                    () -> allOutgoingLanes.keySet().stream().findAny().get())
-                    );
-            // same applies for 'want turn' branch - we first try to find one in turns zone, if impossible - go forward,
-            //
+            nextLane = tryGetSameLaneNumber(lanesAllowedForForward);
+            if (nextLane == null) {
+                nextLane = getAnyLane(lanesAllowedForForward);
+            }
+            if (nextLane == null) {
+                nextLane = tryGetOuterLane(lanesAllowedForTurn);
+            }
+            if (nextLane == null) {
+                nextLane = getAnyLane(lanesAllowedForTurn);
+            }
+            if (nextLane == null) {
+                nextLane = getAnyLane(allOutgoingLanes.keySet());
+            }
         } else {
-            nextLane = lanesAllowedForTurn
-                    .stream()
-                    .findAny()
-                    .orElseGet(
-                            () -> lanesAllowedForForward.stream().findAny().orElseGet(
-                                    () -> allOutgoingLanes.keySet().stream().findAny().get())
-                    );
+            // same applies for 'want turn' branch - we first try to find one in turns zone, if impossible - go forward,
+            nextLane = tryGetOuterLane(lanesAllowedForTurn);
+            if (nextLane == null) {
+                nextLane = getAnyLane(lanesAllowedForTurn);
+            }
+            if (nextLane == null) {
+                nextLane = tryGetSameLaneNumber(lanesAllowedForForward);
+            }
+            if (nextLane == null) {
+                nextLane = getAnyLane(lanesAllowedForForward);
+            }
+            if (nextLane == null) {
+                nextLane = getAnyLane(allOutgoingLanes.keySet());
+            }
         }
 
         if (lane.getRoad().getName() != null && !lane.getRoad().getName().equals(nextLane.getRoad().getName())) {
             LOG.log(String.format("%s turning from %s to %s", getName(), lane.getRoad().getName(),
                     nextLane.getRoad().getName()));
         }
-        setLane(nextLane);
+        setLane(nextLane, false);
+    }
 
+    private Lane tryGetOuterLane(List<Lane> lanesAllowedForTurn) {
+        return lanesAllowedForTurn
+                .stream()
+                .filter(possibleLane -> possibleLane.getLanes().getNumberOfLanes() - possibleLane.getIndexInDirectedLanes() == 1)
+                .findAny()
+                .orElse(null);
+    }
+
+    private Lane getAnyLane(Collection<Lane> lanesAllowedForForward) {
+        Lane nextLane;
+        nextLane = lanesAllowedForForward
+                .stream()
+                // if there is none with same index, pick any from the allowed for forward
+                .findAny()
+                .orElse(null);
+        return nextLane;
+    }
+
+    private Lane tryGetSameLaneNumber(List<Lane> lanesAllowedForForward) {
+        return lanesAllowedForForward
+                .stream()
+                // if possible, with the same lane index from the last lane (outer first)
+                .filter(possibleLane ->
+                        possibleLane.getLanes().getNumberOfLanes() - possibleLane.getIndexInDirectedLanes()
+                                == lane.getLanes().getNumberOfLanes() - lane.getIndexInDirectedLanes())
+                .findAny()
+                .orElse(null);
     }
 
     /**
@@ -246,32 +321,33 @@ public class Vehicle extends MapObject {
     public String toString() {
         return String.format("{Vehicle \"%s\" with speed %.1f m/s and acceleration of %.5f m/s^2}",
                 name,
-                speedMetersPerSecond,
-                accelerationMetersPerSecondSecond);
+                currentSpeedMetersPerSec,
+                currentAccelerationMetersPerSecondSecond);
     }
 
     public double getAccelerationKphH() {
-        return accelerationMetersPerSecondSecond * 1000 / 3600;
+        return currentAccelerationMetersPerSecondSecond * 1000 / 3600;
     }
 
     public double getSpeedKph() {
-        return speedMetersPerSecond * 1000 / 3600;
+        return currentSpeedMetersPerSec * 1000 / 3600;
     }
 
-    public void setLane(Lane lane) {
+    public void setLane(Lane lane, boolean preservePositionOnLane) {
+        if (this.lane != null) {
+            this.lane.removeVehicle(this);
+        }
         this.lane = lane;
+        lane.addVehicle(this);
         // This is a weird case for forward/backward movement. If we are moving in the forward lane, we start
         // from road length 0, and carry on with positive speed/acceleration.
         // if we start from the 'end' of the road - say, in backwards lane - we end up starting movement in
         // roadLength, and movement decreases this position.
         // TODO probably worth making lanes direction agnostic.
-        if (lane.getRoad().getForwardSide().getLanes().contains(lane)) {
-            this.positionOnRoad = 0;
-            isOnReverseLane = false;
+        if (lane.isForwardLane()) {
+            this.positionOnLane = preservePositionOnLane ? this.positionOnLane : 0;
         } else {
-            this.positionOnRoad = lane.getLength();
-            isOnReverseLane = true;
+            this.positionOnLane = preservePositionOnLane ? this.positionOnLane : lane.getLength();
         }
-
     }
 }

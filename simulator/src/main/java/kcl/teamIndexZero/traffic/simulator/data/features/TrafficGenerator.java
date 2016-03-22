@@ -31,6 +31,7 @@ public class TrafficGenerator extends Feature {
     private java.util.List<Link> incoming = new ArrayList<>();
     private java.util.List<Link> outgoing = new ArrayList<>();
     private List<Vehicle> vehiclesToDelete = new ArrayList<>();
+
     /**
      * Constructor
      *
@@ -201,6 +202,7 @@ public class TrafficGenerator extends Feature {
         // remove the cars which have 'arrived' into this TG
         if (!this.vehiclesToDelete.isEmpty()) {
             this.vehiclesToDelete.forEach(vehicle -> {
+                vehicle.getLane().removeVehicle(vehicle);
                 super.getMap().removeMapObject(vehicle.getID());
             });
             this.vehiclesToDelete.clear();
@@ -216,9 +218,18 @@ public class TrafficGenerator extends Feature {
             if (Math.random() > 0.04) {
                 return;
             }
-            Vehicle v = null;
             try {
-                v = new Vehicle(new ID("Vehicle::" + this.getID() + "::" + globalCreationCounter), "Vehicle " + globalCreationCounter, getRandomLane());
+                Lane l = getRandomLane();
+                boolean hasLaneFreeSpace = l.isClearAhead(l.isForwardLane() ? 0 : l.getLength(), 10);
+                if (!hasLaneFreeSpace) {
+                    return;
+                }
+                Vehicle v = new Vehicle(new ID("Vehicle::" + this.getID() + "::" + globalCreationCounter), "Vehicle " + globalCreationCounter, getRandomLane());
+                super.getMap().addMapObject(v);
+                globalCreationCounter++;
+                thisGeneratorCreationCounter++;
+                LOG.log_Trace("TrafficGenerator '", this.getID(), "' created '", v.getName(), "'.");
+
             } catch (JunctionPathException e) {
                 LOG.log_Fatal("Trying to get a path to a lane to pass the new vehicle onto through the Junction failed.");
                 LOG.log_Exception(e);
@@ -226,10 +237,6 @@ public class TrafficGenerator extends Feature {
                 LOG.log_Fatal("Trying to get a lane to pass the new vehicle onto out of the TrafficGenerator ('", this.getID(), "') failed.");
                 LOG.log_Exception(e);
             }
-            super.getMap().addMapObject(v);
-            globalCreationCounter++;
-            thisGeneratorCreationCounter++;
-            LOG.log_Trace("TrafficGenerator '", this.getID(), "' created '", v.getName(), "'.");
         }
     }
 
