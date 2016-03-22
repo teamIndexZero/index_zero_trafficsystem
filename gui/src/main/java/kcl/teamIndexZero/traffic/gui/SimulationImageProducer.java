@@ -185,21 +185,41 @@ public class SimulationImageProducer {
         drawAllTrafficGenerators(graphics);
         drawFeatureSelection(graphics);
 
+        // draw all cars.
         map.getObjectsOnSurface().forEach(mapObject -> {
-            GeoPoint point = mapObject.getPositionOnMap();
+            Vehicle v = (Vehicle) mapObject;
+            GeoPoint point = v.getPositionOnMap();
             if (point == null) {
                 return;
             }
 
-            primitives.drawCircle(graphics, point, 4, mapObject.getColor(), true);
+            if (model.getViewport().getPixelsInMeter() < 1) {
+                primitives.drawCircle(graphics, point, 2, v.getColor(), true);
+            } else {
+                double bearing = v.getBearing();
+                primitives.drawSegment(graphics,
+                        new GeoSegment(
+                                new GeoPoint(
+                                        v.getPositionOnMap().xMeters - Math.cos(bearing) * v.getLengthMeters(),
+                                        v.getPositionOnMap().yMeters - Math.sin(bearing) * v.getLengthMeters()
+                                ),
+                                v.getPositionOnMap()
+                        ),
+                        v.getColor(),
+                        getStrokeByWidthMeters(v.getWidthMeters())
+                );
+                primitives.drawCircle(graphics, point, (int) (Math.floor(v.getWidthMeters() * model.getViewport().getPixelsInMeter())), Color.YELLOW, true);
+            }
 
-            if (mapObject.equals(model.getSelectedMapObject())) {
+            if (v.equals(model.getSelectedMapObject())) {
+                int radius = (int) (model.getViewport().getPixelsInMeter()
+                        * ((Vehicle) model.getSelectedMapObject()).getDistanceToKeepToNextObject());
                 primitives.drawCircle(graphics,
                         point,
-                        (int) (model.getViewport().getPixelsInMeter()
-                                * ((Vehicle) model.getSelectedMapObject()).getDistanceToKeepToNextObject()),
-                        mapObject.getColor());
-                primitives.drawText(graphics, point, mapObject.getNameAndRoad(), mapObject.getColor());
+                        radius,
+                        v.getColor());
+                primitives.drawText(graphics, point, v.getNameAndRoad(), v.getColor());
+                primitives.drawAngleVector(graphics, point, v.getBearing(), radius, 1, v.getColor(), true, false);
             }
         });
     }
@@ -221,7 +241,6 @@ public class SimulationImageProducer {
                     drawJunctionConnectionVector(graphics, j, lane);
 
                 }
-
                 for (Lane lane : r.getBackwardSide().getLanes()) {
                     drawJunctionConnectionVector(graphics, j, lane);
                 }
@@ -254,52 +273,20 @@ public class SimulationImageProducer {
 
     private void drawJunctionConnectionVector(Graphics2D graphics, Junction j, Lane lane) {
         Road r = lane.getRoad();
-        int radius = 140;
-        int startX = model.getViewport().convertXMetersToPixels(j.getGeoPoint().xMeters);
-        int startY = model.getViewport().convertYMetersToPixels(j.getGeoPoint().yMeters);
 
         boolean isLaneOutgoing =
                 (j.getDirectionForFeature(r) == JunctionDescription.RoadDirection.INCOMING && lane.isBackwardLane())
                         || (j.getDirectionForFeature(r) == JunctionDescription.RoadDirection.OUTGOING && lane.isForwardLane());
 
-        double alpha = j.getBearingForLane(lane);
-        String angleDetails = String.format("%.1f˚", Math.toDegrees(alpha));
-        graphics.setStroke(new BasicStroke(2));
-        if (isLaneOutgoing) {
-            angleDetails = "OUT: " + angleDetails;
-            int xEnd = (int) (startX + Math.cos(alpha) * radius);
-            int yEnd = (int) (startY - Math.sin(alpha) * radius);
-            graphics.setColor(Color.RED);
-            graphics.drawLine(startX,
-                    startY,
-                    xEnd,
-                    yEnd);
-            graphics.drawChars(
-                    angleDetails.toCharArray(),
-                    0,
-                    angleDetails.length(),
-                    xEnd - 7,
-                    yEnd - 7
-            );
-        } else {
-            int xEnd = (int) (startX - Math.cos(alpha) * radius);
-            int yEnd = (int) (startY + Math.sin(alpha) * radius);
-            angleDetails = "IN: " + angleDetails;
-            graphics.setColor(Color.BLUE);
-            graphics.drawLine(
-                    xEnd,
-                    yEnd,
-                    startX,
-                    startY);
-            graphics.drawChars(
-                    angleDetails.toCharArray(),
-                    0,
-                    angleDetails.length(),
-                    xEnd + 7,
-                    yEnd + 7
-            );
-
-        }
+        primitives.drawAngleVector(
+                graphics,
+                j.getGeoPoint(),
+                j.getBearingForLane(lane),
+                140,
+                2,
+                isLaneOutgoing ? Color.RED : Color.BLUE,
+                isLaneOutgoing,
+                true);
     }
 
     /**
@@ -346,7 +333,7 @@ public class SimulationImageProducer {
                                 model.debugRoads()
                                         ? COLORS[debugRoadsColorCounter % COLORS.length]
                                         : lane.getColor(),
-                                getStrokeByWidth(lane.getWidth())
+                                getStrokeByWidthMeters(lane.getWidth())
                         );
                     });
                 });
@@ -359,7 +346,7 @@ public class SimulationImageProducer {
                                 model.debugRoads()
                                         ? COLORS[debugRoadsColorCounter % COLORS.length]
                                         : lane.getColor(),
-                                getStrokeByWidth(lane.getWidth())
+                                getStrokeByWidthMeters(lane.getWidth())
                         );
                     });
                 });
@@ -389,20 +376,24 @@ public class SimulationImageProducer {
     /**
      * Cache method for strokes.
      *
-     * @param roadWidth road width in meters.
+     * @param strokeWidthMeters road width in meters.
      * @return cached, or newly created stroke.
      */
-    private Stroke getStrokeByWidth(double roadWidth) {
-        int strokeWidth = (int) Math.ceil(model.getViewport().getPixelsInMeter() * roadWidth);
-        if (!strokeCache.containsKey(strokeWidth)) {
-            strokeCache.put(strokeWidth,
+    private Stroke getStrokeByWidthMeters(double strokeWidthMeters) {
+        int width = (int) Math.ceil(model.getViewport().getPixelsInMeter() * strokeWidthMeters);
+        return getStrokeByWidthPixels(width);
+    }
+
+    private Stroke getStrokeByWidthPixels(int width) {
+        if (!strokeCache.containsKey(width)) {
+            strokeCache.put(width,
                     new BasicStroke(
-                            strokeWidth,
+                            width,
                             BasicStroke.CAP_ROUND,
                             BasicStroke.JOIN_ROUND
                     ));
         }
-        return strokeCache.get(strokeWidth);
+        return strokeCache.get(width);
     }
 
     /**
@@ -519,7 +510,72 @@ public class SimulationImageProducer {
 
             int x = model.getViewport().convertXMetersToPixels(startPoint.xMeters);
             int y = model.getViewport().convertYMetersToPixels(startPoint.yMeters);
-            graphics.drawChars(text.toCharArray(), 0, text.length(), x + 15, y + 15);
+            graphics.drawChars(text.toCharArray(), 0, text.length(), x + 18, y + 18);
+        }
+
+        /**
+         * Draws a vector coming out (or going into) the point in meters. Vector is specified by radius and bearing to
+         * 1, 0 base vector. Please take special care of units - some in meters, some in pixels here.
+         *
+         * @param graphics     graphics to draw on
+         * @param point        pivot point (start or end depending on isOutgoing) of the vector
+         * @param bearing      angle to 1,0 base vector (t east)
+         * @param radiusPixels radius in pixels
+         * @param strokeWidth  width of the stroke
+         * @param isOutgoing   whether the vector is going out, or going into the point
+         */
+        public void drawAngleVector(Graphics2D graphics,
+                                    GeoPoint point,
+                                    double bearing,
+                                    int radiusPixels,
+                                    int strokeWidth,
+                                    Color color,
+                                    boolean isOutgoing,
+                                    boolean drawAngleText) {
+            int startX = model.getViewport().convertXMetersToPixels(point.xMeters);
+            int startY = model.getViewport().convertYMetersToPixels(point.yMeters);
+
+            String angleDetails = String.format("%.1f˚", Math.toDegrees(bearing));
+            graphics.setStroke(getStrokeByWidthPixels(strokeWidth));
+            graphics.setColor(color);
+
+            if (isOutgoing) {
+                angleDetails = "OUT: " + angleDetails;
+                int xEnd = (int) (startX + Math.cos(bearing) * radiusPixels);
+                int yEnd = (int) (startY - Math.sin(bearing) * radiusPixels);
+                graphics.drawLine(startX,
+                        startY,
+                        xEnd,
+                        yEnd);
+                if (drawAngleText) {
+                    graphics.drawChars(
+                            angleDetails.toCharArray(),
+                            0,
+                            angleDetails.length(),
+                            xEnd - 7,
+                            yEnd - 7
+
+                    );
+                }
+            } else {
+                int xEnd = (int) (startX - Math.cos(bearing) * radiusPixels);
+                int yEnd = (int) (startY + Math.sin(bearing) * radiusPixels);
+                angleDetails = "IN: " + angleDetails;
+                graphics.drawLine(
+                        xEnd,
+                        yEnd,
+                        startX,
+                        startY);
+                if (drawAngleText) {
+                    graphics.drawChars(
+                            angleDetails.toCharArray(),
+                            0,
+                            angleDetails.length(),
+                            xEnd + 7,
+                            yEnd + 7
+                    );
+                }
+            }
         }
     }
 }
