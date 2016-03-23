@@ -33,6 +33,12 @@
 \subsection{Graph construction}
 
 \begin{itemize}
+	\item Thoughts
+	\begin{itemize}
+		\item why construct the graph prior to the sim run instead of during	
+		\item > moving the workload at startup time so as to runtime increase performance
+		\item > able to conceptually save state of graph on each tick if save is implemented
+	\end{itemize}
 	\item Original premise: Links, Junctions and Roads
 	\item >>> PIC
 	\item Progressed into Links, Junctions, Lanes in Directed lane group in Road
@@ -41,7 +47,16 @@
 	\item link descriptions are depreciated after work on the OSM showed that universal linkage with junctions were for easier to do then identifying what was 1-to-1 link or a junction from the OSM data
 	\item Graph now composed of directed lanes -> links and Junction features with special JunctionLinks
 	\item Roads are now abstracted in the graph. Lanes still belong to groups of directed lanes which, in turn, belong to roads but the graph connections are done at lane level.
-	\item >>> PIC
+	
+\begin{figure}[h]
+	\vspace{1.5em}
+  	\caption{Roads, Directed lane group and lanes}
+  	\label{fig:RoadsFinal}
+  	\centering
+	\includegraphics[width=0.70\textwidth]{figs/Roads.png}
+  	\vspace{1.5em}
+\end{figure}	
+	
 	\item Roads and directed lane kept for keeping track of what belongs where on the simulation map. e.g.: road with name can be back referenced from a lane.
 	\item 
 \end{itemize}
@@ -78,8 +93,8 @@
 \end{itemize}
 
 \subsection{Helpers}
-\subsubsection{Logger}
 
+\subsubsection{Logger}
 \begin{figure}[h!]
 	\vspace{1.5em}
   	\caption{Logger overview}
