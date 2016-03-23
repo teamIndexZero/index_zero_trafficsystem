@@ -37,14 +37,14 @@ public class RoadTest {
 
     @Test
     public void testGetIncomingLaneCount() throws Exception {
-        assertEquals(5, r1.getForwardLaneCount());
-        assertEquals(0, r2.getForwardLaneCount());
+        assertEquals(5, r1.getBackwardLaneCount());
+        assertEquals(10, r2.getForwardLaneCount());
     }
 
     @Test
     public void testGetOutgoingLaneCount() throws Exception {
-        assertEquals(3, r1.getBackwardLaneCount());
-        assertEquals(10, r2.getBackwardLaneCount());
+        assertEquals(3, r1.getForwardLaneCount());
+        assertEquals(0, r2.getBackwardLaneCount());
     }
 
     @Test
@@ -68,5 +68,28 @@ public class RoadTest {
     public void testGetRoadLength() throws Exception {
         assertEquals(12000, r1.getRoadLength(), 0);
         assertEquals(10000, r2.getRoadLength(), 0);
+    }
+
+    @Test
+    public void testGetLayer() throws Exception {
+        assertEquals(0, r1.getLayer());
+    }
+
+    @Test
+    public void testGetRoadWidth() throws Exception {
+        assertEquals((3 + 5) * 3.2, r1.getRoadWidth(), 0);
+        assertEquals(10 * 3.2, r2.getRoadWidth(), 0);
+    }
+
+    @Test
+    public void testGetForwardLaneCount() throws Exception {
+        assertEquals(3, r1.getForwardLaneCount());
+        assertEquals(10, r2.getForwardLaneCount());
+    }
+
+    @Test
+    public void testGetBackwardLaneCount() throws Exception {
+        assertEquals(5, r1.getBackwardLaneCount());
+        assertEquals(0, r2.getBackwardLaneCount());
     }
 }

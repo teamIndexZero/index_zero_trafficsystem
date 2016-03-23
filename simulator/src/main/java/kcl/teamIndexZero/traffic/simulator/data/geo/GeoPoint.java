@@ -1,16 +1,27 @@
 package kcl.teamIndexZero.traffic.simulator.data.geo;
 
+import kcl.teamIndexZero.traffic.simulator.data.ID;
+
 /**
  * Represents a geographical point (in our synthetic coordinate system (offset to north and east from 0,0).
  */
 public class GeoPoint {
 
+    private static final ID SYNTETIC = new ID("SYNTH_POINT");
+
     public double xMeters;
     public double yMeters;
+    public ID id;
 
     public GeoPoint(double xMeters, double yMeters) {
+        this(xMeters, yMeters, SYNTETIC);
+    }
+
+    public GeoPoint(double xMeters, double yMeters, ID id) {
         this.xMeters = xMeters;
         this.yMeters = yMeters;
+        this.id = id;
+
     }
 
     /**
@@ -20,17 +31,32 @@ public class GeoPoint {
      * @param point1 second point
      * @return distance in meters.
      */
-    public static double getDistance(GeoPoint point, GeoPoint point1) {
+    public static double getDistanceBetween(GeoPoint point, GeoPoint point1) {
         return Math.sqrt(
                 (point.xMeters - point1.xMeters) * (point.xMeters - point1.xMeters) +
                         (point.yMeters - point1.yMeters) * (point.yMeters - point1.yMeters));
     }
 
+    /**
+     * Get an ID of this point (useful for debugging and tracking back to the OSM files).
+     *
+     * @return id of this point.
+     */
+    public ID getId() {
+        return id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return String.format("{%.0f, %.0f}", xMeters, yMeters);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -43,6 +69,9 @@ public class GeoPoint {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int result;

@@ -1,16 +1,13 @@
 package kcl.teamIndexZero.traffic.gui.mvc;
 
 import kcl.teamIndexZero.traffic.simulator.data.SimulationMap;
-import kcl.teamIndexZero.traffic.simulator.data.SimulationParams;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 
-import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -49,19 +46,5 @@ public class GuiModelTest {
                         throw new RuntimeException("Error invoking method " + m1.getName(), e);
                     }
                 });
-    }
-
-    @Test
-    public void shouldModelReset() {
-        //given
-        GuiModel oldModel = new GuiModel(mock(SimulationMap.class));
-        model.setParams(new SimulationParams(LocalDateTime.now(), 20, 20));
-        model.setStatus(GuiModel.SimulationStatus.OFF);
-
-        // when
-        model.reset();
-
-        // then
-        assertThat(model).isEqualTo(oldModel);
     }
 }

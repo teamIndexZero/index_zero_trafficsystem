@@ -1,6 +1,7 @@
 package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +13,7 @@ public class JunctionDescription {
     private ID id;
     private Map<ID, RoadDirection> connectedRoadIDs = new HashMap<>();
     private boolean trafficLightFlag;
+    private GeoPoint geoPoint;
 
     /**
      * Constructor
@@ -20,10 +22,15 @@ public class JunctionDescription {
      * @param connectedRoadIDs  Connected road IDs
      * @param trafficLight_flag Traffic light on the junction flag
      */
-    public JunctionDescription(ID id, Map<ID, RoadDirection> connectedRoadIDs, boolean trafficLight_flag) {
+    public JunctionDescription(ID id, Map<ID, RoadDirection> connectedRoadIDs, boolean trafficLight_flag, GeoPoint geoPoint) {
         this.id = id;
         this.connectedRoadIDs = connectedRoadIDs;
         this.trafficLightFlag = trafficLight_flag;
+        this.geoPoint = geoPoint;
+    }
+
+    public GeoPoint getGeoPoint() {
+        return geoPoint;
     }
 
     /**

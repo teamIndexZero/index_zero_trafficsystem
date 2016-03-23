@@ -1,14 +1,12 @@
 package kcl.teamIndexZero.traffic.simulator.data.descriptors;
 
 import kcl.teamIndexZero.traffic.simulator.data.ID;
-import kcl.teamIndexZero.traffic.simulator.data.features.Road;
+import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +29,7 @@ public class JunctionDescriptionTest {
         this.list.put(new ID("road2"), JunctionDescription.RoadDirection.INCOMING);
         this.list.put(new ID("road3"), JunctionDescription.RoadDirection.OUTGOING);
         this.flag = true;
-        this.jd = new JunctionDescription(this.id, this.list, this.flag);
+        this.jd = new JunctionDescription(this.id, this.list, this.flag, new GeoPoint(0, 0));
     }
 
     @After
@@ -56,4 +54,13 @@ public class JunctionDescriptionTest {
     }
 
 
+    @Test
+    public void testGetGeoPoint() throws Exception {
+        assertEquals(new GeoPoint(0, 0), jd.getGeoPoint());
+    }
+
+    @Test
+    public void testHasTrafficLight() throws Exception {
+        assertTrue(jd.hasTrafficLight());
+    }
 }

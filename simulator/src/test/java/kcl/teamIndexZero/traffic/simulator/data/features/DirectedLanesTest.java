@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -52,5 +53,27 @@ public class DirectedLanesTest {
         Road mocked_road = mock(Road.class);
         DirectedLanes dl = new DirectedLanes(new ID("LaneGroup"), 5, this.rs, mocked_road);
         assertEquals(5, dl.getLanes().size());
+    }
+
+    @Test
+    public void testGetID() throws Exception {
+        Road mocked_road = mock(Road.class);
+        DirectedLanes dl = new DirectedLanes(new ID("LaneGroup"), 5, this.rs, mocked_road);
+        assertEquals(new ID("LaneGroup"), dl.getID());
+    }
+
+    @Test
+    public void testToString() throws Exception {
+        Road mocked_road = mock(Road.class);
+        when(mocked_road.toString()).thenReturn("Road.toString()");
+        DirectedLanes dl = new DirectedLanes(new ID("LaneGroup"), 5, this.rs, mocked_road);
+        assertEquals("{DirLanes of Road.toString()}", dl.toString());
+    }
+
+    @Test
+    public void testGetWidthMeters() throws Exception {
+        Road mocked_road = mock(Road.class);
+        DirectedLanes dl = new DirectedLanes(new ID("LaneGroup"), 5, this.rs, mocked_road);
+        assertEquals( 5 * 3.2, dl.getWidthMeters(), 0);
     }
 }

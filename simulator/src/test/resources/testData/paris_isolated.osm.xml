@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version="0.6" generator="Osmosis 0.44.1">
+    <bounds minlon="2.28973" minlat="48.86784" maxlon="2.30444" maxlat="48.87968" origin="osmconvert 0.8.4"/>
+
+    <!--Common point:-->
+    <node id="commonPoint1" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87438" lon="2.29493"/>
+    <node id="commonPoint2" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.874" lon="2.294"/>
+
+    <!--1st way-->
+    <node id="21660969" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87864" lon="2.29422"/>
+    <node id="2698142543" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87846" lon="2.29423">
+        <tag k="highway" v="crossing"/>
+    </node>
+    <node id="269368412" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87843" lon="2.29424"/>
+    <node id="21660972" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87838" lon="2.29425"/>
+    <node id="269368021" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87801" lon="2.29431"/>
+    <node id="1998793619" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87748" lon="2.2944"/>
+    <node id="269902782" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87738" lon="2.29442"/>
+    <node id="269902563" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87714" lon="2.29446"/>
+    <node id="272336241" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87684" lon="2.29451"/>
+    <node id="269903044" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87673" lon="2.29453"/>
+    <node id="21660967" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87664" lon="2.29454"/>
+    <node id="1961531248" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87656" lon="2.29456"/>
+    <node id="1961531244" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.8765" lon="2.29457"/>
+    <node id="21659957" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87526" lon="2.29479"/>
+
+    <!--2nd way -->
+    <node id="368321" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87382" lon="2.29596"/>
+    <node id="1924310840" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.8739" lon="2.29594"/>
+    <node id="350530161" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87398" lon="2.29591"/>
+    <node id="1924310841" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87404" lon="2.29586"/>
+    <node id="368320" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.8741" lon="2.29581"/>
+    <node id="1924310843" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87417" lon="2.29573"/>
+    <node id="350530163" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87424" lon="2.29563"/>
+    <node id="1924310844" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87429" lon="2.29554"/>
+    <node id="368319" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87432" lon="2.29543"/>
+    <node id="1962530972" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87436" lon="2.29529"/>
+    <node id="272337436" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87438" lon="2.29515"/>
+    <node id="1962530975" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87439" lon="2.29504"/>
+    <node id="1962530973" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87437" lon="2.29483"/>
+    <node id="350530114" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87435" lon="2.29473"/>
+    <node id="1962530969" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87432" lon="2.29462"/>
+    <node id="21292970" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87428" lon="2.29451"/>
+    <node id="1962530968" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87424" lon="2.29443"/>
+    <node id="350530117" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.8742" lon="2.29436"/>
+    <node id="1962530966" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.87415" lon="2.29429"/>
+    <node id="568794047" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.8741" lon="2.29424"/>
+
+    <!--3rd way-->
+    <node id="extraPoint1" version="1" timestamp="2016-03-04T13:07:17Z" lat="48.875" lon="2.293"/>
+
+
+    <way id="4450686" version="1" timestamp="2016-03-04T13:07:17Z">
+        <nd ref="21660969"/>
+        <nd ref="2698142543"/>
+        <nd ref="269368412"/>
+        <nd ref="21660972"/>
+        <nd ref="269368021"/>
+        <nd ref="1998793619"/>
+        <nd ref="269902782"/>
+        <nd ref="269902563"/>
+        <nd ref="272336241"/>
+        <nd ref="269903044"/>
+        <nd ref="21660967"/>
+        <nd ref="1961531248"/>
+        <nd ref="1961531244"/>
+        <nd ref="21659957"/>
+        <nd ref="commonPoint1"/>
+        <tag k="name" v="Avenue Mac-Mahon"/>
+        <tag k="oneway" v="yes"/>
+        <tag k="highway" v="secondary"/>
+        <tag k="maxspeed" v="50"/>
+        <tag k="busway:left" v="opposite_lane"/>
+        <tag k="cycleway:left" v="share_busway"/>
+    </way>
+
+    <way id="190627544" version="1" timestamp="2016-03-04T13:07:17Z">
+        <nd ref="368321"/>
+        <nd ref="1924310840"/>
+        <nd ref="350530161"/>
+        <nd ref="1924310841"/>
+        <nd ref="368320"/>
+        <nd ref="1924310843"/>
+        <nd ref="commonPoint2"/>
+        <nd ref="1924310844"/>
+        <nd ref="368319"/>
+        <nd ref="1962530972"/>
+        <nd ref="272337436"/>
+        <nd ref="1962530975"/>
+        <nd ref="commonPoint1"/>
+        <nd ref="1962530973"/>
+        <nd ref="350530114"/>
+        <nd ref="1962530969"/>
+        <nd ref="21292970"/>
+        <nd ref="1962530968"/>
+        <nd ref="350530117"/>
+        <nd ref="1962530966"/>
+        <nd ref="568794047"/>
+        <tag k="name" v="Place Charles de Gaulle"/>
+        <tag k="note" v="this is not a roundabout; ceci n&apos;est pas un carrefour giratoire"/>
+        <tag k="lanes" v="8"/>
+        <tag k="oneway" v="yes"/>
+        <tag k="highway" v="primary"/>
+        <tag k="name:ru" v="Площадь Шарль де Голл"/>
+        <tag k="name:vi" v="Quảng trường Charles de Gaulle"/>
+        <tag k="name:wa" v="Plèce Charles di Gaulle"/>
+        <tag k="surface" v="cobblestone"/>
+        <tag k="maxspeed" v="50"/>
+        <tag k="old_name" v="Place de l&apos;Étoile"/>
+        <tag k="old_name:vi" v="Quảng trường Étoile"/>
+        <tag k="parking:lane:both" v="no_parking"/>
+    </way>
+
+    <way id="way_3" version="1" timestamp="2016-03-04T13:07:17Z">
+        <nd ref="extraPoint1"/>
+        <nd ref="commonPoint2"/>
+    </way>
+
+</osm>
