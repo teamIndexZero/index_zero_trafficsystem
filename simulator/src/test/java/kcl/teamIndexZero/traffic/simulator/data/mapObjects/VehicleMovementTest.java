@@ -59,7 +59,9 @@ public class VehicleMovementTest {
         // given
         JunctionLink outgoingLink = mock(JunctionLink.class);
         when(lane.getNextLink()).thenReturn(outgoingLink);
-        when(lane.getLength()).thenReturn(10.0);
+        when(lane.getLength()).thenReturn(1000.0);
+        when(lane.isClearAhead(any(), anyDouble(), anyDouble())).thenReturn(true);
+
 
         // when
         vehicle.tick(tick);
@@ -84,8 +86,9 @@ public class VehicleMovementTest {
         when(junction.getConnectedFeatures()).thenReturn(Arrays.asList(road, otherRoad));
 
         when(outgoingLink.getNextFeature()).thenReturn(junction);
+        when(lane.isClearAhead(any(), anyDouble(), anyDouble())).thenReturn(true);
         when(lane.getNextLink()).thenReturn(outgoingLink);
-        when(lane.getLength()).thenReturn(10.0);
+        when(lane.getLength()).thenReturn(1000.0);
 
         // when
         vehicle.tick(tick);
@@ -111,11 +114,15 @@ public class VehicleMovementTest {
         when(junction.getConnectedFeatures()).thenReturn(Arrays.asList(road, otherRoad, otherRoad2));
 
         when(outgoingLink.getNextFeature()).thenReturn(junction);
+        when(lane.isClearAhead(any(), anyDouble(), anyDouble())).thenReturn(true);
         when(lane.getNextLink()).thenReturn(outgoingLink);
         when(lane.getLength()).thenReturn(10.0);
 
-        // when
-        vehicle.tick(tick);
+        // in 4 ticks for this case, we will be able to start moving, and eventually get to the point on road where the
+        // junction is 'visible'
+        for (int i = 0; i < 4; i++) {
+            vehicle.tick(tick);
+        }
 
         // then
         verify(vehicle, never()).driveOnJunction(any());
