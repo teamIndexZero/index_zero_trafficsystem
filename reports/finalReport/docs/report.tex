@@ -27,7 +27,7 @@
 \section{Implementation}
 %Describe the most significant implementation details, focussing on those where unusual or detailed solutions were required. Quote code fragments where necessary, but remember that the full source code will be included as an appendix. Explain how you tested your software (e.g. unit testing) and the extent to which you tested it. If relevant to your project, explain performance issues and how you tackled them.
 
-\subsection{Map data (OSM) import}
+\subsection{Map data \(OSM\) import}
 
 
 \subsection{Graph construction}
@@ -40,6 +40,16 @@
 		\item > able to conceptually save state of graph on each tick if save is implemented
 	\end{itemize}
 	\item Original premise: Links, Junctions and Roads
+
+\begin{figure}
+	\vspace{1.5em}
+  	\caption{Original design for roads}
+  	\label{fig:RoadsOriginal}
+  	\centering
+	\includegraphics[width=0.55\textwidth]{figs/graphConstruction/OriginalRoads.png}
+  	\vspace{1.5em}
+\end{figure}	
+	
 	\item >>> PIC
 	\item Progressed into Links, Junctions, Lanes in Directed lane group in Road
 	\item > linkage done on a lane level instead of road to make it easier to construct a directed graph
@@ -48,14 +58,24 @@
 	\item Graph now composed of directed lanes -> links and Junction features with special JunctionLinks
 	\item Roads are now abstracted in the graph. Lanes still belong to groups of directed lanes which, in turn, belong to roads but the graph connections are done at lane level.
 	
-\begin{figure}[h]
+\begin{figure}
 	\vspace{1.5em}
   	\caption{Roads, Directed lane group and lanes}
   	\label{fig:RoadsFinal}
   	\centering
-	\includegraphics[width=0.80\textwidth]{figs/Roads.png}
+	\includegraphics[width=1\textwidth]{figs/graphConstruction/Roads.png}
   	\vspace{1.5em}
 \end{figure}	
+	
+\begin{figure}
+	\vspace{1.5em}
+  	\caption{Junction}
+  	\label{fig:junction}
+  	\centering
+	\includegraphics[width=0.80\textwidth]{figs/graphConstruction/Junction.png}
+  	\vspace{1.5em}
+\end{figure}		
+	
 	
 	\item Roads and directed lane kept for keeping track of what belongs where on the simulation map. e.g.: road with name can be back referenced from a lane.
 	\item 
@@ -63,7 +83,7 @@
 
 \begin{itemize}
 	\item Problems:
-	\item > issues steaming from the OSM data leads to bug where in a round about a incoming road cannot be connected up
+	\item > issues streaming from the OSM data leads to bug where in a round about a incoming road cannot be connected up
 	\item > Example!! + PIC + explanation as to why exactly
 \end{itemize}
 
@@ -85,29 +105,27 @@
 \begin{itemize}
     \item two types of traffic lights: singles and those in one junction set
     \item all traffic lights work autonomously
-	\item traffic light state: discussion whether traffic light State should be boolean or enum (everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum)
+	\item traffic light state: discussion whether traffic light State should be boolean or enum \(everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum\)
 \end{itemize}
 
 \begin{itemize}
 	\item serialization/de-serialization
 \end{itemize}
 
-\subsection{Helpers}
-
-\subsubsection{Logger}
-\begin{figure}[h]
+\subsection{Logger}
+\begin{figure}
 	\vspace{1.5em}
   	\caption{Logger overview}
   	\label{fig:logger_overview}
   	\centering
-	\includegraphics[width=0.75\textwidth]{figs/logModuleObjectDiagram.png}
+	\includegraphics[width=0.75\textwidth]{figs/logger/LogModuleObjectDiagram.png}
   	\vspace{1.5em}
 \end{figure}
 
     \begin{itemize}
         \item explain why and usage scenarios
         \item add basic arch. uml here
-        \item Log config option injection (why/how)
+        \item Log config option injection \(why/how\)
         \item Output formats (impact on performance)
     \end{itemize}
     
