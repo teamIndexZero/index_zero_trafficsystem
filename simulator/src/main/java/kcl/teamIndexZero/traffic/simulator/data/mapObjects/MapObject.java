@@ -33,6 +33,7 @@ public abstract class MapObject implements ISimulationAware {
      *
      * @param name name of the object (to be shown in simulation maps)
      * @param lane lane to stay on initially
+     * @param id   id of the object. Should be unique!
      */
     public MapObject(ID id, String name, Lane lane) {
         this.name = name;
@@ -53,10 +54,6 @@ public abstract class MapObject implements ISimulationAware {
         return color;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
     public void setMap(SimulationMap map) {
         this.map = map;
     }
@@ -69,10 +66,21 @@ public abstract class MapObject implements ISimulationAware {
         this.name = name;
     }
 
+    /**
+     * Get a name of the object with extra details - road this object belongs to.
+     *
+     * @return object name and road.
+     */
     public String getNameAndRoad() {
         return String.format("%s at %s", name, lane.getRoad().getName());
     }
 
+    /**
+     * Get position on the map (in meters-offset notation). It is coming from the lane this object is attached to, and
+     * the location within this lane
+     *
+     * @return position on map
+     */
     public GeoPoint getPositionOnMap() {
         return lane.getPolyline().getGeoPointAtDistanceFromStart(positionOnLane);
     }

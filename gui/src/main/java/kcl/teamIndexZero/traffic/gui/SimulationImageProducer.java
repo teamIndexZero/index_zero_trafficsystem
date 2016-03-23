@@ -62,7 +62,8 @@ public class SimulationImageProducer {
     /**
      * Constructor
      *
-     * @param map map to draw
+     * @param map   map to draw
+     * @param model gui model
      */
     public SimulationImageProducer(SimulationMap map, GuiModel model) {
         this.map = map;

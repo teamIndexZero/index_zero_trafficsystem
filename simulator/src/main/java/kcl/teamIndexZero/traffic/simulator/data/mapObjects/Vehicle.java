@@ -165,8 +165,9 @@ public class Vehicle extends MapObject {
      * <p>
      * When changing, the car will check availability of space.
      *
-     * @param tick
-     * @return
+     * @param tick simulation moment of time. We need to know that for period of time it covers, to calculate speed and
+     *             position advancement
+     * @return next link
      */
     public Link driveOnLane(SimulationTick tick) {
         Link link = lane.getNextLink();
@@ -397,7 +398,7 @@ public class Vehicle extends MapObject {
             }
             setLane(nextLane, false);
         } else {
-                LOG.log_Warning("Can not turn to desired lane - it is busy.");
+            LOG.log_Warning("Can not turn to desired lane - it is busy.");
         }
     }
 

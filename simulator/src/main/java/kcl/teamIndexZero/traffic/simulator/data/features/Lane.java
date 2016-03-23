@@ -34,7 +34,10 @@ public class Lane extends Feature {
     /**
      * Constructor
      *
-     * @param road_specs Road specifications
+     * @param id                   an identifier of the lane
+     * @param road_specs           Road specifications
+     * @param parent               the {@link DirectedLanes} object this lane belongs to
+     * @param indexInDirectedLanes is the index within directed lanes, with 0 being innermost
      */
     public Lane(ID id, RoadSpecs road_specs, DirectedLanes parent, int indexInDirectedLanes) {
         super(id);
@@ -198,7 +201,7 @@ public class Lane extends Feature {
     }
 
     /**
-     * {@inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public String toString() {
@@ -271,11 +274,13 @@ public class Lane extends Feature {
      * <p>
      * One can mix and swap start and end.
      *
-     * @param start segment start
-     * @param end   segment end
+     * @param exceptFor a vehicle to exclude from check. When looking around for free spots, we do not refer ourselves
+     *                  as an obstacle
+     * @param start     segment start
+     * @param end       segment end
      * @return set of vehicles on that segment.
      */
-    public Collection<Vehicle> getVehiclesAtSegment(final Vehicle self, double start, double end) {
+    public Collection<Vehicle> getVehiclesAtSegment(final Vehicle exceptFor, double start, double end) {
         // just in case the start and end are swapped, swap them back.
         if (start > end) {
             double t = end;
@@ -287,7 +292,7 @@ public class Lane extends Feature {
         return carsOnThisLane
                 .stream()
                 .filter(vehicle -> {
-                    if (vehicle.equals(self))
+                    if (vehicle.equals(exceptFor))
                         return false;
                     double vehicleFront = vehicle.getPositionOnLane();
                     double vehicleBack = isForwardLane()
@@ -302,25 +307,27 @@ public class Lane extends Feature {
     /**
      * For a vehicle, check if it is clear ahead for a specific amount of meters.
      *
+     * @param exceptFor   omit this car from check
      * @param position    vehicle position.
      * @param metersAhead how far ahead to look.
      * @return true if there is no other vehicle
      */
-    public boolean isClearAhead(Vehicle self, double position, double metersAhead) {
+    public boolean isClearAhead(Vehicle exceptFor, double position, double metersAhead) {
         double endSegment = position + (isForwardLane() ? 1 : -1) * metersAhead;
-        return getVehiclesAtSegment(self, position, endSegment).isEmpty();
+        return getVehiclesAtSegment(exceptFor, position, endSegment).isEmpty();
     }
 
     /**
      * Look back, check if it is clear behind there for a specific amount of meters.
      *
+     * @param exceptFor    remove this vehicle from check (usuall self)
      * @param position     vehicle position.
      * @param metersBehind meters to check behind
      * @return true if no one is there behind.
      */
-    public boolean isClearBehind(Vehicle self, double position, double metersBehind) {
+    public boolean isClearBehind(Vehicle exceptFor, double position, double metersBehind) {
         double endSegment = position + (isForwardLane() ? -1 : 1) * metersBehind;
-        return getVehiclesAtSegment(self, position, endSegment).isEmpty();
+        return getVehiclesAtSegment(exceptFor, position, endSegment).isEmpty();
     }
 
     /**

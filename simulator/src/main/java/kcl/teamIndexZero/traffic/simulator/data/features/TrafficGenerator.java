@@ -35,7 +35,8 @@ public class TrafficGenerator extends Feature {
     /**
      * Constructor
      *
-     * @param id Feature ID tag
+     * @param id       Feature ID tag
+     * @param geoPoint geographical location of TG
      */
     public TrafficGenerator(ID id, GeoPoint geoPoint) {
         super(id);
@@ -168,6 +169,8 @@ public class TrafficGenerator extends Feature {
      * Gets a random lane to place a vehicle onto
      *
      * @return Random Lane
+     * @throws JunctionPathException   if there is no path from junction this TG is connected to
+     * @throws DeadEndFeatureException in case we got to dead end.
      */
     public Lane getRandomLane() throws JunctionPathException, DeadEndFeatureException {
         Link outboundLink = outgoing.get((int) (Math.random() * outgoing.size() - 1));
