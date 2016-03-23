@@ -23,6 +23,8 @@ public class TrafficLight {
 
     /**
      * Gets the current Traffic Light state
+     *
+     * @return current state of the traffic light
      */
     public TrafficLightState getState() {
         return this.currentState;

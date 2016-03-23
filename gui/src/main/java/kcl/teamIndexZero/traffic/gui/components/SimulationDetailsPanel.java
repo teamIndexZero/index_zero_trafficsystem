@@ -223,8 +223,8 @@ public class SimulationDetailsPanel extends JPanel implements GuiModel.ChangeLis
         content += createTableRow("Road", selectedMapObject.getLane().getRoad().getName());
         if (selectedMapObject instanceof Vehicle) {
             Vehicle vehicle = (Vehicle) selectedMapObject;
-            content += createTableRow("Speed", String.format("%.2f", vehicle.getSpeedKph()) + " m/s");
-            content += createTableRow("Accel", String.format("%.2f", vehicle.getAccelerationKphH()) + " m/s<sup>2</sup>");
+            content += createTableRow("Speed", String.format("%.2f", vehicle.getSpeedKph()) + " kph");
+            content += createTableRow("Accel", String.format("%.2f", vehicle.getAccelerationKphH()) + " kph/s");
         }
         return String.format("<html><table>%s</table></html>", content);
     }
