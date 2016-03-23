@@ -40,8 +40,9 @@ public class SimulationMap implements ISimulationAware {
     /**
      * Constructor.
      *
-     * @param width  map width
-     * @param height map height
+     * @param width             map width
+     * @param height            map height
+     * @param graph_constructor a graph constructor object which has features alread created
      * @throws MapIntegrityException when there is an unrecoverable error in the integrity of the map
      */
     public SimulationMap(int width, int height, GraphConstructor graph_constructor) throws MapIntegrityException {

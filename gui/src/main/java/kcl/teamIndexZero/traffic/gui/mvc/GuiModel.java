@@ -195,7 +195,8 @@ public class GuiModel implements ISimulationAware {
      * Used for caching the image in simulation image producer - we need to know when things change to redraw that.
      * We should only use for this hashcode things which relate to static map - that is, everything except map objects.
      *
-     * @return
+     * @return hash code of the imporant things in viewport - that is, if ew have panned, zoomed, enabled road debugging
+     * or something else which leads to invalidation of static roads, this will change.
      */
     public int getViewHashCode() {
         int result = viewport != null ? viewport.hashCode() : 0;
