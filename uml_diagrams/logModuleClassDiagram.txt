@@ -1,12 +1,11 @@
 @startuml
 
 package "kcl.teamIndexZero.traffic.log" #FFFFFF {
-
 	Logger --|> Logger_Interface
 	Log_Levels <-- Logger
-	Log_TimeStamp <-- Logger
-	Log_Engine <-- Logger
-	Log_Config <-- Log_Engine
+	Log_TimeStamp --o Logger
+	Log_Engine --o Logger
+	Log_Config --* Log_Engine
 	
 	interface Logger_Interface <<interface>> {
 		{abstract} log( objects : Object... )
@@ -33,7 +32,7 @@ package "kcl.teamIndexZero.traffic.log" #FFFFFF {
 		+log_Exception( e : Exception )
 	}
 
-	Class Log_Engine <<singleton>> {
+	class Log_Engine <<singleton>> {
 		-{static} Log_Engine instance
 		-Log_Config global_config
 		-Long session_msg_number
@@ -163,18 +162,17 @@ package "kcl.teamIndexZero.traffic.log" #FFFFFF {
 		Formatter_TERM --|> Formatter_Interface
 		Formatter_TXT --|> Formatter_Interface
 		Formatter_CSV --|> Formatter_Interface
-		Log_TimeStamp <-- Formatter_TERM
-		Log_TimeStamp <-- Formatter_TXT
-		Log_TimeStamp <-- Formatter_CSV
+		Log_TimeStamp --o Formatter_TERM
+		Log_TimeStamp --o Formatter_TXT
+		Log_TimeStamp --o Formatter_CSV
 		GlobalOutputTypes <-- Output
-		Output <-- Log_Engine
+		Output --* Log_Engine
 		Output <|-- Output_TERM
 		Output <|-- Output_TXT
 		Output <|-- Output_CSV
-		Output <-- Log_Levels
-		Output_TERM --> Formatter_TERM
-		Output_TXT --> Formatter_TXT
-		Output_CSV --> Formatter_CSV
+		Output_TERM *-- Formatter_TERM
+		Output_TXT *-- Formatter_TXT
+		Output_CSV *-- Formatter_CSV
 	}
 	
 	package "kcl.teamIndexZero.traffic.log.fileIO" #DDDDDD {
@@ -218,8 +216,8 @@ package "kcl.teamIndexZero.traffic.log" #FFFFFF {
 		FileIO <|-- FileInput
 	}
 	
-	FileOutput <-- Output
-	FileInput <-- Log_Config
+	FileOutput --* Output
+	FileInput --* Log_Config
 	
 	class MicroLogger { 
 		-MicroLogger()
