@@ -1,7 +1,4 @@
 @startuml
-
-title <b>Logger overview</b>
-
 package "kcl.teamIndexZero.traffic.log" #FFFFFF {
 	object Logger_Interface
 	object Logger

@@ -7,7 +7,8 @@
 %Describe the context for the work and the problem you are addressing. Briefly summarise what you achieved in the project.
 
 \begin{itemize}
-	
+	\item Context
+	\item summary of chevos
 \end{itemize}
 
 \section{Review}
@@ -20,23 +21,35 @@
 \section{Requirements and Design}
 %Describe the requirements you set for your project at the beginning and the design you have taken for your project. Focus on why you decided to tackle the problem in the way you did, and what effects that had on the design. You may also wish to mention the impact of team-working on your requirements and design.
 
+
+
+
 \section{Implementation}
 %Describe the most significant implementation details, focussing on those where unusual or detailed solutions were required. Quote code fragments where necessary, but remember that the full source code will be included as an appendix. Explain how you tested your software (e.g. unit testing) and the extent to which you tested it. If relevant to your project, explain performance issues and how you tackled them.
-\begin{itemize}
-    \item Log module
+
+\subsection{Logger}
+
+\begin{figure}[h!]
+	\vspace{1.5em}
+  	\caption{Logger overview}
+  	\label{fig:logger_overview}
+  	\centering
+	\includegraphics[width=0.5\textwidth]{figs/logModuleObjectDiagram.png}
+  	\vspace{1.5em}
+\end{figure}
+
     \begin{itemize}
         \item explain why and usage scenarios
         \item add basic arch. uml here
-        \item Log config option injection
-        \item Output formats
+        \item Log config option injection (why/how)
+        \item Output formats (impact on performance)
     \end{itemize}
 
-    \item Traffic Lights
-    \begin{itemize}
-        \item two types of traffic lights: singles and those in one junction set
-        \item all traffic lights work autonomously
-        \item traffic light state: discussion whether traffic light State should be boolean or enum (everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum)
-    \end{itemize}
+\subsection{Traffic Lights}
+\begin{itemize}
+    \item two types of traffic lights: singles and those in one junction set
+    \item all traffic lights work autonomously
+	\item traffic light state: discussion whether traffic light State should be boolean or enum (everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum)
 \end{itemize}
 
 \begin{itemize}
@@ -132,7 +145,7 @@ Drawn all static objects (no debug details) in 1087 millis
     \item Map construction
     \begin{itemize}
         \item OSM xml import (lane directions and such)
-        \itme mention specifically the issue with the loosely coupled data/inaccurate data (human error, multiple representations etc.). We had to 'cut edges' to get it there.
+        \item mention specifically the issue with the loosely coupled data/inaccurate data (human error, multiple representations etc.). We had to 'cut edges' to get it there.
         \item SUMO has that capability but implements its own tags and does some guess work
     \end{itemize}
 
