@@ -27,7 +27,58 @@
 \section{Implementation}
 %Describe the most significant implementation details, focussing on those where unusual or detailed solutions were required. Quote code fragments where necessary, but remember that the full source code will be included as an appendix. Explain how you tested your software (e.g. unit testing) and the extent to which you tested it. If relevant to your project, explain performance issues and how you tackled them.
 
-\subsection{Logger}
+\subsection{Map data (OSM) import}
+
+
+\subsection{Graph construction}
+
+\begin{itemize}
+	\item Original premise: Links, Junctions and Roads
+	\item >>> PIC
+	\item Progressed into Links, Junctions, Lanes in Directed lane group in Road
+	\item > linkage done on a lane level instead of road to make it easier to construct a directed graph
+	\item >>> PIC
+	\item link descriptions are depreciated after work on the OSM showed that universal linkage with junctions were for easier to do then identifying what was 1-to-1 link or a junction from the OSM data
+	\item Graph now composed of directed lanes -> links and Junction features with special JunctionLinks
+	\item Roads are now abstracted in the graph. Lanes still belong to groups of directed lanes which, in turn, belong to roads but the graph connections are done at lane level.
+	\item >>> PIC
+	\item Roads and directed lane kept for keeping track of what belongs where on the simulation map. e.g.: road with name can be back referenced from a lane.
+	\item 
+\end{itemize}
+
+\begin{itemize}
+	\item Problems:
+	\item > issues steming from the OSM data leads to bug where in a round about a incoming road cannot be connected up
+	\item > Example!! + PIC + explanation as to why exactly
+\end{itemize}
+
+\subsection{Traffic Generators}
+\begin{itemize}
+	\item TF originally used to produce traffic only
+	\item progressed to also receive traffic exiting the boundaries of the graph
+	\item keeps tab on vehicles received and produced
+	\item responsible for the destruction of vehicle object
+	\item Bug: incoming only lanes to a junction
+	\item Bug: 1 dual way road and then all incoming composed roads into junction meant that for the incoming of the 2 way road, the traffic had no where to go.
+	\item >> Both dealt with by placing TF on junctions
+	\item Bug: originally linkage was checked forward only in the direction of the lanes. Not backwards. meaning if no forward lanes were present in an asymmetric road then the outgoing lanes would not get a TF connected as they were not detected.
+	\item Problem fixed by introducing the "previous link" connection to all features.
+\end{itemize}
+
+
+\subsection{Traffic Lights}
+\begin{itemize}
+    \item two types of traffic lights: singles and those in one junction set
+    \item all traffic lights work autonomously
+	\item traffic light state: discussion whether traffic light State should be boolean or enum (everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum)
+\end{itemize}
+
+\begin{itemize}
+	\item serialization/de-serialization
+\end{itemize}
+
+\subsection{Helpers}
+\subsubsection{Logger}
 
 \begin{figure}[h!]
 	\vspace{1.5em}
@@ -44,18 +95,7 @@
         \item Log config option injection (why/how)
         \item Output formats (impact on performance)
     \end{itemize}
-
-\subsection{Traffic Lights}
-\begin{itemize}
-    \item two types of traffic lights: singles and those in one junction set
-    \item all traffic lights work autonomously
-	\item traffic light state: discussion whether traffic light State should be boolean or enum (everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum)
-\end{itemize}
-
-\begin{itemize}
-	\item serialization/de-serialization
-\end{itemize}
-
+    
 
 \section{Team Work}
 %Describe how you worked together, including the tools and processes you used to facilitate group work.
