@@ -61,6 +61,7 @@ public class Junction extends Feature {
      *
      * @param road      Road to connectNext
      * @param direction Direction of the road at connection point with the junction
+     * @throws AlreadyExistsException if the road has already been added to junction before
      */
     public void addRoad(Road road, JunctionDescription.RoadDirection direction) throws AlreadyExistsException {
         if (connectedFeatures.keySet().contains(road)) {
@@ -137,6 +138,7 @@ public class Junction extends Feature {
     /**
      * Now we are able to check if feature is incoming or outgoing
      *
+     * @param feature the feature to get direction for (i.e. this given feature - is it ingress or egress)
      * @return direction for road.
      */
     public JunctionDescription.RoadDirection getDirectionForFeature(Feature feature) {
@@ -190,8 +192,9 @@ public class Junction extends Feature {
     }
 
     /**
-     * Gets the bearing for a feature - that is, on which angle it connects to a junction.
+     * Gets the bearing for a lane - that is, on which angle it connects to a junction.
      *
+     * @param lane lane which is connected to junction
      * @return incoming or outgoing.
      */
     public double getBearingForLane(Lane lane) {
@@ -207,7 +210,7 @@ public class Junction extends Feature {
             default:
                 throw new IllegalStateException("Don't know what to do");
         }
-        if (lane.getRoad().getForwardSide().getLanes().contains(lane)) {
+        if (lane.isForwardLane()) {
             return segment.getAngleToEastRadians();
         } else {
             return new GeoSegment(segment.end, segment.start).getAngleToEastRadians();

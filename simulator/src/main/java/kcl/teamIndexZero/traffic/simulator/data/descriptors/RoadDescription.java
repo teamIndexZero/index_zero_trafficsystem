@@ -19,9 +19,12 @@ public class RoadDescription {
      * Constructor
      *
      * @param id                Road's ID tag
+     * @param geoPolyline       an actual polyline in geo coordinates representing road.
+     * @param roadName          the real name of the road (say, 'Strand')
      * @param laneCountForward  Number of lanes on side A of the road
      * @param laneCountBackward Number of lanes on side B of the road
-     * @param currentRoadLayer
+     * @param currentRoadLayer  a layer in which this road is located. bridge may be layer 0, and pathway underneath it-
+     *                          layer -1
      */
     public RoadDescription(ID id, String roadName, GeoPolyline geoPolyline, int laneCountForward, int laneCountBackward, int currentRoadLayer) {
         this.laneCountForward = laneCountForward;

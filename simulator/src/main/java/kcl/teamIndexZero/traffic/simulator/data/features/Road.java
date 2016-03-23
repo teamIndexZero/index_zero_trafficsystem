@@ -25,7 +25,9 @@ public class Road extends Feature {
      * @param forwardLaneCount  Number of incoming lanes from the start viewpoint of the road
      * @param backwardLaneCount Number of ongoing lanes from the start viewpoint of the road
      * @param roadLength        Length of the road
-     * @throws IllegalArgumentException when the number of lanes given is less than 1 or the road length is < 0.5
+     * @param polyline          a road polyline
+     * @param name              name of the road
+     * @throws IllegalArgumentException when the number of lanes given is less than 1 or the road length is less than 0.5
      */
     public Road(ID id, int forwardLaneCount, int backwardLaneCount, double roadLength, GeoPolyline polyline, String name) throws IllegalArgumentException {
         this(id, forwardLaneCount, backwardLaneCount, roadLength, polyline, name, 0);
@@ -38,7 +40,10 @@ public class Road extends Feature {
      * @param forwardLaneCount  Number of incoming lanes from the start viewpoint of the road
      * @param backwardLaneCount Number of ongoing lanes from the start viewpoint of the road
      * @param roadLength        Length of the road
-     * @throws IllegalArgumentException when the number of lanes given is less than 1 or the road length is < 0.5
+     * @param polyline          a road polyline
+     * @param name              name of the road
+     * @param layer             a layer in which this road resides. Logical representation of relative elevation
+     * @throws IllegalArgumentException when the number of lanes given is less than 1 or the road length is less than 0.5
      */
     public Road(ID id, int forwardLaneCount, int backwardLaneCount, double roadLength, GeoPolyline polyline,
                 String name, int layer) throws IllegalArgumentException {

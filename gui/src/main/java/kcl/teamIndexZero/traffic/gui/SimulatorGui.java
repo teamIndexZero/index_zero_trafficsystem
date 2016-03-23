@@ -60,7 +60,7 @@ public class SimulatorGui {
             GuiController controller = new GuiController(model, () -> {
                 SimulationDelay delay = new SimulationDelay(model);
                 return new Simulator(
-                        new SimulationParams(LocalDateTime.now(), 0.5, 10000),
+                        new SimulationParams(LocalDateTime.now(), 0.15, 10000),
                         Arrays.asList(
                                 map,
                                 delay,
