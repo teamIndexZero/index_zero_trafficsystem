@@ -53,7 +53,7 @@
   	\caption{Roads, Directed lane group and lanes}
   	\label{fig:RoadsFinal}
   	\centering
-	\includegraphics[width=0.70\textwidth]{figs/Roads.png}
+	\includegraphics[width=0.80\textwidth]{figs/Roads.png}
   	\vspace{1.5em}
 \end{figure}	
 	
@@ -63,7 +63,7 @@
 
 \begin{itemize}
 	\item Problems:
-	\item > issues steming from the OSM data leads to bug where in a round about a incoming road cannot be connected up
+	\item > issues steaming from the OSM data leads to bug where in a round about a incoming road cannot be connected up
 	\item > Example!! + PIC + explanation as to why exactly
 \end{itemize}
 
@@ -95,12 +95,12 @@
 \subsection{Helpers}
 
 \subsubsection{Logger}
-\begin{figure}[h!]
+\begin{figure}[h]
 	\vspace{1.5em}
   	\caption{Logger overview}
   	\label{fig:logger_overview}
   	\centering
-	\includegraphics[width=0.5\textwidth]{figs/logModuleObjectDiagram.png}
+	\includegraphics[width=0.75\textwidth]{figs/logModuleObjectDiagram.png}
   	\vspace{1.5em}
 \end{figure}
 
@@ -117,22 +117,50 @@
 
     \begin{itemize}
         \item learned how to properly use team-collaborative tools
-
-            \begin{itemize}
-                \item Idea
+		\begin{itemize}
+                \item IntelliJ Idea
+                \item >facilitated git work through their embedded VCS module
+                \item >Very nice code/doc and test outline generation. Enables user to focus on the important stuff instead of boilerplate code
                 \item Trello
+                \item >Originally used to help with Kanban process but as the updates inside and usage were sporadic and only done by some members of the group it didn't live up to its fullest potential.
                 \item Hipchat
+                \item > Useful for day to day communication and updates with the github/trello plug-in to keep an overview on the activities done within the group
+                \item > Not everyone was diligent in being on it whilst working on the code but, when used, very useful to shout out and get quick answers to question to the members online at the time.
          \end{itemize}
-        \item learned time-allocating in collabrative enviroment
-        \item learned  problem solvings in collabrative enviroment
-        \item learned  conflict solving in collabrative enviroment
-        \item weekly meetings
-        \item learning from each other (JUnit tests)
-
+         
+        \item learned time-allocating in collaborative environment
+        \item learned  problem solving in collaborative environment
+        \item learned  conflict solving in collaborative environment
+        \item NOTE> Maybe worth talking about the group marking here once that's done.
+        \item Regular weekly meetings
+        \item learning from each other
+        \item > (JUnit tests)
+        \item > Technical problems addressed - Example?
+        \item > Individual strengths can be shared in a group setting
     \end {itemize}
+    
+    Problems:
+    \begin{itemize}
+    	\item procrastination and lack of pro-activity were a problem.
+    	\item Extended periods of low output for the project lead to loosing track of the changes and difficulty understanding current states of the project on a technical level for some members
+    	\item Other peripheral tasks (both technical and not - e.g. research, docs, report.. ) tended to be ignored or relegated to the low priority list in cases
+		\item code review was not as effective as it could have been in fostering legacy learning from more experienced members due to the sporadic contribution in cases
+    	\item In meetings: Code writing once the issues of the week were discussed was not as productive as it could have been during these sessions
+    	\item combination of these issues lead to an asymmetric distribution of work input on the project
+    \end{itemize}
 
 \section{Evaluation}
 %Critically evaluate your project: what worked well, and what didn’t? How did you do relative to your plan? what changes were the result of improved thinking and what changes were forced upon you? how did your team work together? etc. Note that you need to show that you understand the weaknesses in your work as well as its strengths. You may wish to identify relevant future work that could be done on your project.
+\subsection{Possible further development}
+\begin{itemize}
+	\item Scaling number of cars to the size of the graph  (map)
+	\item Round about issue with importing OSM data made by humans 
+	\item -> allow export from other sources /API calls (gmap?)
+	\item -> allow for manual editing of the graph from the GUI view?
+	\item As skirting into hybrid model, detailing such as car sprites, road graphics, etc could be added as zoom factor increases, maybe show lanes from medium zoom and abstract into dots and coloured roads at low zoom
+	\item addition of plug-in capability to add different metrics/behaviours as required by the user
+\end{itemize}
+
 
 \subsection{Performance}
 
