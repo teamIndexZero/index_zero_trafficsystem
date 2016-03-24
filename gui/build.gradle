@@ -5,3 +5,15 @@ dependencies {
     compile project(':log')
     compile project(':simulator')
 }
+
+distributions {
+    main {
+        contents {
+            from(file("docs")) {
+                into {
+                    ""
+                }
+            }
+        }
+    }
+}
