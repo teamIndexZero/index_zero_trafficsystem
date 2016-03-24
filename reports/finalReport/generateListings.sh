@@ -1,13 +1,6 @@
 #!/bin/bash
 
-echo "Generating Source listing includes..."
-OUTPUT="docs/listings.tex"
+OUTPUT=listings.ps
 
-echo "\lstset{literate=
-    {˚}{{\textdegree}}1
-    {¬}{{\textdegree}}1
-}
-" > $OUTPUT
-find ../.. -name *.java | while read line; do echo "\lstinputlisting[language=Java]{$line}" >> $OUTPUT; done;
-
-echo "Finished generating listings!"
+a2ps `find ../.. -name *.java ` -2 --landscape --pretty-print=java --border=no --media=letter --compact=1 --margin=12 -o listings.ps
+ps2pdf listings.ps listings.pdf

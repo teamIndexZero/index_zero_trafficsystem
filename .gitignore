@@ -6,5 +6,7 @@ build
 *.class
 log/logs/
 *.log
+*.ps
+*.*alias
 log_*.txt
 log_config.cfg
