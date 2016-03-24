@@ -22,8 +22,6 @@
 %Describe the requirements you set for your project at the beginning and the design you have taken for your project. Focus on why you decided to tackle the problem in the way you did, and what effects that had on the design. You may also wish to mention the impact of team-working on your requirements and design.
 
 
-
-
 \section{Implementation}
 %Describe the most significant implementation details, focussing on those where unusual or detailed solutions were required. Quote code fragments where necessary, but remember that the full source code will be included as an appendix. Explain how you tested your software (e.g. unit testing) and the extent to which you tested it. If relevant to your project, explain performance issues and how you tackled them.
 
@@ -35,8 +33,18 @@
 \end{itemize}
 
 
-\subsection{Map data \(OSM\) import}
-
+\subsection{Map data import \(OSM\)}
+\begin{itemize}
+    \item Map construction
+    \begin{itemize}
+        \item OSM xml import - as an XML file with published standard (lane directions and such)
+        \item Types of data not working for us - we need  a connected graph of roads, OSM has some ways/nodes, loosely  connected (via IDs)
+        \item Roads are represented as no-width polylines (no individual lanes except for just having the property)
+        \item crossroads are sometimes marked nodes, sometimes just a node used in two ways.
+        \item mention specifically the issue with the loosely coupled data/inaccurate data (human error, multiple representations etc.). We had to 'cut edges' to get it there.
+        \item SUMO has that capability but implements its own tags and does some guess work
+    \end{itemize}
+\end{itemize}
 
 \subsection{Graph construction}
 
@@ -120,6 +128,48 @@
 	\item serialization/de-serialization
 \end{itemize}
 
+
+\subsection{Map visualisation}
+\begin{itemize}
+    \item Map visualisation
+    \begin{itemize}
+        \item Coordinate conversion - lat/lon to meters-offset (Mercator projection). This is internal representaiton which is used in in simulation itself
+        \item Coordinate conversion - meters-offset to pixels x/y (on-screen). This is the view-centric coordinate system which depends on scale, movement, size of window.
+        \item Vehicle specific coordinates: lane it belongs to AND position along the polyline.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Vehicle movement}
+\begin{itemize}
+    \item Junctions and possible outcomes for vehicle
+    \begin {itemize}
+        \item our model: junctions 1-type: only 2 roads connected
+        \item our model: junction 2-type: more than 2 roads connected (actual junctions)
+        \item explain incoming lane angle, outgoing angles and its effect on vehicle movement - what is considered straight movement, and what is considered turn. >110 is prohibited, 110-30 is turn 30-0 is straight. This enforces us to skip weird turns at forks, for example.
+    \end {itemize}
+
+    \item Vehicle movement
+    \begin{itemize}
+        \item Straight movement on the road (even when curved). Acceleration and deceleration.
+        \item Deciding if to go forward or turn (random)
+        \item Crossings. Movement on 2+F crossroads (more than 2 features).
+        \item Distance the car keeps to obstacles
+            \begin{figure}
+                \caption{Car keeping distance to other car}
+                \label{fig:carKeepingDistance}
+                \centering
+                \includegraphics[width=0.3\textwidth]{figs/carMovement/car_keeping_distance_to_other.png}
+                \hspace{0.2em}
+                \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_after.png}
+                \hspace{0.2em}
+                \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_before.png}
+            \end{figure}
+        \item Lane changing - if there is another car in distance to keep, see to outer lane (if the same space is free) and change if possible, then try to do same for inner lane. If both buys, just brake.
+    \end{itemize}
+
+\end{itemize}
+
+
 \subsection{Logger}
 \begin{figure}
 	\vspace{1.5em}
@@ -130,13 +180,31 @@
   	\vspace{1.5em}
 \end{figure}
 
+\begin{itemize}
+    \item explain why and usage scenarios
+    \item add basic arch. uml here
+    \item Log config option injection \(why/how\)
+    \item Output formats (impact on performance)
+\end{itemize}
+
+\begin{itemize}
+    \item Log module
     \begin{itemize}
-        \item explain why and usage scenarios
-        \item add basic arch. uml here
-        \item Log config option injection \(why/how\)
-        \item Output formats (impact on performance)
+        \item coloured terminal window if more time,
+        \item >easier to read
+        \item >segregated from the console
+        \item Custom Filters
+        \item >filtering based on class name (origin)
+        \item >filtering based on selection of multiple non-sequential log levels instead of everything below the set global level (granular control)
     \end{itemize}
-    
+
+     \item Traffic Lights
+     \begin{itemize}
+        \item traffic lights rules are basic, they do not change states according to the traffic (not intelligent traffic lights)
+        \item only two states in traffic lights: red and green, we do not have early/late yellow etc.
+     \end{itemize}
+\end{itemize}
+
 
 \section{Team Work}
 %Describe how you worked together, including the tools and processes you used to facilitate group work.
@@ -190,91 +258,32 @@
 
 \subsection{Performance}
 
+\begin{center}
+\begin{longtabu} to \textwidth {|
+    X[2,l]|
+    X[4,l]|
+    X[3,c]|
+    X[3,c]|
+    X[3,c]|
+    }
+    \hline
+    \textbf{Sample} & \textbf{Size} & \textbf{XML load} & \textbf{Graph linkage} & \textbf{Roads draw time} \\ \hline
+Straight road & 1 road and 0 junction, 9 mapFeatures, 12 mapLinks, 2 traffic generators & 4 & 0 & 2 \\ \hline
+Elephant and Castle & 101 road and 80 junction, 454 mapFeatures, 18 mapLinks, 12 traffic generators & 37 & 4 & 8 \\ \hline
+Paris, Arc & 284 road and 168 junction, 1145 mapFeatures, 57 mapLinks, 35 traffic generators & 118 & 68 & 70 \\ \hline
+Manhattan, Battery Park & 212 road and 148 junction, 829 mapFeatures, 81 mapLinks, 40 traffic generators & 11 & 5 & 29 \\ \hline
+Strand area & 781 road and 530 junction, 2998 mapFeatures, 196 mapLinks, 105 traffic generators & 62 & 19 & 41 \\ \hline
+Buckingham Palace& 275 road and 176 junction, 1032 mapFeatures, 68 mapLinks, 41 traffic generators & 28 & 8 & 21 \\ \hline
+Whole Manhattan & 14763 road and 10429 junction, 58394 mapFeatures, 1055 mapLinks, 596 traffic generators & 13607 & 468 & 531 \\ \hline
+Whole Greater London & 31101 road and 24314 junction, 120672 mapFeatures, 547 mapLinks, 391 traffic generators & 32911 & 644 & 1087 \\ \hline
+
+\end{longtabu}
+\end{center}
+All time units in milliseconds.
+
 Alex: probably worth making these numbers up to a nice table, wdyt?
 
 Test machine: OS X, Intel Core I7-4770HQ, 2.2 GHz, 16GB RAM, SSD
-
-Opening sample Paris, Arc de Triomphe
-Loaded 284 road and 168 junction descriptions in 118 millis
-Constructed graph of 1145 mapFeatures, 57 mapLinks, 35 traffic generators in 68 millis
-Drawn all static objects (no debug details) in 70 millis
-Drawn dynamic objects in 0 millis
-
-Opening sample Manhattan/Battery Park
-Loaded 212 road and 148 junction descriptions in 11 millis
-Constructed graph of 829 mapFeatures, 81 mapLinks, 40 traffic generators in 5 millis
-Drawn all static objects (no debug details) in 29 millis
-Drawn dynamic objects in 0 millis
-
-Opening sample Elephant and Castle strange roundabout
-Loaded 101 road and 80 junction descriptions in 37 millis
-Constructed graph of 454 mapFeatures, 18 mapLinks, 12 traffic generators in 4 millis
-Drawn all static objects (no debug details) in 8 millis
-Drawn dynamic objects in 0 millis
-
-
-Opening sample Strand area
-Loaded 781 road and 530 junction descriptions in 62 millis
-Constructed graph of 2998 mapFeatures, 196 mapLinks, 105 traffic generators in 19 millis
-Drawn all static objects (no debug details) in 41 millis
-Drawn dynamic objects in 0 millis
-
-
-Opening sample Straight road with 6 lanes
-Loaded 1 road and 0 junction descriptions in 4 millis
-Constructed graph of 9 mapFeatures, 12 mapLinks, 2 traffic generators in 0 millis
-Drawn all static objects (no debug details) in 2 millis
-Drawn dynamic objects in 0 millis
-
-Opening sample Simple one-way square
-Loaded 1 road and 1 junction descriptions in 3 millis
-Constructed graph of 6 mapFeatures, 2 mapLinks, 2 traffic generators in 0 millis
-Drawn all static objects (no debug details) in 1 millis
-Drawn dynamic objects in 0 millis
-
-Opening sample Buckingham Palace area
-Loaded 275 road and 176 junction descriptions in 28 millis
-Constructed graph of 1032 mapFeatures, 68 mapLinks, 41 traffic generators in 8 millis
-Drawn all static objects (no debug details) in 21 millis
-Drawn dynamic objects in 0 millis
-
-Opening sample Whole Manhattan
-Loaded 14763 road and 10429 junction descriptions in 13607 millis
-Constructed graph of 58394 mapFeatures, 1055 mapLinks, 596 traffic generators in 468 millis
-Drawn all static objects (no debug details) in 531 millis
-Drawn dynamic objects in 0 millis
-
-Opening sample Whole Greater London
-Loaded 31101 road and 24314 junction descriptions in 32911 millis
-Constructed graph of 120672 mapFeatures, 547 mapLinks, 391 traffic generators in 644 millis
-Drawn all static objects (no debug details) in 1087 millis
-
-
-\begin{itemize}
-    \item Map construction
-    \begin{itemize}
-        \item OSM xml import (lane directions and such)
-        \item mention specifically the issue with the loosely coupled data/inaccurate data (human error, multiple representations etc.). We had to 'cut edges' to get it there.
-        \item SUMO has that capability but implements its own tags and does some guess work
-    \end{itemize}
-
-    \item Log module
-    \begin{itemize}
-        \item coloured terminal window if more time,
-        \item >easier to read
-        \item >segregated from the console
-        \item Custom Filters
-        \item >filtering based on class name (origin)
-        \item >filtering based on selection of multiple non-sequential log levels instead of everything below the set global level (granular control)
-    \end{itemize}
-
-     \item Traffic Lights
-     \begin{itemize}
-        \item traffic lights rules are basic, they do not change states according to the traffic (not intelligent traffic lights)
-        \item only two states in traffic lights: red and green, we do not have early/late yellow etc. 
-     \end{itemize}
-\end{itemize}
-
 
 
 \section{Peer Assessment}
