@@ -26,6 +26,24 @@ starts demonstration
 
 Be sure to close the window to release gradle process.
 
+## Preparing data
+
+The Simulator can use adopted version of Open Street Map files. This is the `osmosis` - OpenStreetMap management tool
+spell to produce an area usable for simulation:
+
+```
+osmosis --read-xml file=INPUT_LARGE_FILE.osm enableDateParsing=no
+        --tf accept-ways highway=trunk,motorway,primary,secondary,tertiary,motorway_link,trunk_link,primary_link,secondary_link,tertiary_link
+        --bounding-box bottom=48.867844 left=2.289727 top=48.879678 right=2.304442 completeWays=yes
+        --used-node
+        --write-xml OUTPUT_FILE.osm
+```
+
+One need to substitute geographical coordinates for bottom, left, top and right to get an appropriate box.
+
+In order to get source files, one may download Planet.osm (which is huge) or get pre-made area files. Consult
+http://wiki.openstreetmap.org/wiki/Downloading_data for exact details on obtaining map source files.
+
 ## Developing with IntelliJ IDEA
 
  In order to import project, from the IntelliJ IDEA start screen, select Import -> From existing model -> Choose Gradle
@@ -60,3 +78,10 @@ There are a couple of easy things in use for testing, namely:
 Obviously we not need use 2) and 3), but they come handy as we get into the longer run.
 
 Created by KCL students as part of a group project
+
+
+# Acknowledgements
+
+1. Icons taken from open-iconic icon set (https://github.com/iconic/open-iconic), MIT license.
+2. Open Street Map excellent wiki resource on how to load the XML data file, and how to work with it to obtian specific
+ features and bounding box https://wiki.openstreetmap.org/wiki/Main_Page

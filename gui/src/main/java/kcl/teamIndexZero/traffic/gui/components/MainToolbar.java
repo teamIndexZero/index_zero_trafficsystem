@@ -24,9 +24,8 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
     private final GuiModel model;
     private final GuiController controller;
     private JButton playButton;
-    private JButton stopButton;
+    private JButton resetButton;
     private JButton pauseButton;
-    private JTextField tickDetailsField;
 
 
     /**
@@ -39,6 +38,7 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
         super("MainToolBar");
         this.model = model;
         this.controller = controller;
+        setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         setFloatable(false);
         addButtons();
 
@@ -53,17 +53,10 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
     public void onModelChanged() {
         // updating button status
         pauseButton.setEnabled(model.getStatus() == GuiModel.SimulationStatus.INPROGRESS);
-        stopButton.setEnabled(model.getStatus() == GuiModel.SimulationStatus.INPROGRESS
-                || model.getStatus() == GuiModel.SimulationStatus.PAUSED);
+        resetButton.setEnabled(true);
         playButton.setEnabled(model.getStatus() == GuiModel.SimulationStatus.OFF
                 || model.getStatus() == GuiModel.SimulationStatus.PAUSED);
 
-        // updating tick details
-        if (model.getTick() != null) {
-            tickDetailsField.setText(model.getTick().toString());
-        } else {
-            tickDetailsField.setText("<NONE>");
-        }
     }
 
     /*
@@ -71,35 +64,46 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
      */
     protected void addButtons() {
         playButton = makeButton(
-                "play",
+                "media-play-3x",
                 "Start the simulation",
                 "Start",
                 controller::start);
         add(playButton);
 
         pauseButton = makeButton(
-                "pause",
+                "media-pause-3x",
                 "Temporarily pause the simulation",
                 "Pause",
                 controller::pause
         );
         add(pauseButton);
 
-        stopButton = makeButton(
-                "stop",
-                "Stop the simulation",
-                "Stop",
-                controller::stop);
-        add(stopButton);
+        resetButton = makeButton(
+                "reload-3x",
+                "Restart from chooser",
+                "Restart",
+                controller::restart);
+        add(resetButton);
+        addSeparator();
 
-        tickDetailsField = new JTextField(16);
-        add(tickDetailsField);
+        JButton resetZoomButton = makeButton(
+                "compass-3x",
+                "Reset Zoom to Original",
+                "Reset Zoom",
+                model.getViewport()::resetZoom);
+        add(resetZoomButton);
     }
 
 
     /**
      * Helper method to create button. We are using our own {@link Callback} interface within to ensure the flow is
      * transferred to where it should belong.
+     *
+     * @param imageName      name of the image file within icons folder (without extension)
+     * @param toolTipText    text of the tooltip to show over icon
+     * @param altText        what to show if no image found
+     * @param actionListener what to invoke when clicked
+     * @return new button
      */
     protected JButton makeButton(String imageName,
                                  String toolTipText,

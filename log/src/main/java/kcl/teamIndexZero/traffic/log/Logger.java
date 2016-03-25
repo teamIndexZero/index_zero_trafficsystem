@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Es on 27/01/2016.
+ * Logger
+ * Entry point for all logging calls
  */
 public class Logger implements Logger_Interface {
     private static Map<String, Logger> loggers;
@@ -49,7 +50,7 @@ public class Logger implements Logger_Interface {
      * @param objects Message details
      */
     @Override
-    public void log(Object... objects) {
+    public synchronized void log(Object... objects) {
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.MSG, calling_instance_name, objects);
     }
 
@@ -60,7 +61,7 @@ public class Logger implements Logger_Interface {
      * @param objects Message details
      */
     @Override
-    public void log_Fatal(Object... objects) {
+    public synchronized void log_Fatal(Object... objects) {
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.FATAL, calling_instance_name, objects);
     }
 
@@ -71,7 +72,7 @@ public class Logger implements Logger_Interface {
      * @param objects Message details
      */
     @Override
-    public void log_Error(Object... objects) {
+    public synchronized void log_Error(Object... objects) {
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.ERROR, calling_instance_name, objects);
     }
 
@@ -81,7 +82,7 @@ public class Logger implements Logger_Interface {
      * @param objects Message details
      */
     @Override
-    public void log_Warning(Object... objects) {
+    public synchronized void log_Warning(Object... objects) {
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.WARNING, calling_instance_name, objects);
     }
 
@@ -92,7 +93,7 @@ public class Logger implements Logger_Interface {
      * @param objects Message details
      */
     @Override
-    public void log_Debug(Object... objects) {
+    public synchronized void log_Debug(Object... objects) {
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.DEBUG, calling_instance_name, objects);
     }
 
@@ -102,7 +103,7 @@ public class Logger implements Logger_Interface {
      * @param objects Message details
      */
     @Override
-    public void log_Trace(Object... objects) {
+    public synchronized void log_Trace(Object... objects) {
         log_engine.processLogMsg(new Log_TimeStamp(), Log_Levels.TRACE, calling_instance_name, objects);
     }
 

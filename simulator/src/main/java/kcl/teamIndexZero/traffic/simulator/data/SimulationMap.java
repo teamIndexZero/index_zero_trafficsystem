@@ -1,13 +1,19 @@
 package kcl.teamIndexZero.traffic.simulator.data;
 
+import kcl.teamIndexZero.traffic.log.Logger;
+import kcl.teamIndexZero.traffic.log.Logger_Interface;
 import kcl.teamIndexZero.traffic.simulator.ISimulationAware;
+import kcl.teamIndexZero.traffic.simulator.data.features.Feature;
+import kcl.teamIndexZero.traffic.simulator.data.links.Link;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
+import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An umbrella object containing map deails for the simulation. Its responsibilities are clearly divided with Simulator:
+ * An umbrella object containing map details for the simulation. Its responsibilities are clearly divided with Simulator:
  * {@link kcl.teamIndexZero.traffic.simulator.Simulator} is a control interface whilst the {@link SimulationMap} is a
  * collection of objects relating to the map
  * <p>
@@ -24,19 +30,59 @@ import java.util.List;
  */
 public class SimulationMap implements ISimulationAware, Serializable {
 
+    private static Logger_Interface LOG = Logger.getLoggerInstance(SimulationMap.class.getSimpleName());
     private final int width;
     private final int height;
-    private List<MapObject> objectsOnMap = new ArrayList<>();
+    public double widthMeters;
+    public double heightMeters;
+    private Map<ID, Feature> mapFeatures = new HashMap<>();
+    private Map<ID, Link> mapLinks;
+    private Map<ID, MapObject> objectsOnSurface = new HashMap<>();
 
     /**
      * Constructor.
      *
-     * @param width  map width
-     * @param height map height
+     * @param width             map width
+     * @param height            map height
+     * @param graph_constructor a graph constructor object which has features alread created
+     * @throws MapIntegrityException when there is an unrecoverable error in the integrity of the map
      */
-    public SimulationMap(int width, int height) {
+    public SimulationMap(int width, int height, GraphConstructor graph_constructor) throws MapIntegrityException {
         this.width = width;
         this.height = height;
+        graph_constructor.getFeatures().forEach((id, feature) -> {
+            addFeature(feature);
+        });
+        this.mapLinks = graph_constructor.getLinks();
+    }
+
+    /**
+     * Adds features to the map
+     *
+     * @param feature Feature to add
+     */
+    private void addFeature(Feature feature) {
+        LOG.log_Trace("Adding feature '", feature.getID(), "' to map.");
+        feature.setMap(this);
+        this.mapFeatures.putIfAbsent(feature.getID(), feature);
+    }
+
+    /**
+     * Get the features on the map
+     *
+     * @return all features on the map
+     */
+    public Map<ID, Feature> getMapFeatures() {
+        return mapFeatures;
+    }
+
+    /**
+     * Gets all the links on the map
+     *
+     * @return Links of the map
+     */
+    public Map<ID, Link> getMapLinks() {
+        return mapLinks;
     }
 
     /**
@@ -44,11 +90,17 @@ public class SimulationMap implements ISimulationAware, Serializable {
      */
     @Override
     public void tick(SimulationTick timeStep) {
-        objectsOnMap.forEach(
-                object -> {
-                    object.tick(timeStep);
-                }
-        );
+        synchronized (this) {
+            mapFeatures.forEach(
+                    (id, feature) -> feature.tick(timeStep)
+            );
+            mapLinks.forEach(
+                    (id, link) -> link.tick(timeStep)
+            );
+            objectsOnSurface.forEach((id, mapObject) ->
+                    mapObject.tick(timeStep)
+            );
+        }
     }
 
     /**
@@ -56,7 +108,6 @@ public class SimulationMap implements ISimulationAware, Serializable {
      */
     public int getWidth() {
         return width;
-
     }
 
     /**
@@ -73,33 +124,33 @@ public class SimulationMap implements ISimulationAware, Serializable {
      */
     public void addMapObject(MapObject mapObject) {
         //todo check if this really does not occupy some other object's space on map
-        objectsOnMap.add(mapObject);
+        objectsOnSurface.put(mapObject.getID(), mapObject);
         mapObject.setMap(this);
     }
 
     /**
-     * Try moving object from one position to another (it may be impossible - i.e. occupied). Old position will be freed
-     * while the new one will be occupied if it goes successfully.
+     * Removes a mapObject from the map
      *
-     * @param object an object to add
-     * @param pos    position to move to.
+     * @param id ID tag of map object
      */
-    public void moveObject(MapObject object, MapPosition pos) {
-        // TODO check rules of physics
-        // TODO  check that we don't have overlaps
-        MapPosition oldPos = object.getPosition();
-        object.setPosition(pos);
+    public void removeMapObject(ID id) {
+        objectsOnSurface.remove(id);
     }
 
     /**
-     * TODO - bad example, we're exposing the objects from map. It should be encapsulated.
+     * Gets all objects on the surface of the map
      *
-     * @return objects on map.
+     * @return Read-only collection of the objects
      */
-    public List<MapObject> getObjectsOnMap() {
-        return objectsOnMap;
+    public List<MapObject> getObjectsOnSurface() {
+        return Collections.unmodifiableList(new ArrayList<>(objectsOnSurface.values()));
     }
 
+    /**
+     * toString method
+     *
+     * @return Description of the map
+     */
     public String toString() {
         return "Map (" + this.width + "x" + this.height + ") has " + this.objectsOnMap.size() + " objects.";
     }

@@ -1,0 +1,59 @@
+@startuml
+
+title <b>Simulator overview</b>
+
+package "kcl.teamIndexZero.traffic.simulator.data" #FFFFFF {
+	package "kcl.teamIndexZero.traffic.simulator.data.descriptors" {
+		object LinkDescription
+		object RoadDescription
+		object TrafficLightRule
+	}
+	package "kcl.teamIndexZero.traffic.simulator.data.features" {
+		object DirectedLanes
+		object Feature
+		object Junction
+		object Lane
+		object Road
+		object RoadSpecs
+	}
+	package "kcl.teamIndexZero.traffic.simulator.data.links" {
+		object Link
+		object TrafficLight
+		object TrafficLightInSet
+		object TrafficLightSet
+	}
+	package "kcl.teamIndexZero.traffic.simulator.data.mapObjects" {
+		object GraphConstructor
+		object ID
+		object SimulationMap
+		object SimulationParams
+		object SimulationTick
+		object TrafficLightController
+	}
+	package "kcl.teamIndexZero.traffic.simulator.data.exceptions" {
+		object AlreadyExistsException
+		object EmptySimMapException
+		object MapIntegrityException
+		object MissingImplementationException
+		object OrphanFeatureException
+		object UnrecognisedLinkException
+	}
+	package "kcl.teamIndexZero.traffic.simulator.data.mapSetup" {
+		object MapFactory
+		object OSMFeature		
+	}
+	
+	Feature --|> Junction
+	Feature --|> Lane
+	DirectedLanes *-- Lane
+	DirectedLanes --* Road
+	Lane o-- Link
+	Junction o-- Link
+	Link --|> TrafficLight
+	Link --|> TrafficLightInSet
+	TrafficLightSet *-- TrafficLightInSet
+	TrafficLightController *-- TrafficLightSet
+	TrafficLightRule o-- TrafficLightController
+	
+}
+@enduml

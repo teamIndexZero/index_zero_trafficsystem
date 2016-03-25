@@ -9,17 +9,17 @@ public class SimulationParams {
 
     // no need to encapsulate these - they're going to be rather simplistic uses for these fields
     public LocalDateTime simulatedTimeStart;
-    public int tickSeconds;
+    public double tickSeconds;
     public int durationInTicks;
 
     /**
      * Parameters for the simulation.
      *
      * @param simulatedTimeStart simulated time, not real time. I.e. we start our 'simulated' time on 12th of Feb 2013 18:00
-     * @param tickSeconds        how many seconds simulated time doe s one tick correspond to
+     * @param tickSeconds        how many seconds simulated time doe s in tick correspond to
      * @param durationInTicks    how many ticks should the simulation be run for
      */
-    public SimulationParams(LocalDateTime simulatedTimeStart, int tickSeconds, int durationInTicks) {
+    public SimulationParams(LocalDateTime simulatedTimeStart, double tickSeconds, int durationInTicks) {
         this.simulatedTimeStart = simulatedTimeStart;
         this.tickSeconds = tickSeconds;
         this.durationInTicks = durationInTicks;
@@ -32,14 +32,19 @@ public class SimulationParams {
 
         SimulationParams that = (SimulationParams) o;
 
-        if (tickSeconds != that.tickSeconds) return false;
-        return durationInTicks == that.durationInTicks;
+        if (Double.compare(that.tickSeconds, tickSeconds) != 0) return false;
+        if (durationInTicks != that.durationInTicks) return false;
+        return simulatedTimeStart != null ? simulatedTimeStart.equals(that.simulatedTimeStart) : that.simulatedTimeStart == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = tickSeconds;
+        int result;
+        long temp;
+        result = simulatedTimeStart != null ? simulatedTimeStart.hashCode() : 0;
+        temp = Double.doubleToLongBits(tickSeconds);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + durationInTicks;
         return result;
     }

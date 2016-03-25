@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Created by Es on 27/01/2016.
  * Log_TimeStamp class
  */
 public class Log_TimeStamp {
@@ -43,7 +42,9 @@ public class Log_TimeStamp {
      * @return time of time stamp
      */
     public String getTime() {
-        return now.format(DateTimeFormatter.ofPattern("HH:mm:ss.S"));
+        String nano = now.format(DateTimeFormatter.ofPattern("n")).substring(0, 1);
+        String time = now.format(DateTimeFormatter.ofPattern("HH:mm:ss."));
+        return time + nano;
     }
 
     /**

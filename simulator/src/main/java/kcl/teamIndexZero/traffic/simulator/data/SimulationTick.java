@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
  * For now we are mostly intersted in several things:
  * <p>
  * 1. What's the ordinal number of this tick?
- * 2. How long does this tick span for (in simulated time)? E.g. one tick may be equal 1 second or 1 minute, that is
+ * 2. How long does this tick span for (in simulated time)? E.g. in tick may be equal 1 second or 1 minute, that is
  * our simulation granularity
  * 3. What is the tick's simulated moment in time? (it may be used in future - consider, for example, night time
  * approaching or dusk forcing drivers to lower the speed so that they can react, or a time dependency for traffic
@@ -20,7 +20,7 @@ public class SimulationTick {
 
     private int tickNumber;
     private LocalDateTime simulatedTime;
-    private int tickDurationSeconds;
+    private double tickDurationSeconds;
 
     /**
      * Constructor for tick.
@@ -29,7 +29,7 @@ public class SimulationTick {
      * @param simulatedTime       time this tick represents within a simulation run (i.e. date)
      * @param tickDurationSeconds duration of single tick in simulated time
      */
-    public SimulationTick(int tickNumber, LocalDateTime simulatedTime, int tickDurationSeconds) {
+    public SimulationTick(int tickNumber, LocalDateTime simulatedTime, double tickDurationSeconds) {
         this.tickNumber = tickNumber;
         this.simulatedTime = simulatedTime;
         this.tickDurationSeconds = tickDurationSeconds;
@@ -43,7 +43,7 @@ public class SimulationTick {
         return String.format("{Tick #%d %s}", tickNumber, simulatedTime.format(DATE_TIME_FORMAT));
     }
 
-    public int getTickDurationSeconds() {
+    public double getTickDurationSeconds() {
         return tickDurationSeconds;
     }
 
