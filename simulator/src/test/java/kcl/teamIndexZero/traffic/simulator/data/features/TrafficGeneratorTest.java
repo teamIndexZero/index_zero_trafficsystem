@@ -146,7 +146,7 @@ public class TrafficGeneratorTest {
         when(map.getObjectsOnSurface()).thenReturn(list);
         tg.linkRoad(r1);
         SimulationTick tick = mock(SimulationTick.class);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 100; i++) {
             tg.tick(tick);
             assertTrue(tg.getThisGeneratorCreationCounter() >= 0);
         }
