@@ -55,21 +55,31 @@
 		\item > moving the workload at startup time so as to runtime increase performance
 		\item > able to conceptually save state of graph on each tick if save is implemented
 	\end{itemize}
+	\item Graph constructed from description value objects of roads, junctions and links
 	\item Original premise: Links, Junctions and Roads
+	\item >Features (Roads and Junctions) are connected via links (still in high abstraction) see Figure~\ref{fig:FeatureConnect}
 
 \begin{figure}
 	\vspace{1.5em}
-  	\caption{Original design for roads}
+  	\caption{Original design with Features and Links}
+  	\label{fig:FeatureConnect}
+  	\centering
+	\includegraphics[width=0.55\textwidth]{figs/graphConstruction/OriginalConnections.png}
+  	\vspace{1.5em}
+\end{figure}
+	
+\begin{figure}
+	\vspace{1.5em}
+  	\caption{Roads in the original high abstraction design}
   	\label{fig:RoadsOriginal}
   	\centering
 	\includegraphics[width=0.55\textwidth]{figs/graphConstruction/OriginalRoads.png}
   	\vspace{1.5em}
 \end{figure}	
-	
-	\item >>> PIC
+
 	\item Progressed into Links, Junctions, Lanes in Directed lane group in Road
-	\item > linkage done on a lane level instead of road to make it easier to construct a directed graph
-	\item >>> PIC
+	\item > linkage done on a lane level instead of road to make it easier to construct a directed graph, whilst maintaining access to groups of lanes and the road they belong to for traffic behaviour.
+	\item >>>Example!
 	\item link descriptions are depreciated after work on the OSM showed that universal linkage with junctions were for easier to do then identifying what was 1-to-1 link or a junction from the OSM data
 	\item Graph now composed of directed lanes -> links and Junction features with special JunctionLinks
 	\item Roads are now abstracted in the graph. Lanes still belong to groups of directed lanes which, in turn, belong to roads but the graph connections are done at lane level.
@@ -91,7 +101,6 @@
 	\includegraphics[width=0.6\textwidth]{figs/graphConstruction/Junction.png}
   	\vspace{1.5em}
 \end{figure}		
-	
 	
 	\item Roads and directed lane kept for keeping track of what belongs where on the simulation map. e.g.: road with name can be back referenced from a lane.
 	\item 
