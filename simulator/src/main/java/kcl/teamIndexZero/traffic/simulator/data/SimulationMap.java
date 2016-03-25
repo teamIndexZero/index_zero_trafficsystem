@@ -9,8 +9,7 @@ import kcl.teamIndexZero.traffic.simulator.data.mapObjects.MapObject;
 import kcl.teamIndexZero.traffic.simulator.exceptions.MapIntegrityException;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * An umbrella object containing map details for the simulation. Its responsibilities are clearly divided with Simulator:
@@ -152,6 +151,6 @@ public class SimulationMap implements ISimulationAware, Serializable {
      * @return Description of the map
      */
     public String toString() {
-        return "Map (" + this.width + "x" + this.height + ") has " + this.objectsOnMap.size() + " objects.";
+        return "Map (" + this.width + "x" + this.height + ") has " + this.getObjectsOnSurface().size() + " objects.";
     }
 }

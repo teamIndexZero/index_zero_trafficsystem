@@ -18,7 +18,7 @@ import java.util.Arrays;
 
 
 /**
- * Main class (entry poing for simulator Graphical User Interface).
+ * Main class (entry point for simulator Graphical User Interface).
  */
 public class SimulatorGui {
 
