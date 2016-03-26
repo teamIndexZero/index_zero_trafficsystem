@@ -96,7 +96,7 @@ and a theory which are they based on.
         \caption{Original design with Features and Links}
         \label{fig:FeatureConnect}
         \centering
-        \includegraphics[width=0.55\textwidth]{figs/graphConstruction/OriginalConnections.png}
+        \includegraphics[width=0.50\textwidth]{figs/graphConstruction/OriginalConnections.png}
         \vspace{1.5em}
     \end{figure}
 
@@ -105,7 +105,7 @@ and a theory which are they based on.
         \caption{Roads in the original high abstraction design}
         \label{fig:RoadsOriginal}
         \centering
-        \includegraphics[width=0.55\textwidth]{figs/graphConstruction/OriginalRoads.png}
+        \includegraphics[width=0.45\textwidth]{figs/graphConstruction/OriginalRoads.png}
         \vspace{1.5em}
     \end{figure}
 
@@ -121,7 +121,7 @@ and a theory which are they based on.
   	\caption{Roads, Directed lane group and lanes}
   	\label{fig:RoadsFinal}
   	\centering
-	\includegraphics[width=1\textwidth]{figs/graphConstruction/Roads.png}
+	\includegraphics[width=0.75\textwidth]{figs/graphConstruction/Roads.png}
   	\vspace{1.5em}
 \end{figure}	
 	
@@ -163,10 +163,12 @@ and a theory which are they based on.
 	
 \begin{figure}[h]
 	\vspace{1.5em}
-  	\caption{Island problem}
+  	\caption{Island problem resolution}
   	\label{fig:islandReal}
   	\centering
-	\includegraphics[width=0.6\textwidth]{figs/trafficGenerator/IslandExample_realmap.png}
+	\includegraphics[width=0.4\textwidth]{figs/trafficGenerator/IslandExample_realmap.png}
+	\hspace{0.2em}
+	\includegraphics[width=0.40\textwidth]{figs/trafficGenerator/IslandExample_simmap.png}
   	\vspace{1.5em}
 \end{figure}
 
@@ -180,6 +182,11 @@ and a theory which are they based on.
 	\item traffic light state: discussion whether traffic light State should be boolean or enum \(everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum\)
 \end{itemize}
 
+\begin{itemize}
+        \item traffic lights rules are basic, they do not change states according to the traffic (not intelligent traffic lights)
+        \item only two states in traffic lights: red and green, we do not have early/late yellow etc.
+\end{itemize}
+     
 \begin{itemize}
 	\item serialization/de-serialization
 \end{itemize}
@@ -294,6 +301,31 @@ and a theory which are they based on.
     \item txt for general record keeping
     \item csv useful for filtering data inside a spreadsheet software or importing to database - more flexible for reformatting the output also
     \item >console
+    \item information recorded
+    \begin{itemize}
+    	\item Session message number
+    	\item Date/Time stamp
+    	\item message origin (class name usually)
+\begin{lstlisting}[language=java]
+	private static Logger_Interface LOG = Logger.getLoggerInstance(Road.class.getSimpleName());
+\end{lstlisting}
+    	\item NORMAL MSG
+		\item message level (Fatal, error, normal msg, debug, trace)
+    	\item EXCEPTIONS
+    	\item stack trace of the exception
+    \end{itemize}
+    \item Since in Java most types are children of the Object class and we have autoboxing \cite{Oracle1995} for primitive types we can use 'Object' as the type for the signature of the method that are called to pass a message
+    \item Log message passed through to log via arbitrary number of parameters
+    \item '...' also known as 'vararg' \cite{Oracle2004}
+\begin{lstlisting}[language=Java]
+	void log_Error(Object... objects);
+\end{lstlisting}   
+	\item this allows easy message compositions with dynamic variables within. e.g.:
+\begin{lstlisting}[language=Java]
+	LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links (Back). ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");
+	LOG.log_Trace("X--> '", lanes.getID(), "' has no previous link(s).");
+\end{lstlisting} 
+
 \end{itemize}
 
 \begin{itemize}
@@ -306,12 +338,6 @@ and a theory which are they based on.
         \item >filtering based on class name (origin)
         \item >filtering based on selection of multiple non-sequential log levels instead of everything below the set global level (granular control)
     \end{itemize}
-
-     \item Traffic Lights
-     \begin{itemize}
-        \item traffic lights rules are basic, they do not change states according to the traffic (not intelligent traffic lights)
-        \item only two states in traffic lights: red and green, we do not have early/late yellow etc.
-     \end{itemize}
 \end{itemize}
 
 
