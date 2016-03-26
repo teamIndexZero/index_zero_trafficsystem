@@ -21,6 +21,8 @@ sed -i -e 's/SEPARATORSEPARATOR/ \& /g' $OUTPUT.tmp
 cat $OUTPUT.tmp | while read line; do echo $line \\\\ \\hline; done>> $OUTPUT
 
 echo "
+\caption{Git commit history}
+\label{table:gitCommits}
 
 \end{longtabu}
 \end{center}" >> $OUTPUT

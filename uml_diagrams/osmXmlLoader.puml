@@ -1,13 +1,7 @@
 @startuml
-partition "Third Party Tools" {
-(*) -->[Data preparation time] Raw OpenStreetMap file (area, such as London Full),\ncontaining all needed and unneeded features of the \nOSM (needed: roads, traffic lights, nodes, \nnot needed: building shapes, trees, kebab kiosks, etc.
--> [Osmosis: bounding box] File limited by a physical bounding box provided in \nlat/long coordinates. On this step, file still contains\nboth needed and not-needed features, however now \nit is of much smaller size.
---> [Osmosis: filter by way type] File containing map area which is limited by bounding\nbox but at the same time contains only needed features\nsuch as highways, trunk ways, bridges, traffic lights.
--left-> [JOSM: Manual fixes] Sometimes, extra polishing by visual tool such as JOSM is needed.\nData coming from OSM is extremely non-uniform, it contains errors\nand different authors express same concepts in different ways \n(Example: not all junctions are marked as junctions in the file,\nbut some are.
-}
 
 partition "OpenStreetMap XML Loader" {
--> [Run-time]User selects one of the data files either pre-packaged with\nthe app or loaded from the file system.
+(*)-> [Run-time]User selects one of the data files either pre-packaged with\nthe app or loaded from the file system.
 -> [Parser constructed] SAX parser over provided input stream is created, then \nit starts listening to XML events
 --> [Reading bounding box] Bounding box is first read from file, which gives us geog\nraphical window all other objects will belong to
 -left-> [GeoToMeters init] Conversion function initialized with bounding box.From now and\non, all the coordinates can be converted to meteres_offset system\n
