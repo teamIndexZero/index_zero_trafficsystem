@@ -18,7 +18,6 @@ public class GUI_Primitives {
     InputStream imageStream;
     int j = 0, k = 0;
     Image image, image1;
-    // TODO add log instance here.
     public void drawLine(int x1, int y1, int x2, int y2, Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g.drawLine(x1, y1, x2, y2);
@@ -36,15 +35,15 @@ public class GUI_Primitives {
         drawLine(x2, y2, x3, y3, g);
     }
 
-    public void drawSmallCar(int x3, int y3, double angleToXAxis, Graphics g) {
+    public void drawSmallCar(int x3, int y3, double angleToXAxis, Graphics g) throws IOException {
         drawCar(x3, y3, angleToXAxis, "gui/src/main/resources/sprites/bmw_z_top_view_clip_art_18132.jpg", g);
     }
 
-    public void drawTruck(int x3, int y3, double angleToXAxis, Graphics g) {
+    public void drawTruck(int x3, int y3, double angleToXAxis, Graphics g) throws IOException {
         drawCar(x3, y3, angleToXAxis, "gui/src/main/resources/sprites/8460_st0640_117.jpg", g);
     }
 
-    private void drawCar(int x3, int y3, double angleToXAxis, String filename, Graphics g) {
+    private void drawCar(int x3, int y3, double angleToXAxis, String filename, Graphics g) throws IOException {
         /*
         Files taken from
         http://all-free-download.com/free-vector/car-vector-top-view-download.html
@@ -74,12 +73,20 @@ public class GUI_Primitives {
                     graphics.drawImage(image, x3 - 18, y3 - 18, 40, 40, null);
                 }
             }
-        } catch (IOException e) {
-            // TODO add logger.
+        } catch (Exception e) {
             e.printStackTrace();
-            log.log_Fatal("File not found", "GUI_Primnitives");
+            if (e instanceof IOException) {
+                log.log_Fatal("File not found", "GUI_Primnitives");
+            }
+            if (e instanceof IllegalArgumentException) {
+                log.log_Error("Check function, parameter passing error", "GUI_Primitives");
+            } else {
+                log.log_Exception(e);
+                System.out.println("Unknown error");
+            }
         } finally {
             graphics.setTransform(originalTransform);
+            imageStream.close();
         }
     }
 }
