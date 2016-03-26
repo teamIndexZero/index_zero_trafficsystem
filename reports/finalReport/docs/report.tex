@@ -34,6 +34,7 @@ and a theory which are they based on.
 
 %Describe the requirements you set for your project at the beginning and the design you have taken for your project. Focus on why you decided to tackle the problem in the way you did, and what effects that had on the design. You may also wish to mention the impact of team-working on your requirements and design.
 
+
 \section{Implementation}
 %Describe the most significant implementation details, focussing on those where unusual or detailed solutions were required. Quote code fragments where necessary, but remember that the full source code will be included as an appendix. Explain how you tested your software (e.g. unit testing) and the extent to which you tested it. If relevant to your project, explain performance issues and how you tackled them.
 
@@ -74,8 +75,6 @@ and a theory which are they based on.
     \end{itemize}
 \end{itemize}
 
-
-
 \subsection{Graph construction}
 
 \begin{itemize}
@@ -107,32 +106,33 @@ and a theory which are they based on.
         \vspace{1.5em}
     \end{figure}
 
-    \item Progressed into Links, Junctions, Lanes in Directed lane group in Road
-    \item > linkage done on a lane level instead of road to make it easier to construct a directed graph, whilst maintaining access to groups of lanes and the road they belong to for traffic behaviour.
-    \item >>>Example!
-    \item link descriptions are depreciated after work on the OSM showed that universal linkage with junctions were for easier to do then identifying what was 1-to-1 link or a junction from the OSM data
-    \item Graph now composed of directed lanes -> links and Junction features with special JunctionLinks
-    \item Roads are now abstracted in the graph. Lanes still belong to groups of directed lanes which, in turn, belong to roads but the graph connections are done at lane level.
-
-    \begin{figure}
-        \vspace{1.5em}
-        \caption{Roads, Directed lane group and lanes}
-        \label{fig:RoadsFinal}
-        \centering
-        \includegraphics[width=1\textwidth]{figs/graphConstruction/Roads.png}
-        \vspace{1.5em}
-    \end{figure}
-
-    \begin{figure}
-        \vspace{1.5em}
-        \caption{Junction}
-        \label{fig:junction}
-        \centering
-        \includegraphics[width=0.6\textwidth]{figs/graphConstruction/Junction.png}
-        \vspace{1.5em}
-    \end{figure}
-
-    \item Roads and directed lane kept for keeping track of what belongs where on the simulation map. e.g.: road with name can be back referenced from a lane.
+	\item Progressed into Links, Junctions, Lanes in Directed lane group in Road
+	\item > linkage done on a lane level instead of road to make it easier to construct a directed graph, whilst maintaining access to groups of lanes and the road they belong to for traffic behaviour.
+	\item >>>Example!
+	\item link descriptions are depreciated after work on the OSM showed that universal linkage with junctions were for easier to do then identifying what was 1-to-1 link or a junction from the OSM data
+	\item Graph now composed of directed lanes -> links and Junction features with special JunctionLinks
+	\item Roads are now abstracted in the graph. Lanes still belong to groups of directed lanes which, in turn, belong to roads but the graph connections are done at lane level.
+	
+\begin{figure}
+	\vspace{1.5em}
+  	\caption{Roads, Directed lane group and lanes}
+  	\label{fig:RoadsFinal}
+  	\centering
+	\includegraphics[width=1\textwidth]{figs/graphConstruction/Roads.png}
+  	\vspace{1.5em}
+\end{figure}	
+	
+\begin{figure}
+	\vspace{1.5em}
+  	\caption{Junction}
+  	\label{fig:junction}
+  	\centering
+	\includegraphics[width=0.6\textwidth]{figs/graphConstruction/Junction.png}
+  	\vspace{1.5em}
+\end{figure}
+	
+	\item Roads and directed lane kept for keeping track of what belongs where on the simulation map. e.g.: road with name can be back referenced from a lane.
+	\item 
 \end{itemize}
 
 \begin{itemize}
@@ -281,6 +281,8 @@ and a theory which are they based on.
 
 
 \section{Team Work}
+%Describe how you worked together, including the tools and processes you used to facilitate group work.
+
 \begin{itemize}
     \item learned how to properly use team-collaborative tools
     \begin{itemize}
@@ -314,8 +316,6 @@ Problems:
     \item In meetings: Code writing once the issues of the week were discussed was not as productive as it could have been during these sessions
     \item combination of these issues lead to an asymmetric distribution of work input on the project
 \end{itemize}
-
-
 
 \section{Evaluation}
 %Critically evaluate your project: what worked well, and what didn’t? How did you do relative to your plan? what changes were the result of improved thinking and what changes were forced upon you? how did your team work together? etc. Note that you need to show that you understand the weaknesses in your work as well as its strengths. You may wish to identify relevant future work that could be done on your project.
