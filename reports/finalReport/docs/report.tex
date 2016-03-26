@@ -29,7 +29,7 @@
 \begin{itemize}
     \item Java SE 1.8
     \item most of the actual simulation and drawing code is written manually
-    \item libraries used: main code: java standard library (rt.jar), testing code: junit, mockito, fest-assert. Own logger used.
+    \item libraries used: main code: java standard library \(rt.jar\), testing code: junit, mockito, fest-assert. Own logger used.
 \end{itemize}
 
 
@@ -37,9 +37,18 @@
 \begin{itemize}
     \item Map construction
     \begin{itemize}
-        \item OSM xml import - as an XML file with published standard (lane directions and such)
-        \item Types of data not working for us - we need  a connected graph of roads, OSM has some ways/nodes, loosely  connected (via IDs)
-        \item Roads are represented as no-width polylines (no individual lanes except for just having the property)
+        \begin{figure}
+            \caption{Road and lanes polylines stages}
+            \label{fig:roadAndLanesPolylines}
+            \centering
+            \includegraphics[width=0.4\textwidth]{figs/road/road_polyline.png}
+            \hspace{0.2em}
+            \includegraphics[width=0.4\textwidth]{figs/road/road_lanes.png}
+        \end{figure}
+
+        \item OSM xml import - as an XML file with published standard \(lane directions and such\)
+        \item Types of data not working for us - we need  a connected graph of roads, OSM has some ways/nodes, loosely  connected \(via IDs\)
+        \item Roads are represented as no-width polylines \(no individual lanes except for just having the property\). Such roads ar displayed in Figure \ref{fig:roadAndLanesPolylines}, on the left - original road polyline coming from OpenStreetMap XML file \(think black line\). On the right - typical example of result of lane generation.
         \item crossroads are sometimes marked nodes, sometimes just a node used in two ways.
         \item mention specifically the issue with the loosely coupled data/inaccurate data (human error, multiple representations etc.). We had to 'cut edges' to get it there.
         \item SUMO has that capability but implements its own tags and does some guess work
@@ -59,23 +68,23 @@
 	\item Original premise: Links, Junctions and Roads
 	\item >Features (Roads and Junctions) are connected via links (still in high abstraction) see Figure~\ref{fig:FeatureConnect}
 
-\begin{figure}
-	\vspace{1.5em}
-  	\caption{Original design with Features and Links}
-  	\label{fig:FeatureConnect}
-  	\centering
-	\includegraphics[width=0.55\textwidth]{figs/graphConstruction/OriginalConnections.png}
-  	\vspace{1.5em}
-\end{figure}
-	
-\begin{figure}
-	\vspace{1.5em}
-  	\caption{Roads in the original high abstraction design}
-  	\label{fig:RoadsOriginal}
-  	\centering
-	\includegraphics[width=0.55\textwidth]{figs/graphConstruction/OriginalRoads.png}
-  	\vspace{1.5em}
-\end{figure}	
+    \begin{figure}
+        \vspace{1.5em}
+        \caption{Original design with Features and Links}
+        \label{fig:FeatureConnect}
+        \centering
+        \includegraphics[width=0.55\textwidth]{figs/graphConstruction/OriginalConnections.png}
+        \vspace{1.5em}
+    \end{figure}
+
+    \begin{figure}
+        \vspace{1.5em}
+        \caption{Roads in the original high abstraction design}
+        \label{fig:RoadsOriginal}
+        \centering
+        \includegraphics[width=0.55\textwidth]{figs/graphConstruction/OriginalRoads.png}
+        \vspace{1.5em}
+    \end{figure}
 
 	\item Progressed into Links, Junctions, Lanes in Directed lane group in Road
 	\item > linkage done on a lane level instead of road to make it easier to construct a directed graph, whilst maintaining access to groups of lanes and the road they belong to for traffic behaviour.
@@ -84,23 +93,23 @@
 	\item Graph now composed of directed lanes -> links and Junction features with special JunctionLinks
 	\item Roads are now abstracted in the graph. Lanes still belong to groups of directed lanes which, in turn, belong to roads but the graph connections are done at lane level.
 	
-\begin{figure}
-	\vspace{1.5em}
-  	\caption{Roads, Directed lane group and lanes}
-  	\label{fig:RoadsFinal}
-  	\centering
-	\includegraphics[width=1\textwidth]{figs/graphConstruction/Roads.png}
-  	\vspace{1.5em}
-\end{figure}	
-	
-\begin{figure}
-	\vspace{1.5em}
-  	\caption{Junction}
-  	\label{fig:junction}
-  	\centering
-	\includegraphics[width=0.6\textwidth]{figs/graphConstruction/Junction.png}
-  	\vspace{1.5em}
-\end{figure}		
+    \begin{figure}
+        \vspace{1.5em}
+        \caption{Roads, Directed lane group and lanes}
+        \label{fig:RoadsFinal}
+        \centering
+        \includegraphics[width=1\textwidth]{figs/graphConstruction/Roads.png}
+        \vspace{1.5em}
+    \end{figure}
+
+    \begin{figure}
+        \vspace{1.5em}
+        \caption{Junction}
+        \label{fig:junction}
+        \centering
+        \includegraphics[width=0.6\textwidth]{figs/graphConstruction/Junction.png}
+        \vspace{1.5em}
+    \end{figure}
 	
 	\item Roads and directed lane kept for keeping track of what belongs where on the simulation map. e.g.: road with name can be back referenced from a lane.
 	\item 
@@ -145,34 +154,70 @@
         \item Coordinate conversion - lat/lon to meters-offset (Mercator projection). This is internal representaiton which is used in in simulation itself
         \item Coordinate conversion - meters-offset to pixels x/y (on-screen). This is the view-centric coordinate system which depends on scale, movement, size of window.
         \item Vehicle specific coordinates: lane it belongs to AND position along the polyline.
+        \item GUI features: map zoom, pan, scale.
+            \begin{figure}
+                \vspace{1.5em}
+                \caption{Map zoom options}
+                \label{fig:mapZoomOptions}
+                \centering
+                \includegraphics[width=0.4\textwidth]{figs/road/zoom_dots.png}
+                \hspace{0.2em}
+                \includegraphics[width=0.4\textwidth]{figs/road/zoom_cars.png}
+            \end{figure}
+
     \end{itemize}
 \end{itemize}
 
 \subsection{Vehicle movement}
 \begin{itemize}
     \item Junctions and possible outcomes for vehicle
+        \begin{figure}
+            \caption{Junctions found in real life}
+            \label{fig:junctionTypes}
+            \centering
+            \includegraphics[width=0.4\textwidth]{figs/junction/junction_5_roads.png}
+            \hspace{0.2em}
+            \includegraphics[width=0.4\textwidth]{figs/junction/junction_two_roads.png}
+        \end{figure}
+
+        \begin{figure}
+            \caption{Types of forks found in real life }
+            \label{fig:junctionTypes}
+            \centering
+            \includegraphics[width=0.4\textwidth]{figs/junction/junction_oneway_to_fork.png}
+            \hspace{0.2em}
+            \includegraphics[width=0.4\textwidth]{figs/junction/junction_two_way_to_fork.png}
+        \end{figure}
+
     \begin {itemize}
         \item our model: junctions 1-type: only 2 roads connected
         \item our model: junction 2-type: more than 2 roads connected (actual junctions)
+            \begin{figure}
+                \caption{Junction forward or turn options depending on angle }
+                \label{fig:forwardOrTurnOption}
+                \centering
+                \includegraphics[width=0.4\textwidth]{figs/junction/junction_car_incoming_angle_with_turn_sectors.png}
+            \end{figure}
         \item explain incoming lane angle, outgoing angles and its effect on vehicle movement - what is considered straight movement, and what is considered turn. >110 is prohibited, 110-30 is turn 30-0 is straight. This enforces us to skip weird turns at forks, for example.
     \end {itemize}
 
     \item Vehicle movement
+        \begin{figure}
+            \caption{Car changing lane}
+            \label{fig:carKeepingDistance}
+            \centering
+            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_keeping_distance_to_other.png}
+            \hspace{0.2em}
+            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_before.png}
+            \hspace{0.2em}
+            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_after.png}
+        \end{figure}
+
     \begin{itemize}
         \item Straight movement on the road (even when curved). Acceleration and deceleration.
         \item Deciding if to go forward or turn (random)
         \item Crossings. Movement on 2+F crossroads (more than 2 features).
         \item Distance the car keeps to obstacles
-            \begin{figure}
-                \caption{Car changing lane}
-                \label{fig:carKeepingDistance}
-                \centering
-                \includegraphics[width=0.3\textwidth]{figs/carMovement/car_keeping_distance_to_other.png}
-                \hspace{0.2em}
-                \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_before.png}
-                \hspace{0.2em}
-                \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_after.png}
-            \end{figure}
         \item Lane changing - if there is another car in distance to keep, see to outer lane (if the same space is free) and change if possible, then try to do same for inner lane. If both buys, just brake.
     \end{itemize}
 
@@ -216,8 +261,6 @@
 
 
 \section{Team Work}
-%Describe how you worked together, including the tools and processes you used to facilitate group work.
-
     \begin{itemize}
         \item learned how to properly use team-collaborative tools
 		\begin{itemize}
