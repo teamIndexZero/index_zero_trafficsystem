@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 /**
  * Created by lexaux on 21/03/2016.
@@ -11,7 +12,7 @@ import java.awt.image.BufferedImage;
 public class GuiPrimitivesTest {
 
     @Test
-    public void testDrawingPerformance() {
+    public void testDrawingPerformance() throws IOException {
         // record time
         GUI_Primitives primitives = new GUI_Primitives();
 
