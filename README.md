@@ -63,7 +63,7 @@ http://wiki.openstreetmap.org/wiki/Downloading_data for exact details on obtaini
 8. In IDEA (top-right): Unregistered VCS root detected -> Add root
 9. Try building it - in Gradle sidebar, invoke: gradlew.bat build in top level terminal.
 
-ª
+
 ## Project structure
 
 1. simulator - actual simulator with all the logic embedded in there
