@@ -76,13 +76,12 @@ public class GUI_Primitives {
         } catch (Exception e) {
             e.printStackTrace();
             if (e instanceof IOException) {
-                log.log_Fatal("File not found", "GUI_Primnitives");
+                log.log_Fatal(e.getMessage(), "GUI_Primnitives");
             }
             if (e instanceof IllegalArgumentException) {
                 log.log_Error("Check function, parameter passing error", "GUI_Primitives");
             } else {
                 log.log_Exception(e);
-                System.out.println("Unknown error");
             }
         } finally {
             graphics.setTransform(originalTransform);
