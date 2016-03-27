@@ -28,6 +28,8 @@ public abstract class Feature implements ISimulationAware {
 
     /**
      * Used to debug things.
+     *
+     * @return a nicely formatted HTML string detailing feature position and state
      */
     public abstract String toHTMLString();
 

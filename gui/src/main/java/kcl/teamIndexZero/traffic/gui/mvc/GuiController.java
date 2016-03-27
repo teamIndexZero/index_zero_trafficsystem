@@ -26,7 +26,8 @@ public class GuiController {
     /**
      * Constructor with model. Controller needs it since it actively changes model details.
      *
-     * @param model GUI model
+     * @param model   GUI model
+     * @param factory a factory which will create us a simulator
      */
     public GuiController(GuiModel model, SimulatorFactory factory) {
         this.model = model;
@@ -35,6 +36,8 @@ public class GuiController {
 
     /**
      * We may need that for status updates and understanding how is simulation going on
+     *
+     * @return thread in which actual simulation happens
      */
     public Thread getSimulatorThread() {
         return simulatorThread;

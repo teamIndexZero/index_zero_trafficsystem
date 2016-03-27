@@ -19,7 +19,8 @@ public class Link implements ISimulationAware {
     /**
      * Constructor
      *
-     * @param id Link ID tag
+     * @param id       Link ID tag
+     * @param geoPoint location of this link
      */
     public Link(ID id, GeoPoint geoPoint) {
         this.id = id;

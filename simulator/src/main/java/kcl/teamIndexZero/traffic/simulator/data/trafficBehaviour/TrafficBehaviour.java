@@ -21,6 +21,8 @@ public class TrafficBehaviour {
 
     /**
      * Constructor
+     *
+     * @param junction a junction this behavior controls
      */
     public TrafficBehaviour(Junction junction) {
         this.junction = junction;
