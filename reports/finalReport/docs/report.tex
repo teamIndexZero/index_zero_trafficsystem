@@ -8,7 +8,25 @@
 
 \begin{itemize}
 	\item Context
+	\begin{itemize}
+		\item Road traffic simulator
+		\item Goal was to simulate road traffic on urban networks to enable some general data gathering and be able to plugin more specific metric recorder for pollutants, throughput load on junction, etc...
+		\item ES::NOTE: maybe do a comparison with the goals set out in the original report?
+		\item Originally started as a cell automata micro model
+		\item Model became too restrictive as cells were of fixed lengths and model was not easily scalable
+		\item Morphed to encompass features of macro model and agency principles
+	\end{itemize}
 	\item summary of chevos
+	\begin{itemize}
+		\item Hybrid model
+		\item map objects as agent that decide their behaviours based on environment
+		\item focus of design was about solid foundations so that the software can be expanded upon without any major structural changes
+		\item i.e.: very expandable without needing to change the core design
+		\item Maps imported from real-life OpenStreetMap (OSM) data so realistic
+		\item Maps can also be created synthetically as long as the format is the same
+		\item allows for real world usage off-the-shelf
+		\item PIC of the app!!!
+	\end{itemize}
 \end{itemize}
 
 \section{Review}
@@ -31,8 +49,10 @@ and a theory which are they based on.
 \begin{itemize}
     \item Flexible requirements - start with something basic, get to more complex (stage 2 possibilities.)
     \item Model evolved from simple cellular-automata with discrete cells occupied by cars (or free) to more physics-like model, with the cars having position and bearing in real world map, moving along the lanes, with position and sizes resembling real like and set as floating-point numbers
-    \item Started with one set of requirements - traffic lights, self-driving cars - but ended up with 1. real life map model (roads, lanes, crossings) 2. simpler car behavior (no traffic lights, random decision as to go forward on crossing or turn) 3. much more comprehensive GUI (map pane with zoom/pan, on-map selection with mouse, different rendering settings such as debug roads, debug crossings, etc.) 4. more complex vehicle movement model - acceleration/decelration, distance to keep.
-
+    \item Started with one set of requirements - traffic lights, self-driving cars - but ended up with 1. real life map model (roads, lanes, crossings) 2. simpler car behaviour (no traffic lights, random decision as to go forward on crossing or turn) 3. much more comprehensive GUI (map pane with zoom/pan, on-map selection with mouse, different rendering settings such as debug roads, debug crossings, etc.) 4. more complex vehicle movement model - acceleration/deceleration, distance to keep.
+	\item ES::NOTE: maybe original pic of the 3 modules here?
+	\item >> Separation of concern principles
+	\item >> focus on solid bases to enable expandability and real world usage?
 \end{itemize}
 
 %Describe the requirements you set for your project at the beginning and the design you have taken for your project. Focus on why you decided to tackle the problem in the way you did, and what effects that had on the design. You may also wish to mention the impact of team-working on your requirements and design.
@@ -46,6 +66,7 @@ and a theory which are they based on.
     \item Java SE 1.8
     \item most of the actual simulation and drawing code is written manually
     \item libraries used: main code: java standard library \(rt.jar\), testing code: junit, mockito, fest-assert. Own logger used.
+    \item OSM for the import map data
 \end{itemize}
 
 
@@ -84,7 +105,7 @@ and a theory which are they based on.
 	\item Thoughts
     \begin{itemize}
         \item why construct the graph prior to the sim run instead of during
-        \item > moving the workload at startup time so as to runtime increase performance
+        \item > moving the workload at startup time so as to increase runtime performance
         \item > able to conceptually save state of graph on each tick if save is implemented
     \end{itemize}
     \item Graph constructed from description value objects of roads, junctions and links
@@ -328,18 +349,6 @@ and a theory which are they based on.
 
 \end{itemize}
 
-\begin{itemize}
-    \item Log module
-    \begin{itemize}
-        \item coloured terminal window if more time,
-        \item >easier to read
-        \item >segregated from the console
-        \item Custom Filters
-        \item >filtering based on class name (origin)
-        \item >filtering based on selection of multiple non-sequential log levels instead of everything below the set global level (granular control)
-    \end{itemize}
-\end{itemize}
-
 
 \section{Team Work}
 %Describe how you worked together, including the tools and processes you used to facilitate group work.
@@ -388,8 +397,24 @@ Problems:
 	\item -> allow for manual editing of the graph from the GUI view?
 	\item As skirting into hybrid model, detailing such as car sprites, road graphics, etc could be added as zoom factor increases, maybe show lanes from medium zoom and abstract into dots and coloured roads at low zoom
 	\item addition of plug-in capability to add different metrics/behaviours as required by the user
+	\item creation of vehicles with specs based off real life data
+	\item >pollution based on vehicle profile
+	\item manual addition of temporary block on map so modify traffic flow (construction/road works/accidents/etc..)
+	\item Simulation recorder/player - large simulations can be run prior then played and analysed later
+	\item NOTE: Traffic lights??
 \end{itemize}
 
+\begin{itemize}
+    \item Log module expansion
+    \begin{itemize}
+        \item coloured terminal window if more time,
+        \item >easier to read
+        \item >segregated from the console
+        \item Custom Filters
+        \item >filtering based on class name (origin)
+        \item >filtering based on selection of multiple non-sequential log levels instead of everything below the set global level (granular control)
+    \end{itemize}
+\end{itemize}
 
 \subsection{Performance}
 After the implementation of main application, performance measurements were taken.
