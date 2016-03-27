@@ -75,6 +75,27 @@ public class GeoPolyline {
     }
 
     /**
+     * Gets real bearing for the poing of polyline (that is, angle between it and 1,0 vector) in radians.
+     *
+     * @param distanceFromStart distance from start.
+     * @return angle. 0 if outside of lane.
+     */
+    public double getBearingAtDistanceFromStart(double distanceFromStart) {
+        GeoSegment containingSegment = null;
+        for (GeoSegment segment : segments) {
+            if (distanceFromStart <= segment.getLength()) {
+                containingSegment = segment;
+                break;
+            }
+            distanceFromStart -= segment.getLength();
+        }
+        if (containingSegment == null) {
+            return 0;
+        }
+        return containingSegment.getAngleToEastRadians();
+    }
+
+    /**
      * Gets the starting point for the segment.
      *
      * @return start point.

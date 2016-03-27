@@ -23,6 +23,7 @@ public class DirectedLanes {
      * @param id              ID tag
      * @param number_of_lanes Number of lanes on this direction
      * @param road_specs      Road specifications
+     * @param road            - the road this set of lanes belongs to
      */
     public DirectedLanes(ID id, int number_of_lanes, RoadSpecs road_specs, Road road) {
         this.id = id;
