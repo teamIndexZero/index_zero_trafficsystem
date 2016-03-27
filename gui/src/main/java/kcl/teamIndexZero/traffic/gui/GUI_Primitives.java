@@ -85,7 +85,9 @@ public class GUI_Primitives {
             }
         } finally {
             graphics.setTransform(originalTransform);
-            imageStream.close();
+            if (imageStream != null) {
+                imageStream.close();
+            }
         }
     }
 }
