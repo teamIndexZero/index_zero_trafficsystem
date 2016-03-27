@@ -193,9 +193,14 @@ public class SimulationImageProducer {
             if (point == null) {
                 return;
             }
-
+            GUI_Primitives cars = new GUI_Primitives();
             if (model.getViewport().getPixelsInMeter() < 1) {
-                primitives.drawCircle(graphics, point, 2, v.getColor(), true);
+                //cars.drawSmallCar(2,5,90,graphics);
+                int x, y;
+                x = (int) point.xMeters;
+                y = (int) point.yMeters;
+                cars.drawSmallCar(x, y, 0, graphics);
+                //primitives.drawCircle(graphics, point, 2, v.getColor(), true);
             } else {
                 double bearing = v.getBearing();
                 primitives.drawSegment(graphics,
