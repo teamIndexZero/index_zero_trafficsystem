@@ -3,6 +3,10 @@
 
 %Your initial report set out your aims for the project which you may wish to modify in light of feedback received. The final report should detail out what you set to achieve, what you did achieve, how you achieved it, and your evaluation of your work. You are free to structure your report as you see fit, and different projects may naturally lead to different structures. An example structure for your report follows. Bear in mind that the main aim of your report is to show the examiners that you have done quality work: focus on the noteworthy, not the mundane; explain what the examiners cannot know rather than the obvious; and show that you understand your project’s weaknesses as well as its strengths.
 
+
+% Apply paragraph spacing only for the main report body %
+\setlength{\parskip}{1em}
+
 \section{Introduction}
 %Describe the context for the work and the problem you are addressing. Briefly summarise what you achieved in the project.
 
@@ -97,6 +101,10 @@ Also as it was said [] usage of 3d modes dramatically affects the performance.[m
 \section{Implementation}
 %Describe the most significant implementation details, focussing on those where unusual or detailed solutions were required. Quote code fragments where necessary, but remember that the full source code will be included as an appendix. Explain how you tested your software (e.g. unit testing) and the extent to which you tested it. If relevant to your project, explain performance issues and how you tackled them.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Alex part
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Technology and libraries}
 \begin{itemize}
     \item Java SE 1.8
@@ -105,32 +113,107 @@ Also as it was said [] usage of 3d modes dramatically affects the performance.[m
     \item OSM for the import map data
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Alex part
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Map data import (OSM)}
+According to the requirements, the software would need to be able to model traffic behavior in real-like road networks. In addition to the organic requirements needs, there were synthetic type of requirements demanding for variuos test fixtures for all appication components from actual vehicle behavior to individual lane visualisation.
 
-\subsection{Map data import \(OSM\)}
+Decision was made to use already-available public-domain ordnance data from OpenStreetMap\footnote{OSM data is available under ODbL license, see http://www.openstreetmap.org/copyright} (OSM)  worldwide project. It was a natural decision since data is available for all the world, and is collaboratively created by multitude of users, OSM has a strong technical community and ample documentation, and, finally, it contains all the data which may be required for traffic simulation. In addition to that, data files are available in well-known XML format\footnote{Having said that, there is no official XML type specification due to main software pieces in ecosystem vaguely interpreting different cases: http://wiki.openstreetmap.org/wiki/OSM\_XML}. As an extremely useful side-effect, using such widely available data allows a user to obtain a map of the area of paticular interest for simulation following simple steps, so it greatly adds to the practical value. At the same time, the implementation of such loading turned out to be not strightforward due to data originating from many human contributors bearing all the inconsistencies and errors possible for vaguely defined data.
+
+OSM format defines three main types of objects: nodes (points having coordinates), ways (polylines, sequences of nodes) and relations (types of relationships between other objects), which are extensively tagged, to represent all the complex setting of the real-world mapping. For example, a way (sequence of node references) with tag type equal to primary and lanes equal to 4, would mean a two-way primary road. A way with type building represents a building on the map, and should be a closed polygon. All the objects have the ID attached to them.
+
+Following is a compact overview of the pipeline data follows from the OpenStreetMap file downloadable from the internet to the actual simulation process:
+\begin{itemize}
+    \item Stage 1. Using standard OSM software tools (Osmosis, JOSM), prepare the excerpt from large data set suitable, which is suitable for simulation.
+
+    \item Stage 2. Using obtained OSM XML file, load a set of Descriptor objects:
+    \begin{itemize}
+        \item Collection of road descriptors: objects describing roads, with number of lanes in each direction
+        \item Collection of junction descriptors: object describing junctions, and their connection with roads
+        \item Generic knowledge about map setting, such as map geographical bounding box.
+    \end{itemize}
+
+    \item Stage 3. Using descriptor objects, construct in-memory graph representation of the road networks:
+    \begin{itemize}
+        \item Create roads from descriptions. Create individual lanes within the roads. Offset lanes accordingly.
+        \item Create junctions from descriptors.
+        \item Link roads and junctions using junction descriptors. Link on individual lanes. Compute possible inflow and outflow paths for junctions to save time in simulation run.
+        \item Walk the graph and attach traffic generators and receivers to not yet connected edges.
+    \end{itemize}
+
+    \item Stage 4. Run the traffic simulation on the created map.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Alex part
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Preparing data file}
+First of all, user needs to decide on the actual geographical area they want to perform simulation in. The area is uniquely defined by 2 pairs geogrphical of coordinates in latitude, longitude coordinate system: (south-west lat, long) - (north-east lat,long). After that, user needs to either download the full planet.osm file (containing whole OSM data set), or an area excerpt containing area of interest\footnote{Geofabrik is a reliable source for OSM excerpts with fresh data http://www.geofabrik.de}.
+
+Following is the osmosis tool command line, which combines both cut and filter steps into single run:
+\begin{lstlisting}
+$ osmosis --read-xml file=INPUT_LARGE_FILE.osm enableDateParsing=no
+        --tf accept-ways highway=trunk,motorway,primary,secondary,tertiary
+            ,motorway_link,trunk_link,primary_link,secondary_link,tertiary_link
+        --bounding-box bottom=48.867844 left=2.289727 top=48.879678 right=2.304442 completeWays=yes
+        --used-node
+        --write-xml OUTPUT_FILE.osm
+\end{lstlisting}
+'completeWays=yes' key is of specific interest. When osmosis attempts bounding box reduction, and finds a way which is located both inside and outside the bounding box, its default behavior is to terminate the way at the last node within the box. When applied to real life data, this yielded ugly results, sometimes terminating road network segment where it should not terminate. As a counter action, this key is used to include all the ways which are within, or intersect with, bounding box rectangle.  As a result, we obtain an OSM XML file with some ways spanning outside of the box, which may be opened directly from within the user interface of the Traffic Simulator system, or edited in any standard OSM file editor, such as JOSM.
+
+Figure \ref{fig:thirdPartyToolsOSMPreparation} summarizes steps performed during prelminary file preparation process.
+\begin{figure}[h]
+    \caption{Process of preparing the OSM xml file using OSM tools}
+    \label{fig:thirdPartyToolsOSMPreparation}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../../uml_diagrams/thirdPartyToolsDataLoading.png}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Alex part
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Descriptors creation from the OSM file}
+After the actual simulation map OSM file is created, it may be opened directly from traffic simulation. In order for the data contained in an XML file to be used, it first needs to be read, parsed and adopted into the internal format, and also linked into the in-memory graph.
+
+Actual parsing of the XML file has been implemented using standard java SAX\footnote{Simple API for XML, https://docs.oracle.com/javase/7/docs/api/javax/xml/parsers/SAXParser.html} parser. When choosing between the DOM and SAX parsing, the latter was selected with no doubt, since the DOM has significantly larger memory requirement as soon as it establishes the whole document as tree in memory, and exposes many complex APIs and methods for manipulation which are not needed for the loading data case. SAX employs event-driven XML parsing model: when parser encounters new element, closing element, an attribute or text blocks, it invokes appropriate methods on handler object. In order to listen to these events, class OsmSaxHandler has been created.
+
+From the XML file, first the boudning box is read, the actual geographical rectangle containing all the places of interest. Whilst OSM operates in geo coordinates, actual simulation happens on a flat cartesian coordinate system first quadrant map. All objects have coordinates as offset from zero point by x and by y axis. Figure \ref{fig:coordinateConversions} provides an overview of what are the coordinate systems used across the traffic simulation system. On this stage of parsing, conversion operator is initialized for geographical to meters offset coordinate system conversion.
+
+\begin{figure}[h]
+    \caption{Coordinate systems used in traffic simulation system}
+    \label{fig:coordinateConversions}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../../uml_diagrams/coordinateSystems.png}
+\end{figure}
+
+ Since OSM has quite few basic objects to express mapping data, roads are expressed as <way> elements, containing sequence of references to nodes, effectively forming a polyline. There is no notion of road width in original data, only the number of lanes and if the road is one way. The design decision has been made to default lane width to standard 3.2 meters. Using lane width, one-way flag and number of lanes in road, physical representation of road is created.
+
+\begin{figure}[h]
+    \caption{Road and lanes polylines stages}
+    \label{fig:roadAndLanesPolylines}
+    \centering
+    \includegraphics[width=0.4\textwidth]{figs/road/road_polyline.png}
+    \hspace{0.2em}
+    \includegraphics[width=0.4\textwidth]{figs/road/road_lanes.png}
+\end{figure}
+
+At the same time, XML data file provides enough information to construct a central road axis polyline. After this polyline is available, polylines for the individual lanes are constructed, using positive or negative shifts along thr normal vector to current segment of the polyline, with the shift amount depending on the position of the lane in road. Figure \ref{fig:roadAndLanesPolylines} provides an overview of the process: on the left the road central axis polyline is visible (thin black hairline), on the right the more complex junction with multiple lanes, construted using the method mentioned before.
+
+For the simulation to run smoothly, the road networks needs to be represented as a well-formed graph data structure. In order to facilitate the requirement, post-processing is applied to the road and junction descriptions collected from the XML file. Roads containing junction node as a non-edge polyline node were split - one part terminating at junction whilst the other starting from it. This allowed for future uniformity of the movement logic. The vehicle simply foollows high-level graph while making low-level decision on acceleration and deceleration and is naturally transported to the next feature (graph node) as long as it terminates previous one.
+
+Unfortunately, the collaborative nature of OpenStreetMap data leads to multiple ambiguities. Same real-world concepts, such as junctions, road connections and pedestrian crossing, happen to be expressed in a different way in XML file by different contributors. For example, the node has a tag which indicates that it is a junction, however not all real crossings do have this label attached to the crossing node. The design decision has been made to default to the least common denominator, and simply consider a situation when same node identified by the id is contained in two ways a crossing. This design decision, as well as data eventual consistency, led to the concrete changes in coding practice: for example, instead of throwing an exception when meeting an inconsistent data situtation, the load layer attempts to fix it to best possible degree available to it, extensively logging the causes and related data excerpts for human inspection. For example, if the node referenced in the road polyling is not found in data file, the data loading is not terminated - some nodes just happen to be cut off by processing, and some are erroneously referenced. It seems that official OSM software is tolerant to these inconsistencies as well, and presence of such ill-formed data is one of the causes of the absence of the formal data specification.
+
+The approach of importing OpenStreetMap data was eventually found to have some similarities to the one employed in SUMO system, with some use of guess work as well as high tolerance to the data file errors. At the same time, SUMO employs much more complex and rich data standard for its simulation setting.
+
 \begin{itemize}
     \item Map construction
     \begin{itemize}
-        \begin{figure}[h]
-            \caption{Road and lanes polylines stages}
-            \label{fig:roadAndLanesPolylines}
-            \centering
-            \includegraphics[width=0.4\textwidth]{figs/road/road_polyline.png}
-            \hspace{0.2em}
-            \includegraphics[width=0.4\textwidth]{figs/road/road_lanes.png}
-        \end{figure}
-
-        \item OSM xml import - as an XML file with published standard \(lane directions and such\)
-            \begin{figure}[h]
-                \caption{Process of preparing the OSM xml file using OSM tools}
-                \label{fig:thirdPartyToolsOSMPreparation}
-                \centering
-                \includegraphics[width=0.8\textwidth]{../../uml_diagrams/thirdPartyToolsDataLoading.png}
-            \end{figure}
-
         \item Types of data not working for us - we need  a connected graph of roads, OSM has some ways/nodes, loosely  connected \(via IDs\)
-        \item Roads are represented as no-width polylines \(no individual lanes except for just having the property\). Such roads ar displayed in Figure \ref{fig:roadAndLanesPolylines}, on the left - original road polyline coming from OpenStreetMap XML file \(think black line\). On the right - typical example of result of lane generation.
-        \item crossroads are sometimes marked nodes, sometimes just a node used in two ways.
-        \item mention specifically the issue with the loosely coupled data/inaccurate data (human error, multiple representations etc.). We had to 'cut edges' to get it there.
         \item SUMO has that capability but implements its own tags and does some guess work
     \end{itemize}
 \end{itemize}
@@ -499,3 +582,6 @@ Whole Greater London & 31101 road and 24314 junction, 120672 mapFeatures, 547 ma
 		\item Jacek Krupski
 		\item Farhad Rahimli
     \end{itemize}
+
+% Apply paragraph spacing only for the main report body %
+\setlength{\parskip}{0em}

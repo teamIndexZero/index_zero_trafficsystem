@@ -1,25 +1,14 @@
 @startuml
 
 partition "OpenStreetMap XML Loader" {
-(*)-> [Run-time]User selects one of the data files either pre-packaged with\nthe app or loaded from the file system.
--> [Parser constructed] SAX parser over provided input stream is created, then \nit starts listening to XML events
---> [Reading bounding box] Bounding box is first read from file, which gives us geog\nraphical window all other objects will belong to
--left-> [GeoToMeters init] Conversion function initialized with bounding box.From now and\non, all the coordinates can be converted to meteres_offset system\n
---> [Loading nodes] Nodes are read then. Each node is a point with lat/lon coordinates.\npoints are stored by ID, with coordinates converted to meters \noffset system
--> [Loading ways] Ways in OSM are seequences of nodes. When the ways are\nloaded, two processes happen:\n\n1. RoadDescription objects are stored. They have name,\nsequence of nodes (polyline) and meta info (number of \nlanes, either road is one-way.\n\n2.Each node is recorded as belonging to a path. This is \n needed to detect junctions even if they are not marked.
+(*)--> [Run-time]User selects one of the data files either pre-packaged with the app or loaded from the file system.
+--> [Parser constructed] SAX parser over provided input stream is created. It uses custom SAX handler. Actual XML parsing starts
+--> [Reading bounding box] Bounding box is first read from file, which gives us geographical window all other objects will belong to
+--> [GeoToMeters init] Conversion function initialized with bounding box.From now and on, all the coordinates can be converted to meteres_offset system
+--> [Loading nodes] Nodes are read then. Each node is a point with lat/lon coordinates.points are stored by ID, with coordinates\n converted to meters offset system
+--> [Loading ways] Ways in OSM are seequences of nodes. When the ways are loaded, two processes happen:\n\n1. RoadDescription objects are stored. They have name, sequence of nodes (polyline) and meta info (number of \nlanes, if the road is one-way.\n\n2.Each node is recorded as belonging to a path. This is needed to detect junctions even if they are not marked.
 --> [create Junc. Descr.] From previously stored nodes, we find ones which belong\nto more than one road. We create JunctionDescription \nobjects, and record IDs of connected features either as \nincoming or outgoing. In case the road has possible \njunction in the middle of its polyline, such road is split.
--left-> [Result object] ParseResult object is created which contains collections of \nJunctionDescription, collection of RoadDescription and a \nbounding box of meters. \nBeyond this point, no lat/long coordinates are used at all.
+--> [Result object] ParseResult object is created which contains collections of \nJunctionDescription, collection of RoadDescription and a \nbounding box of meters. \nBeyond this point, no lat/long coordinates are used at all.
 }
-partition "Graph Construction" {
---> [Result is passed to Graph Constructor]Roads are created
--> Lanes are created
---> Junctions are created
--left-> Lanes are linked to junctions
---> Junctions calculate possible inflow/outflow paths for all lanes
--> Traffic Generators are linked in terminus areas (ends). \nSame traffic generators are acting as traffic receivers, \ncollecting cars going out of screen.
---> Graph integrity check is performed.
--left-> Graph is ready - we can traverse via nodes (features) \nand edges (links). Road is a feature, jucntion is a feature, \nTrafficGenerator is a feature.\nBeyond this point there is no *Description objects, only \nreal graph objects which are used for simulation.
-}
-
---> [Resulting graph is passed to simulation code](*)
+--> [Resulting descriptor set is passed to graph constructor](*)
 @enduml
