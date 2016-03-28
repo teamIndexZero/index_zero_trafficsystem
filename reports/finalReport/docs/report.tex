@@ -109,7 +109,7 @@ Also as it was said [] usage of 3d modes dramatically affects the performance.[m
 \begin{itemize}
     \item Java SE 1.8
     \item most of the actual simulation and drawing code is written manually
-    \item libraries used: main code: java standard library \(rt.jar\), testing code: junit, mockito, fest-assert. Own logger used.
+    \item libraries used: main code: Java standard library \(rt.jar\), testing code: jUnit, Mockito, Fest-assert. Own logger used.
     \item OSM for the import map data
 \end{itemize}
 
@@ -118,9 +118,9 @@ Also as it was said [] usage of 3d modes dramatically affects the performance.[m
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Map data import (OSM)}
-According to the requirements, the software would need to be able to model traffic behavior in real-like road networks. In addition to the organic requirements needs, there were synthetic type of requirements demanding for variuos test fixtures for all appication components from actual vehicle behavior to individual lane visualisation.
+According to the requirements, the software would need to be able to model traffic behaviour in real-like road networks. In addition to the organic requirements needs, there were synthetic type of requirements demanding for various test fixtures for all application components from actual vehicle behaviour to individual lane visualisation.
 
-Decision was made to use already-available public-domain ordnance data from OpenStreetMap\footnote{OSM data is available under ODbL license, see http://www.openstreetmap.org/copyright} (OSM)  worldwide project. It was a natural decision since data is available for all the world, and is collaboratively created by multitude of users, OSM has a strong technical community and ample documentation, and, finally, it contains all the data which may be required for traffic simulation. In addition to that, data files are available in well-known XML format\footnote{Having said that, there is no official XML type specification due to main software pieces in ecosystem vaguely interpreting different cases: http://wiki.openstreetmap.org/wiki/OSM\_XML}. As an extremely useful side-effect, using such widely available data allows a user to obtain a map of the area of paticular interest for simulation following simple steps, so it greatly adds to the practical value. At the same time, the implementation of such loading turned out to be not strightforward due to data originating from many human contributors bearing all the inconsistencies and errors possible for vaguely defined data.
+Decision was made to use already-available public-domain ordnance data from OpenStreetMap\footnote{OSM data is available under ODbL license, see http://www.openstreetmap.org/copyright} (OSM)  worldwide project. It was a natural decision since data is available for all the world, and is collaboratively created by multitude of users, OSM has a strong technical community and ample documentation, and, finally, it contains all the data which may be required for traffic simulation. In addition to that, data files are available in well-known XML format\footnote{Having said that, there is no official XML type specification due to main software pieces in ecosystem vaguely interpreting different cases: http://wiki.openstreetmap.org/wiki/OSM\_XML}. As an extremely useful side-effect, using such widely available data allows a user to obtain a map of the area of particular interest for simulation following simple steps, so it greatly adds to the practical value. At the same time, the implementation of such loading turned out to be not straightforward due to data originating from many human contributors bearing all the inconsistencies and errors possible for vaguely defined data.
 
 OSM format defines three main types of objects: nodes (points having coordinates), ways (polylines, sequences of nodes) and relations (types of relationships between other objects), which are extensively tagged, to represent all the complex setting of the real-world mapping. For example, a way (sequence of node references) with tag type equal to primary and lanes equal to 4, would mean a two-way primary road. A way with type building represents a building on the map, and should be a closed polygon. All the objects have the ID attached to them.
 
@@ -162,7 +162,7 @@ $ osmosis --read-xml file=INPUT_LARGE_FILE.osm enableDateParsing=no
         --used-node
         --write-xml OUTPUT_FILE.osm
 \end{lstlisting}
-'completeWays=yes' key is of specific interest. When osmosis attempts bounding box reduction, and finds a way which is located both inside and outside the bounding box, its default behavior is to terminate the way at the last node within the box. When applied to real life data, this yielded ugly results, sometimes terminating road network segment where it should not terminate. As a counter action, this key is used to include all the ways which are within, or intersect with, bounding box rectangle.  As a result, we obtain an OSM XML file with some ways spanning outside of the box, which may be opened directly from within the user interface of the Traffic Simulator system, or edited in any standard OSM file editor, such as JOSM.
+'completeWays=yes' key is of specific interest. When osmosis attempts bounding box reduction, and finds a way which is located both inside and outside the bounding box, its default behaviour is to terminate the way at the last node within the box. When applied to real life data, this yielded ugly results, sometimes terminating road network segment where it should not terminate. As a counter action, this key is used to include all the ways which are within, or intersect with, bounding box rectangle.  As a result, we obtain an OSM XML file with some ways spanning outside of the box, which may be opened directly from within the user interface of the Traffic Simulator system, or edited in any standard OSM file editor, such as JOSM.
 
 Figure \ref{fig:thirdPartyToolsOSMPreparation} summarizes steps performed during prelminary file preparation process.
 \begin{figure}[h]
@@ -182,7 +182,7 @@ After the actual simulation map OSM file is created, it may be opened directly f
 
 Actual parsing of the XML file has been implemented using standard java SAX\footnote{Simple API for XML, https://docs.oracle.com/javase/7/docs/api/javax/xml/parsers/SAXParser.html} parser. When choosing between the DOM and SAX parsing, the latter was selected with no doubt, since the DOM has significantly larger memory requirement as soon as it establishes the whole document as tree in memory, and exposes many complex APIs and methods for manipulation which are not needed for the loading data case. SAX employs event-driven XML parsing model: when parser encounters new element, closing element, an attribute or text blocks, it invokes appropriate methods on handler object. In order to listen to these events, class OsmSaxHandler has been created.
 
-From the XML file, first the boudning box is read, the actual geographical rectangle containing all the places of interest. Whilst OSM operates in geo coordinates, actual simulation happens on a flat cartesian coordinate system first quadrant map. All objects have coordinates as offset from zero point by x and by y axis. Figure \ref{fig:coordinateConversions} provides an overview of what are the coordinate systems used across the traffic simulation system. On this stage of parsing, conversion operator is initialized for geographical to meters offset coordinate system conversion.
+From the XML file, first the bounding box is read, the actual geographical rectangle containing all the places of interest. Whilst OSM operates in geo-coordinates, actual simulation happens on a flat Cartesian coordinate system first quadrant map. All objects have coordinates as offset from zero point by x and by y axis. Figure \ref{fig:coordinateConversions} provides an overview of what are the coordinate systems used across the traffic simulation system. On this stage of parsing, conversion operator is initialized for geographical to meters offset coordinate system conversion.
 
 \begin{figure}[h]
     \caption{Coordinate systems used in traffic simulation system}
@@ -202,9 +202,9 @@ From the XML file, first the boudning box is read, the actual geographical recta
     \includegraphics[width=0.4\textwidth]{figs/road/road_lanes.png}
 \end{figure}
 
-At the same time, XML data file provides enough information to construct a central road axis polyline. After this polyline is available, polylines for the individual lanes are constructed, using positive or negative shifts along thr normal vector to current segment of the polyline, with the shift amount depending on the position of the lane in road. Figure \ref{fig:roadAndLanesPolylines} provides an overview of the process: on the left the road central axis polyline is visible (thin black hairline), on the right the more complex junction with multiple lanes, construted using the method mentioned before.
+At the same time, XML data file provides enough information to construct a central road axis polyline. After this polyline is available, polylines for the individual lanes are constructed, using positive or negative shifts along thr normal vector to current segment of the polyline, with the shift amount depending on the position of the lane in road. Figure \ref{fig:roadAndLanesPolylines} provides an overview of the process: on the left the road central axis polyline is visible (thin black hairline), on the right the more complex junction with multiple lanes, constructed using the method mentioned before.
 
-For the simulation to run smoothly, the road networks needs to be represented as a well-formed graph data structure. In order to facilitate the requirement, post-processing is applied to the road and junction descriptions collected from the XML file. Roads containing junction node as a non-edge polyline node were split - one part terminating at junction whilst the other starting from it. This allowed for future uniformity of the movement logic. The vehicle simply foollows high-level graph while making low-level decision on acceleration and deceleration and is naturally transported to the next feature (graph node) as long as it terminates previous one.
+For the simulation to run smoothly, the road networks needs to be represented as a well-formed graph data structure. In order to facilitate the requirement, post-processing is applied to the road and junction descriptions collected from the XML file. Roads containing junction node as a non-edge polyline node were split - one part terminating at junction whilst the other starting from it. This allowed for future uniformity of the movement logic. The vehicle simply follows high-level graph while making low-level decision on acceleration and deceleration and is naturally transported to the next feature (graph node) as long as it terminates previous one.
 
 Unfortunately, the collaborative nature of OpenStreetMap data leads to multiple ambiguities:
 \begin{itemize}
@@ -225,42 +225,38 @@ At the same time, extending the map data loader with extra functionality, such a
 
 \subsection{Graph construction}
 
-\begin{itemize}
-	\item Thoughts
-    \begin{itemize}
-        \item why construct the graph prior to the sim run instead of during
-        \item > moving the workload at startup time so as to increase runtime performance
-        \item > able to conceptually save state of graph on each tick if save is implemented
-    \end{itemize}
-    \item Graph constructed from description value objects of roads, junctions and links
-    \item Original premise: Links, Junctions and Roads
-    \item >Features (Roads and Junctions) are connected via links (still in high abstraction) see Figure~\ref{fig:FeatureConnect}
+Graph construction is done prior to the simulation running rather than during (JIT). This approach moves the performance penalty away from the live simulation leaving some overhead for large workload heavy maps. it also, conceptually, makes for easier storage of map states on every tick as, once the graph is set, the only changes are in the counters, link states (e.g.: such as traffic lights being red/green) and the map objects travelling on the graph.
+From the previously created descriptors, the graph constructor creates the features and links of the graph and links them together in this order (see Figure~\ref{fig:graphConstructSeqDiag} and ~\ref{fig:roadConstructSeqDiag} in Appendix~\ref{sec:roadConstructionSequences}):
+\begin{enumerate}
+	\item Roads, their directed lane groups and individual lanes are created,
+	\item Junctions are created and the roads branching off them connected,
+	\item Traffic generators are placed.
+\end{enumerate}
 
-    \begin{figure}[h]
-        \vspace{1.5em}
-        \caption{Original design with Features and Links}
-        \label{fig:FeatureConnect}
-        \centering
-        \includegraphics[width=0.50\textwidth]{figs/graphConstruction/OriginalConnections.png}
-        \vspace{1.5em}
-    \end{figure}
+\subsubsection{Feature creation and linkage}
 
-    \begin{figure}[h]
-        \vspace{1.5em}
-        \caption{Roads in the original high abstraction design}
-        \label{fig:RoadsOriginal}
-        \centering
-        \includegraphics[width=0.45\textwidth]{figs/graphConstruction/OriginalRoads.png}
-        \vspace{1.5em}
-    \end{figure}
+Originally the graph was kept abstract with features connected via links (see Figure~\ref{fig:FeatureConnect}). These features could be either junctions or roads. Roads were connected as whole features (see Figure~\ref{fig:RoadsOriginal}).
 
-	\item Progressed into Links, Junctions, Lanes in Directed lane group in Road
-	\item > linkage done on a lane level instead of road to make it easier to construct a directed graph, whilst maintaining access to groups of lanes and the road they belong to for traffic behaviour.
-	\item >>>Example!
-	\item link descriptions are depreciated after work on the OSM showed that universal linkage with junctions were for easier to do then identifying what was 1-to-1 link or a junction from the OSM data
-	\item Graph now composed of directed lanes -> links and Junction features with special JunctionLinks
-	\item Roads are now abstracted in the graph. Lanes still belong to groups of directed lanes which, in turn, belong to roads but the graph connections are done at lane level.
-	
+\begin{figure}[h]
+	\vspace{1.5em}
+    \caption{Original design with Features and Links}
+    \label{fig:FeatureConnect}
+    \centering
+    \includegraphics[width=0.50\textwidth]{figs/graphConstruction/OriginalConnections.png}
+    \vspace{1.5em}
+\end{figure}
+
+\begin{figure}[h]
+    \vspace{1.5em}
+    \caption{Roads in the original high abstraction design}
+    \label{fig:RoadsOriginal}
+    \centering
+    \includegraphics[width=0.45\textwidth]{figs/graphConstruction/OriginalRoads.png}
+    \vspace{1.5em}
+\end{figure}
+
+As more work was done it became clear that this high level of abstraction on the graph was not going to be practical. Thus it progressed into having roads broken into groups of directed lanes. This allows the lanes to be connected individually in a directed fashion in the graph. Roads are now composed of lane groups that are, themselves, composed of single lanes (see Figure~\ref{fig:RoadsFinal}).
+
 \begin{figure}[h]
 	\vspace{1.5em}
   	\caption{Roads, Directed lane group and lanes}
@@ -269,6 +265,21 @@ At the same time, extending the map data loader with extra functionality, such a
 	\includegraphics[width=0.75\textwidth]{figs/graphConstruction/Roads.png}
   	\vspace{1.5em}
 \end{figure}	
+
+Although roads and lane groups are not directly connected up in the graph, the belonging lanes can back reference those enabling travelling objects to access their properties. I.e.: A vehicle on a lane can find out the Road's name or ID as well as what direction it belongs to.
+
+Junctions were developed around this exploded view of the road feature. Lanes are connected up to junctions via special junction specific links that give access to available paths (exit points) from that particular entry point with the <getLinks()> method for any passing objects (see Figure~\ref{fig:junction}). 
+
+\begin{lstlisting}[language=Java]
+    public List<Link> getLinks() {
+        try {
+            return junction.getNextLinks(super.getID());
+        } catch (JunctionPathException e) {
+            LOG.log_Fatal("No exit link from the junction were found! i.e.: Car is stuck!");
+            return new ArrayList<>();
+        }
+    }
+\end{lstlisting}
 	
 \begin{figure}[h]
 	\vspace{1.5em}
@@ -278,18 +289,13 @@ At the same time, extending the map data loader with extra functionality, such a
 	\includegraphics[width=0.6\textwidth]{figs/graphConstruction/Junction.png}
   	\vspace{1.5em}
 \end{figure}
-	
-	\item Roads and directed lane kept for keeping track of what belongs where on the simulation map. e.g.: road with name can be back referenced from a lane.
+
+\begin{itemize}
+	\item link descriptions are depreciated after work on the OSM showed that universal linkage with junctions were for easier to do then identifying what was 1-to-1 link or a junction from the OSM data
 	\item 
 \end{itemize}
 
-\begin{itemize}
-	\item Problems:
-	\item > issues streaming from the OSM data leads to bug where in a round about a incoming road cannot be connected up
-	\item > Example!! + PIC + explanation as to why exactly
-\end{itemize}
-
-\subsection{Traffic Generators}
+\subsubsection{Traffic Generators}
 \begin{itemize}
 	\item TF originally used to produce traffic only
 	\item progressed to also receive traffic exiting the boundaries of the graph. Additional movement check - cars don't disappear anywhere but in Traffic Generators so we are sure on graph consistency at least in long run time.
@@ -336,6 +342,12 @@ At the same time, extending the map data loader with extra functionality, such a
 	\item serialization/de-serialization
 \end{itemize}
 
+\subsection{Caveats}
+\begin{itemize}
+	\item Problems:
+	\item > issues streaming from the OSM data leads to bug where in a round about a incoming road cannot be connected up
+	\item > Example!! + PIC + explanation as to why exactly
+\end{itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
