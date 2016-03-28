@@ -13,7 +13,6 @@ import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -223,11 +222,7 @@ public class SimulationImageProducer {
             if (v.equals(model.getSelectedMapObject())) {
                 int radius = (int) (model.getViewport().getPixelsInMeter()
                         * ((Vehicle) model.getSelectedMapObject()).getDistanceToKeepToNextObject());
-                try {
-                    cars.drawSmallCar(x, y, radius, g);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                cars.drawSmallCar(x, y, radius, g);
                 /*primitives.drawCircle(graphics,
                         point,
                         radius,
