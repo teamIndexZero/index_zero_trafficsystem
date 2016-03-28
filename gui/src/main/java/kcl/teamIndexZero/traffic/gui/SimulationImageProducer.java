@@ -13,6 +13,7 @@ import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -190,16 +191,17 @@ public class SimulationImageProducer {
         map.getObjectsOnSurface().forEach(mapObject -> {
             Vehicle v = (Vehicle) mapObject;
             GeoPoint point = v.getPositionOnMap();
+            int x, y;
+            x = (int) point.xMeters;
+            y = (int) point.yMeters;
+            BufferedImage image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
+            Graphics g = image.getGraphics();
             if (point == null) {
                 return;
             }
             GUI_Primitives cars = new GUI_Primitives();
             if (model.getViewport().getPixelsInMeter() < 1) {
-                //cars.drawSmallCar(2,5,90,graphics);
-                int x, y;
-                x = (int) point.xMeters;
-                y = (int) point.yMeters;
-                cars.drawSmallCar(x, y, 0, graphics);
+                cars.drawSmallCar(x, y, 2, g);
                 //primitives.drawCircle(graphics, point, 2, v.getColor(), true);
             } else {
                 double bearing = v.getBearing();
@@ -214,16 +216,22 @@ public class SimulationImageProducer {
                         v.getColor(),
                         getStrokeByWidthMeters(v.getWidthMeters())
                 );
-                primitives.drawCircle(graphics, point, (int) (Math.floor(v.getWidthMeters() * model.getViewport().getPixelsInMeter())), Color.YELLOW, true);
+                cars.drawSmallCar(x, y, bearing, g);
+                //primitives.drawCircle(graphics, point, (int) (Math.floor(v.getWidthMeters() * model.getViewport().getPixelsInMeter())), Color.YELLOW, true);
             }
 
             if (v.equals(model.getSelectedMapObject())) {
                 int radius = (int) (model.getViewport().getPixelsInMeter()
                         * ((Vehicle) model.getSelectedMapObject()).getDistanceToKeepToNextObject());
-                primitives.drawCircle(graphics,
+                try {
+                    cars.drawSmallCar(x, y, radius, g);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                /*primitives.drawCircle(graphics,
                         point,
                         radius,
-                        v.getColor());
+                        v.getColor());*/
                 primitives.drawText(graphics, point, v.getNameAndRoad(), v.getColor());
                 primitives.drawAngleVector(graphics, point, v.getBearing(), radius, 1, v.getColor(), true, false);
             }
