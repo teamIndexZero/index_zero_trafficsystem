@@ -218,6 +218,7 @@ Following problems were encountered and solved during the implementation of the 
 \begin{itemize}
     \item Coordinate conversions. Since the Mercator projection with spherical geoid simplification is used, there is certain inaccuracy in coordinates converted to meters offset.
     \item Splitting roads having junctions in the middle of the road. Rather a technical complexity, it led to a cumbersome algorithm, since the processing of the roads and junctions happened at the same time, so in case of the split it is required to ensure that all references to split road are updated to either part of it.
+    \item Link descriptions. Initially, it was anticipated that another type of descriptors - Link descriptors - would be created to mark the places where two parts of the road are connected (for example, pedestrian crossing on a straight road). However, after the implementation of the data loading found out a need for road splitting, Link descriptors had to be abandoned in favour of more general idea of junction descriptors having only two roads connected. Otherwise, the edge-case situation of a link descriptor created in a geographical point, which was later to be found to be in the middle of another road led to an overly complex code handling this edge cases. This conversion only positively reflected on the overall design of the system, following "keep it simple" rule. Later stage of the graph construction and actual simulation were found working perectly with junctions of two roads acting as links.
     \item Lane construction. Deriving from a single zero-width road polyline a set of lane polylines which are offset into appropriate direction (perpendicular to the segment).
 \end{itemize}
 
@@ -400,7 +401,7 @@ By having traffic generators automatically placed at any dangling links, any OSM
 \subsection{Vehicle movement}
 \begin{itemize}
     \item How vehicle moves: physical model (speed, acceleration, direction, distance.)
-    \item Speed limits, two ttypes of cars
+    \item Speed limits, two types of cars
     \item Car belongs to a lane. How coordinate conversion happens (poing, angles, distnace.)
     \item Moving on a lane, changing lanes:
         \begin{figure}[h]
