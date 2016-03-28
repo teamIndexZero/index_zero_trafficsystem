@@ -44,8 +44,8 @@ public class TrafficLightsInSetRuleTest {
     @Test
     public void testChangeStateofSet() throws Exception {
 
-        trafficLightSet.addTrafficlight(trafficLightInSetA, 'A');
-        trafficLightSet.addTrafficlight(trafficLightInSetB, 'B');
+        trafficLightSet.addTrafficlight(trafficLightInSetA, TrafficLightSet.TrafficLightSetGroup.GROUPA);
+        trafficLightSet.addTrafficlight(trafficLightInSetB, TrafficLightSet.TrafficLightSetGroup.GROUPB);
         model.changeStateofSet(trafficLightSet.InteriorListA); //Set A starts from GREEN so after change has RED
         model.changeStateofSet(trafficLightSet.InteriorListB); // The opposite from above
 

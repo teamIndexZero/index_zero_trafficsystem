@@ -78,31 +78,35 @@ public class TrafficLightControllerTest {
     @Test
     public void testAddRuleSetA() {
         flag = false;
-        trafficLightSet.addTrafficlight(trafficLightInSetA, 'A');           //initially the State was GREEN
-        model.TrafficLightSetList = trafficLightSet.TrafficLightSetList;
+        trafficLightSet.addTrafficlight(trafficLightInSetA, TrafficLightSet.TrafficLightSetGroup.GROUPA);           //initially the State was GREEN
+        model.TrafficLightSetList = trafficLightSet.InteriorListA;
         model.addRule(setRule);                                             // Now should be RED
 
-        for (TrafficLightInSet tf : model.TrafficLightSetList) {
-            if (tf.currentState == TrafficLightState.RED) {
-                flag = true;
-            };
+        if (model.TrafficLightSetList != null) {
+            for (TrafficLightInSet tf : model.TrafficLightSetList) {
+                if (tf.currentState == TrafficLightState.RED) {
+                    flag = true;
+                };
+            }
+            Assert.assertTrue(flag);
         }
-        Assert.assertTrue(flag);
     }
 
     @Test
     public void testAddRuleSetB() {
         flag = false;
-        trafficLightSet.addTrafficlight(trafficLightInSetB, 'B');       //initially the State was RED
-        model.TrafficLightSetList = trafficLightSet.TrafficLightSetList;
+        trafficLightSet.addTrafficlight(trafficLightInSetB, TrafficLightSet.TrafficLightSetGroup.GROUPB);       //initially the State was RED
+        model.TrafficLightSetList = trafficLightSet.InteriorListB;
         model.addRule(setRule);                                          // Now should be GREEN
 
-        for (TrafficLightInSet tf : model.TrafficLightSetList) {
-            if (tf.currentState == TrafficLightState.GREEN) {
-                flag = true;
-            };
+        if (model.TrafficLightSetList != null) {
+            for (TrafficLightInSet tf : model.TrafficLightSetList) {
+                if (tf.currentState == TrafficLightState.GREEN) {
+                    flag = true;
+                };
+            }
+            Assert.assertTrue(flag);
         }
-        Assert.assertTrue(flag);
     }
 
     @Test

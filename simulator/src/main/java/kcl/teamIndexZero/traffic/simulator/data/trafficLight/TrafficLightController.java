@@ -23,16 +23,13 @@ import java.util.List;
  * Controls the traffic lights in the map based on their rules
  */
 public class TrafficLightController implements ISimulationAware {
-        public String temp;
+
         public long CurrentTime;
-        public LocalDateTime Temporary;
         public long lastChange = 0;
         public long timer = 5;
-        public long delay;
+        public long TrafficLightDelay;
+        public long TrafficLightInSetDelay;
         public static LocalDateTime start = LocalDateTime.of(1984, 12, 16, 7, 45, 55);
-        private TrafficLight model; //list this
-        private TrafficLightInSet modelSet; //list this
-        private TrafficLightSet set;
         public List<TrafficLight> TrafficLightSinglesList;
         public List<TrafficLightInSet> TrafficLightSetList;
         SimulationTick simulationTick;
@@ -46,9 +43,13 @@ public class TrafficLightController implements ISimulationAware {
             TrafficLightSetList = new ArrayList<TrafficLightInSet>();
         }
 
+        /**
+          * Converts LocalDateTime to long
+          *
+          * @param date a LocalDateTime object
+          */
         public long formatTimeToLong(LocalDateTime date) {
-            long milliseconds = ChronoUnit.MILLIS.between(start, date);
-            return milliseconds;
+            return ChronoUnit.MILLIS.between(start, date);
         }
 
        /**
@@ -82,19 +83,25 @@ public class TrafficLightController implements ISimulationAware {
             CurrentTime = formatTimeToLong(simulationTick.getSimulatedTime());
 
             /*when single traffic lights do not work in a synchronous way with the ticks*/
-            model.TrafficLightDelay = CurrentTime - lastChange;
-            if ((model.TrafficLightDelay >= timer) && (model.currentState == TrafficLightState.GREEN)) {
-                model.currentState = TrafficLightState.RED;
-            }
+            this.TrafficLightDelay = CurrentTime - lastChange;
+
+            TrafficLightSinglesList.forEach(TrafficLight -> {
+                if ((this.TrafficLightDelay >= timer) && (TrafficLight.currentState == TrafficLightState.GREEN)) {
+                        TrafficLight.currentState = TrafficLightState.RED;
+                }
+            });
 
             /*when set's traffic lights do not work in a synchronous way with the ticks*/
-            modelSet.TrafficLightInSetDelay = CurrentTime - lastChange;
-            if ((modelSet.TrafficLightInSetDelay >= timer) && (modelSet.currentState == TrafficLightState.GREEN)){
-                modelSet.currentState = TrafficLightState.RED;
-            }
+            this.TrafficLightInSetDelay = CurrentTime - lastChange;
+
+            TrafficLightSetList.forEach(TrafficLightInSet -> {
+                if ((this.TrafficLightInSetDelay >= timer) && (TrafficLightInSet.currentState == TrafficLightState.GREEN)){
+                    TrafficLightInSet.currentState = TrafficLightState.RED;
+                }
+            });
 
             if ((CurrentTime - lastChange) > timer) {
-                if (modelSet != null) {
+                if ((TrafficLightSetList != null) && (TrafficLightSinglesList != null)) {
                     TrafficLightsInSetRule.changeStateofSet(TrafficLightSetList);
                     TrafficLightRule.changeStateofSingleTrafficLights(TrafficLightSinglesList);
                     lastChange = CurrentTime;

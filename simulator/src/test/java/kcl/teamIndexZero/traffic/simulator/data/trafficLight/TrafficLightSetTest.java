@@ -33,8 +33,8 @@ public class TrafficLightSetTest {
 
     @Test
     public void testAddTrafficlight() throws Exception {
-        model.addTrafficlight(trafficLightInSetA, 'A');
-        model.addTrafficlight(trafficLightInSetB, 'B');
+        model.addTrafficlight(trafficLightInSetA, TrafficLightSet.TrafficLightSetGroup.GROUPA);
+        model.addTrafficlight(trafficLightInSetB, TrafficLightSet.TrafficLightSetGroup.GROUPB);
 
         for (TrafficLightInSet tf : model.InteriorListA) {
             if (tf.currentState == TrafficLightState.GREEN) { //should fulfill this statement as initial state is GREEN in this group
@@ -61,7 +61,7 @@ public class TrafficLightSetTest {
 
     @Test
     public void testGetSet() throws Exception {
-        assertEquals(model.getSet(new ID("TrafficLightSetTest")), model.TrafficLightSetList);
+        assertEquals(model.getSetGroupA(new ID("TrafficLightSetTest")), model.InteriorListA);
     }
 
     @Test
