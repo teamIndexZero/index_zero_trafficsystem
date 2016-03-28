@@ -18,21 +18,21 @@ public class GUI_Primitives {
     int j = 0, k = 0;
     Image image, image1;
 
-    public void drawSmallCar(int x3, int y3, double angleToXAxis, Graphics g) throws IOException {
+    public void drawSmallCar(int x3, int y3, double angleToXAxis, Graphics2D g) throws IOException {
         drawCar(x3, y3, angleToXAxis, "gui/src/main/resources/sprites/bmw_z_top_view_clip_art_18132.jpg", g);
     }
 
-    public void drawTruck(int x3, int y3, double angleToXAxis, Graphics g) throws IOException {
+    public void drawTruck(int x3, int y3, double angleToXAxis, Graphics2D g) throws IOException {
         drawCar(x3, y3, angleToXAxis, "gui/src/main/resources/sprites/8460_st0640_117.jpg", g);
     }
 
-    private void drawCar(int x3, int y3, double angleToXAxis, String filename, Graphics g) throws IOException {
+    private void drawCar(int x3, int y3, double angleToXAxis, String filename, Graphics2D g) throws IOException {
         /*
         Files taken from
         http://all-free-download.com/free-vector/car-vector-top-view-download.html
         http://hdimagelib.com/trailer+truck+top+view
         */
-        Graphics2D graphics = (Graphics2D) g;
+        Graphics2D graphics = g;
         AffineTransform originalTransform = graphics.getTransform();
         try {
             AffineTransform newTransformation = new AffineTransform();
