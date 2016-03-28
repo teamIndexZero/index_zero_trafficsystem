@@ -194,7 +194,7 @@ From the XML file, first the boudning box is read, the actual geographical recta
  Since OSM has quite few basic objects to express mapping data, roads are expressed as <way> elements, containing sequence of references to nodes, effectively forming a polyline. There is no notion of road width in original data, only the number of lanes and if the road is one way. The design decision has been made to default lane width to standard 3.2 meters. Using lane width, one-way flag and number of lanes in road, physical representation of road is created.
 
 \begin{figure}[h]
-    \caption{Road and lanes polylines stages}
+    \caption{Polyline creation and visualisation stages}
     \label{fig:roadAndLanesPolylines}
     \centering
     \includegraphics[width=0.4\textwidth]{figs/road/road_polyline.png}
@@ -206,17 +206,22 @@ At the same time, XML data file provides enough information to construct a centr
 
 For the simulation to run smoothly, the road networks needs to be represented as a well-formed graph data structure. In order to facilitate the requirement, post-processing is applied to the road and junction descriptions collected from the XML file. Roads containing junction node as a non-edge polyline node were split - one part terminating at junction whilst the other starting from it. This allowed for future uniformity of the movement logic. The vehicle simply foollows high-level graph while making low-level decision on acceleration and deceleration and is naturally transported to the next feature (graph node) as long as it terminates previous one.
 
-Unfortunately, the collaborative nature of OpenStreetMap data leads to multiple ambiguities. Same real-world concepts, such as junctions, road connections and pedestrian crossing, happen to be expressed in a different way in XML file by different contributors. For example, the node has a tag which indicates that it is a junction, however not all real crossings do have this label attached to the crossing node. The design decision has been made to default to the least common denominator, and simply consider a situation when same node identified by the id is contained in two ways a crossing. This design decision, as well as data eventual consistency, led to the concrete changes in coding practice: for example, instead of throwing an exception when meeting an inconsistent data situtation, the load layer attempts to fix it to best possible degree available to it, extensively logging the causes and related data excerpts for human inspection. For example, if the node referenced in the road polyling is not found in data file, the data loading is not terminated - some nodes just happen to be cut off by processing, and some are erroneously referenced. It seems that official OSM software is tolerant to these inconsistencies as well, and presence of such ill-formed data is one of the causes of the absence of the formal data specification.
+Unfortunately, the collaborative nature of OpenStreetMap data leads to multiple ambiguities:
+\begin{itemize}
+    \item Human factor. Same real-world concepts, such as junctions, road connections and pedestrian crossing, happen to be expressed in a different way in XML file by different contributors. For example, the node has a tag which indicates that it is a junction, however not all real crossings do have this label attached to the crossing node. The design decision has been made to default to the least common denominator, and simply consider a situation when same node identified by the id is contained in two ways a crossing.
+    \item Eventual data consistency. In some cases the OpenStreetMap data contains simple errors or misconceptions, which led to the concrete changes in coding practice: for example, instead of throwing an exception when meeting an inconsistent data situtation, the load layer attempts to fix it to best possible degree available to it, extensively logging the causes and related data excerpts for human inspection. For example, if the node referenced in the road polyling is not found in data file, the data loading is not terminated - some nodes just happen to be cut off by processing, and some are erroneously referenced. It seems that official OSM software is tolerant to these inconsistencies as well, and presence of such ill-formed data is one of the causes of the absence of the formal data specification.
+\end{itemize}
 
 The approach of importing OpenStreetMap data was eventually found to have some similarities to the one employed in SUMO system, with some use of guess work as well as high tolerance to the data file errors. At the same time, SUMO employs much more complex and rich data standard for its simulation setting.
 
+Following problems were encountered and solved during the implementation of the XML data loading:
 \begin{itemize}
-    \item Map construction
-    \begin{itemize}
-        \item Types of data not working for us - we need  a connected graph of roads, OSM has some ways/nodes, loosely  connected \(via IDs\)
-        \item SUMO has that capability but implements its own tags and does some guess work
-    \end{itemize}
+    \item Coordinate conversions. Since the Mercator projection with spherical geoid simplification is used, there is certain inaccuracy in coordinates converted to meters offset.
+    \item Splitting roads having junctions in the middle of the road. Rather a technical complexity, it led to a cumbersome algorithm, since the processing of the roads and junctions happened at the same time, so in case of the split it is required to ensure that all references to split road are updated to either part of it.
+    \item Lane construction. Deriving from a single zero-width road polyline a set of lane polylines which are offset into appropriate direction (perpendicular to the segment).
 \end{itemize}
+
+At the same time, extending the map data loader with extra functionality, such as maintaining pedestrian crossing information or traffic lights information, would provide system with some benefits, there is a clear potential for improvement on this side.
 
 \subsection{Graph construction}
 
@@ -332,11 +337,15 @@ The approach of importing OpenStreetMap data was eventually found to have some s
 \end{itemize}
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Alex part
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Map visualisation}
 \begin{itemize}
     \item Map visualisation
     \begin{itemize}
-        \item Coordinate conversion - lat/lon to meters-offset (Mercator projection). This is internal representaiton which is used in in simulation itself
         \item Coordinate conversion - meters-offset to pixels x/y (on-screen). This is the view-centric coordinate system which depends on scale, movement, size of window.
         \item Vehicle specific coordinates: lane it belongs to AND position along the polyline.
         \item GUI features: map zoom, pan, scale.
@@ -353,8 +362,29 @@ The approach of importing OpenStreetMap data was eventually found to have some s
     \end{itemize}
 \end{itemize}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Alex part
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Vehicle movement}
 \begin{itemize}
+    \item How vehicle moves: physical model (speed, acceleration, direction, distance.)
+    \item Speed limits, two ttypes of cars
+    \item Car belongs to a lane. How coordinate conversion happens (poing, angles, distnace.)
+    \item Moving on a lane, changing lanes:
+        \begin{figure}[h]
+            \caption{Car changing lane}
+            \label{fig:carKeepingDistance}
+            \centering
+            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_keeping_distance_to_other.png}
+            \hspace{0.2em}
+            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_before.png}
+            \hspace{0.2em}
+            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_after.png}
+        \end{figure}
+
+    \item What vehicle should do when reaching junctions
     \item Junctions and possible outcomes for vehicle
         \begin{figure}[h]
             \caption{Junctions found in real life}
@@ -385,27 +415,6 @@ The approach of importing OpenStreetMap data was eventually found to have some s
             \end{figure}
         \item explain incoming lane angle, outgoing angles and its effect on vehicle movement - what is considered straight movement, and what is considered turn. >110 is prohibited, 110-30 is turn 30-0 is straight. This enforces us to skip weird turns at forks, for example.
     \end {itemize}
-
-    \item Vehicle movement
-        \begin{figure}[h]
-            \caption{Car changing lane}
-            \label{fig:carKeepingDistance}
-            \centering
-            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_keeping_distance_to_other.png}
-            \hspace{0.2em}
-            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_before.png}
-            \hspace{0.2em}
-            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_after.png}
-        \end{figure}
-
-    \begin{itemize}
-        \item Straight movement on the road (even when curved). Acceleration and deceleration.
-        \item Deciding if to go forward or turn (random)
-        \item Crossings. Movement on 2+F crossroads (more than 2 features).
-        \item Distance the car keeps to obstacles
-        \item Lane changing - if there is another car in distance to keep, see to outer lane (if the same space is free) and change if possible, then try to do same for inner lane. If both buys, just brake.
-    \end{itemize}
-
 \end{itemize}
 
 
