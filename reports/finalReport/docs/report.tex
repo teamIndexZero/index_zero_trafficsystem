@@ -268,7 +268,7 @@ As more work was done it became clear that this high level of abstraction on the
 
 Although roads and lane groups are not directly connected up in the graph, the belonging lanes can back reference those enabling travelling objects to access their properties. I.e.: A vehicle on a lane can find out the Road's name or ID as well as what direction it belongs to.
 
-Junctions were developed around this exploded view of the road feature. Lanes are connected up to junctions via special junction specific links that give access to available paths (exit points) from that particular entry point with the <getLinks()> method for any passing objects (see Figure~\ref{fig:junction}). 
+Junctions were developed around this exploded view of the road feature. Lanes are connected up to junctions via special junction specific links that give access to available paths from that particular entry point with the <getLinks()> method for any passing objects (see Figure~\ref{fig:junction}).
 
 \begin{lstlisting}[language=Java]
     public List<Link> getLinks() {
@@ -280,8 +280,14 @@ Junctions were developed around this exploded view of the road feature. Lanes ar
         }
     }
 \end{lstlisting}
-	
-\begin{figure}[h]
+
+Paths are calculated after lane linkage has been done. All entry points are connected up to all exit points unless it double backs on the same road (u-turn) (see Figure~\ref{fig:junction}). The paths are stored in a <TrafficBehaviour> object as lists for each entry point ID inside a map:
+
+\begin{lstlisting}[language=Java]
+	private Map<ID, List<ID>> outflowPaths;
+\end{lstlisting}
+
+\begin{figure}[!h]
 	\vspace{1.5em}
   	\caption{Junction}
   	\label{fig:junction}
@@ -292,26 +298,41 @@ Junctions were developed around this exploded view of the road feature. Lanes ar
 
 \begin{itemize}
 	\item link descriptions are depreciated after work on the OSM showed that universal linkage with junctions were for easier to do then identifying what was 1-to-1 link or a junction from the OSM data
-	\item 
 \end{itemize}
 
 \subsubsection{Traffic Generators}
-\begin{itemize}
-	\item TF originally used to produce traffic only
-	\item progressed to also receive traffic exiting the boundaries of the graph. Additional movement check - cars don't disappear anywhere but in Traffic Generators so we are sure on graph consistency at least in long run time.
-	\item keeps tab on vehicles received and produced
-	\item responsible for the destruction of vehicle object
-	\item Bug: incoming only lanes to a junction
-	\item Bug: 1 dual way road and then all incoming composed roads into junction meant that for the incoming of the 2 way road, the traffic had no where to go.
-	\item >> Both dealt with by placing TF on junctions
-	\item Bug: originally linkage was checked forward only in the direction of the lanes. Not backwards. meaning if no forward lanes were present in an asymmetric road then the outgoing lanes would not get a TF connected as they were not detected.
-	\item Problem fixed by introducing the "previous link" connection to all features.
-	\item Good for spotting OSM data issues/inconsistencies at a glance since the visualisation has TFs included on the map
-	\item acts as a safety net for those (above)
-	\item also, adding TFs during map construction ensures that 'island' features sets are not left without traffic on them
-	\item *island: disconnected groups from the main graph or orphan features that either indicate error/inconsistencies in the OSM import data or physical islands on maps
-	\item e.g.: 
-	
+
+Traffic generators were originally designed to only produce traffic but evolved to also take receipt of it thus taking on the responsibility of deleting vehicles as they exited the boundaries of the simulated map. This ensures that vehicles cannot keep going (graphically) and disappears at the designated boundaries. This also allows to keep track on the numbers of vehicles produced and received at those points (see Figure~\ref{fig:boundaryTF}).
+
+During development two corner cases were encountered:
+\begin{enumerate}
+	\item Junctions were there were only incoming lanes connected to,
+	\item Junctions were there were only incoming lanes connected to save for one road.
+\end{enumerate}
+
+In the first case, vehicles from all lanes had no where to go. In the second case, where the traffic came into the junction from the lone road with both direction included, the traffic had also no where to go since the only way out would have been a u-turn which is not allowed.
+Both were dealt by placing traffic generators on those special case junctions to take in the orphaned traffic (see Figure~\ref{fig:junctionTF}).
+
+\begin{figure}[h]
+	\vspace{1.5em}
+	\centering
+	\begin{minipage}[t]{0.60\textwidth}
+  		\caption{Traffic Generators at Map boundaries}
+  		\label{fig:boundaryTF}
+  		\centering
+		\includegraphics[width=1\textwidth]{figs/trafficGenerator/generate-receive.png}
+	\end{minipage}\hfill
+	\begin{minipage}[t]{0.35\textwidth}
+  		\caption{Junction Traffic Generator}
+  		\label{fig:junctionTF}
+  		\centering
+		\includegraphics[width=1\textwidth]{figs/trafficGenerator/inflowOnly.png}
+	\end{minipage}
+	\vspace{1.5em}
+\end{figure}
+
+By having traffic generators automatically placed at any dangling links, any OSM data issues or inconsistencies can be seen in the graphical representation of the map at a glance. It also acts as a safety net when these occur by ensuring that all ends are connected to something and traffic is kept within the boundaries of the map (i.e.: no escaping vehicles). Another positive side effect is that, during construction of the graph, any island features (be it orphaned features that are unconnected or actual geographic islands) are ensured to have traffic running on them. For example see Figure~\ref{fig:islandReal}.
+
 \begin{figure}[h]
 	\vspace{1.5em}
   	\caption{Island problem resolution}
@@ -323,10 +344,7 @@ Junctions were developed around this exploded view of the road feature. Lanes ar
   	\vspace{1.5em}
 \end{figure}
 
-\end{itemize}
-
-
-\subsection{Traffic Lights}
+\subsubsection{Traffic Lights}
 \begin{itemize}
     \item two types of traffic lights: singles and those in one junction set
     \item all traffic lights work autonomously
@@ -342,7 +360,7 @@ Junctions were developed around this exploded view of the road feature. Lanes ar
 	\item serialization/de-serialization
 \end{itemize}
 
-\subsection{Caveats}
+\subsubsection{Caveats}
 \begin{itemize}
 	\item Problems:
 	\item > issues streaming from the OSM data leads to bug where in a round about a incoming road cannot be connected up
