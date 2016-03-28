@@ -18,7 +18,7 @@ public class GuiPrimitivesTest {
 
         long timestamp = System.currentTimeMillis();
         BufferedImage image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
-        Graphics g = image.getGraphics();
+        Graphics2D g = (Graphics2D) image.getGraphics();
         int count = 25 * 500;
         while (count-- > 0) {
             if (count % 2 == 1) {
