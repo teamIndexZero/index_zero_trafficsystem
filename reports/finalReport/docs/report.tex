@@ -314,7 +314,7 @@ During development two corner cases were encountered:
 In the first case, vehicles from all lanes had no where to go. In the second case, where the traffic came into the junction from the lone road with both direction included, the traffic had also no where to go since the only way out would have been a u-turn which is not allowed.
 Both were dealt by placing traffic generators on those special case junctions to take in the orphaned traffic (see Figure~\ref{fig:junctionTF}).
 
-\begin{figure}[h]
+\begin{figure}[!h]
 	\vspace{1.5em}
 	\centering
 	\begin{minipage}[t]{0.60\textwidth}
@@ -334,7 +334,7 @@ Both were dealt by placing traffic generators on those special case junctions to
 
 By having traffic generators automatically placed at any dangling links, any OSM data issues or inconsistencies can be seen in the graphical representation of the map at a glance. It also acts as a safety net when these occur by ensuring that all ends are connected to something and traffic is kept within the boundaries of the map (i.e.: no escaping vehicles). Another positive side effect is that, during construction of the graph, any island features (be it orphaned features that are unconnected or actual geographic islands) are ensured to have traffic running on them. For example see Figure~\ref{fig:islandReal}.
 
-\begin{figure}[h]
+\begin{figure}[!h]
 	\vspace{1.5em}
   	\caption{Island problem resolution}
   	\label{fig:islandReal}
@@ -380,7 +380,7 @@ By having traffic generators automatically placed at any dangling links, any OSM
         \item Coordinate conversion - meters-offset to pixels x/y (on-screen). This is the view-centric coordinate system which depends on scale, movement, size of window.
         \item Vehicle specific coordinates: lane it belongs to AND position along the polyline.
         \item GUI features: map zoom, pan, scale.
-            \begin{figure}[h]
+            \begin{figure}[!h]
                 \vspace{1.5em}
                 \caption{Map zoom options}
                 \label{fig:mapZoomOptions}
@@ -404,7 +404,7 @@ By having traffic generators automatically placed at any dangling links, any OSM
     \item Speed limits, two types of cars
     \item Car belongs to a lane. How coordinate conversion happens (poing, angles, distnace.)
     \item Moving on a lane, changing lanes:
-        \begin{figure}[h]
+        \begin{figure}[!h]
             \caption{Car changing lane}
             \label{fig:carKeepingDistance}
             \centering
@@ -417,7 +417,7 @@ By having traffic generators automatically placed at any dangling links, any OSM
 
     \item What vehicle should do when reaching junctions
     \item Junctions and possible outcomes for vehicle
-        \begin{figure}[h]
+        \begin{figure}[!h]
             \caption{Junctions found in real life}
             \label{fig:junctionTypes}
             \centering
@@ -426,7 +426,7 @@ By having traffic generators automatically placed at any dangling links, any OSM
             \includegraphics[width=0.4\textwidth]{figs/junction/junction_two_roads.png}
         \end{figure}
 
-        \begin{figure}[h]
+        \begin{figure}[!h]
             \caption{Types of forks found in real life }
             \label{fig:forkTypes}
             \centering
@@ -450,7 +450,12 @@ By having traffic generators automatically placed at any dangling links, any OSM
 
 
 \subsection{Logger}
-\begin{figure}[h]
+
+A logger was created at the beginning to help over the life of the development process. As one of the three major resources available for debugging (the others being in-line print and exceptions) it was viewed as an essential to have for the project. A home-brewed logger was chosen over a ready-made one to keep the functionalities to those required and, also, as it was a good addition to the code base.
+
+The logger was used extensively to keep track of what was happening during runtime and have a way to keep a non-volatile record of states during each run for errors/bugs that were hard to reproduce. Although simple, the architecture was designed to be flexible allowing further developments of outputs and formatters (see Figure~\ref{fig:logger_overview}).
+
+\begin{figure}[!h]
 	\vspace{1.5em}
   	\caption{Logger overview}
   	\label{fig:logger_overview}
@@ -459,55 +464,104 @@ By having traffic generators automatically placed at any dangling links, any OSM
   	\vspace{1.5em}
 \end{figure}
 
+\subsubsection{Log Messages}
+The logger allows for various types (importance level) of messages which are all defined as calls in the interface:
 \begin{itemize}
-    \item explain why and usage scenarios
-    \item > Debugging (1/3 resources for tracking down issues: exception, log, inline print)
-    \item > Keep track of what's happening and have a non-volatile record of states during a particular run (for hard to reproduce errors)
-    \item > custom 'homebrew' logger as only relatively simple logging required
-    \item interface for logger included to that in the future another implementation or different logger can be used without too much trouble
-    \item add basic arch. UML here
-    \item Log config option injection \(why/how\)
-    \item >Ability to inject log configuration options without recompiling the application
-    \item >More flexible than hard coded options
-    \begin{itemize}
-    	\item Log levels
-    	\item Output format (txt, csv, console)
-    	\item Output name (file name in the case of txt and csv)
-    	\item Exceptions in log switch
-    	\item if no config file is found a default one is created that includes some guidelines on what options are available
-    \end{itemize}
-    \item Output formats (impact on performance)
-    \item >text and csv will heavily influence runtime performance due to the lower performance of writing to files compared to memory
-    \item txt for general record keeping
-    \item csv useful for filtering data inside a spreadsheet software or importing to database - more flexible for reformatting the output also
-    \item >console
-    \item information recorded
-    \begin{itemize}
-    	\item Session message number
-    	\item Date/Time stamp
-    	\item message origin (class name usually)
-\begin{lstlisting}[language=java]
-	private static Logger_Interface LOG = Logger.getLoggerInstance(Road.class.getSimpleName());
-\end{lstlisting}
-    	\item NORMAL MSG
-		\item message level (Fatal, error, normal msg, debug, trace)
-    	\item EXCEPTIONS
-    	\item stack trace of the exception
-    \end{itemize}
-    \item Since in Java most types are children of the Object class and we have autoboxing \cite{Oracle1995} for primitive types we can use 'Object' as the type for the signature of the method that are called to pass a message
-    \item Log message passed through to log via arbitrary number of parameters
-    \item '...' also known as 'vararg' \cite{Oracle2004}
-\begin{lstlisting}[language=Java]
-	void log_Error(Object... objects);
-\end{lstlisting}   
-	\item this allows easy message compositions with dynamic variables within. e.g.:
-\begin{lstlisting}[language=Java]
-	LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links (Back). ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");
-	LOG.log_Trace("X--> '", lanes.getID(), "' has no previous link(s).");
-\end{lstlisting} 
-
+	\item Fatal messages: for unrecoverable errors (program crashes),
+	\item Error messages: for recoverable errors (program can continue somehow),
+	\item Normal messages: for standard information messages,
+	\item Debug messages: for more specific events that would be more useful for debugging,
+	\item Trace messages: to help trace the program flow when bugs arise.
 \end{itemize}
 
+Messages to the logger, whether actual messages or exceptions, all carry certain properties to the outputs:
+\begin{itemize}
+	\item A session message number,
+	\item the date/time stamp of the message,
+	\item the origin of the message (the class's name usually - see code snippet~\ref{code:loggerAccess})
+\end{itemize}
+
+An actual message will also include its level with the message description whilst and exception message will just carry the stack trace of the exception.
+
+\begin{codeCaption}
+	\caption{Access to the logger}
+	\label{code:loggerAccess}
+	\centering
+	\begin{lstlisting}[language=java]
+		private static Logger_Interface LOG = Logger.getLoggerInstance(Road.class.getSimpleName());
+	\end{lstlisting}
+\end{codeCaption}
+
+Since in Java most types are children of the Object class and we have 'autoboxing'\cite{Oracle1995} for primitive types we can use <Object> as the type for the signature of the method that are called to pass a message. In logging messages there are no set number of arguments for the description so there are two options opened to us: Allow strings only or allow any number of arguments to be passed to the methods for the log calls. The latter was chosen for flexibility's sake in order to be able to pass dynamic variables directly (see code snippet~\ref{code:loggerMsgCalls}). In Java the 3 dots (also known as 'vararg' \cite{Oracle2004}) can be used to achieve such goals (see code snippet~\ref{code:loggerVarArgs}).
+
+\begin{codeCaption}
+	\caption{Example message calls to the logger}
+	\label{code:loggerMsgCalls}
+	\centering
+	\begin{lstlisting}[language=Java]
+		LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links (Back). ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");
+		LOG.log_Trace("X--> '", lanes.getID(), "' has no previous link(s).");
+	\end{lstlisting} 
+\end{codeCaption}
+
+\begin{codeCaption}
+	\caption{Logger message call with VarArgs}
+	\label{code:loggerVarArgs}
+	\centering
+	\begin{lstlisting}[language=Java]
+		void log_Error(Object... objects);
+	\end{lstlisting} 
+\end{codeCaption}
+
+\subsubsection{Log Outputs}
+There are three outputs with matching formatters available for use:
+\begin{enumerate}
+	\item Console,
+	\item Text file,
+	\item Comma separated values (CSV) file.
+\end{enumerate}
+
+Any file output due to the nature of writing to disk will incur a more sizeable performance cost than printing to the console. Text is used for general record keeping where CSV aims to help debugging as it is easier to import it into a database or spreadsheet to filter out the messages based on the different properties that are passed along the message description. It also allows for more flexibility if reformatting is required outside the logger.
+
+
+
+\subsubsection{Log Configuration}
+
+Configuration injection via a file was implemented so that options could be changed without having to recompile the application. It offers more flexibility as well than hard coded options for the user. Through the configuration file the following options can be manipulated:
+
+\begin{itemize}
+   	\item At which log level to record messages,
+   	\item Output format (txt, csv, console),
+   	\item Output name (file name in the case of txt and csv),
+   	\item Whether or not to record Exceptions in the log,
+\end{itemize}
+
+In the event that no configuration file is found a default one is created that includes some guidelines on what options are available (see code snippet~\ref{code:loggerConfigFile}).
+
+\begin{codeCaption}
+	\caption{Sample configuration file for the logger}
+	\label{code:loggerConfigFile}
+	\centering
+	\begin{lstlisting}
+		//======================================================================================
+		// - Log configuration file - 
+		//======================================================================================
+		// Output types available: TERMINAL, TXT, CSV
+		// Flag types available: EXCEPTIONS,
+		// 	> syntax: NAME_OF_FLAG=1 for On or NAME_OF_FLAG=0 for Off
+		// Variable types available: LEVEL
+		// 	> level types: OFF, FATAL, ERROR, WARNING, MESSAGE, DEBUG, TRACE
+		//=======================================EXAMPLES=======================================
+		// OUTPUT=<TERMINAL,my_name>
+		// VARIABLE<LEVEL,OFF>
+		// FLAG=<EXCEPTION,0>
+		//======================================================================================
+		VARIABLE=<LEVEL,WARNING>
+		FLAG=<EXCEPTIONS,1>
+		OUTPUT=<TERMINAL,Console>
+		OUTPUT=<TXT,log>
+	\end{lstlisting}
+\end{codeCaption}
 
 \section{Team Work}
 %Describe how you worked together, including the tools and processes you used to facilitate group work.
