@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -92,11 +93,11 @@ public class GraphConstructorTest {
 
     @Test
     public void testGetFeatures() throws Exception {
-        //assertEquals(22, graphConstructor.getFeatures().size());
+        assertEquals(47, graphConstructor.getFeatures().size());
     }
 
     @Test
     public void testGetLinks() throws Exception {
-
+        assertEquals(20, graphConstructor.getLinks().size());
     }
 }
