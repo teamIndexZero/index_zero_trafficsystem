@@ -351,12 +351,20 @@ By having traffic generators automatically placed at any dangling links, any OSM
 \end{figure}
 
 \subsubsection{Caveats}
-\begin{itemize}
-	\item Problems:
-	\item > issues streaming from the OSM data leads to bug where in a round about a incoming road cannot be connected up
-	\item > Example!! + PIC + explanation as to why exactly
-\end{itemize}
+There is one problem stemming from the way the OSM data is laid out. It manifests itself most commonly in round-about situations. In cases, some incoming lanes belonging to a road going into a round-about cannot be connected in a directed fashion as the entry into the roundabout goes contra-way to that road. A good example of this issue is the Waterloo roundabout (see Figure~\ref{fig:roundAbout}).
 
+\begin{figure}[!h]
+	\vspace{1.5em}
+  	\caption{Round-about problem}
+  	\label{fig:roundAbout}
+  	\centering
+	\includegraphics[width=0.4\textwidth]{figs/graphConstruction/RoundAbout1.png}
+	\hspace{0.2em}
+	\includegraphics[width=0.40\textwidth]{figs/graphConstruction/RoundAbout2.png}
+  	\vspace{1.5em}
+\end{figure}
+
+The most obvious way to deal with this would be to detect roundabouts at the post OSM data import and recreate a viable set of descriptors that would not produce this errors. This would, however, add an additional overhead as all link and feature descriptors would need to be examined alongside their geographical relationships. At the moment, since we detect that there are only incoming lanes to the point of connection, a traffic generator is automatically added to the junction to take receipt of the traffic.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Alex part
@@ -675,7 +683,10 @@ In the event that no configuration file is found a default one is created that i
     \item > Technical problems addressed - Example?
     \item > Individual strengths can be shared in a group setting
 \end {itemize}
+\subsection{Learning outcomes}
 
+
+\subsection{Team performance}
 Problems:
 \begin{itemize}
     \item procrastination and lack of pro-activity were a problem.
@@ -686,10 +697,9 @@ Problems:
     \item combination of these issues lead to an asymmetric distribution of work input on the project
 \end{itemize}
 
+
 \section{Evaluation}
-
-
-\subsection{Performance}
+\subsection{Application performance}
 After the implementation of main application, performance measurements were taken. The parts of the functionality carrying most of the compuatational load were wrapped in time marker code and their performance was measured. Single sample was taken each time, since performing subsequent measurements yielded exaclty the same results. Following are some details on the time measurement procedures undertaken:
 
 \begin{itemize}
@@ -752,8 +762,6 @@ Whole Greater London & 31101 road and 24314 junction, 120672 mapFeatures, 547 ma
         \item >filtering based on selection of multiple non-sequential log levels instead of everything below the set global level (granular control)
     \end{itemize}
 \end{itemize}
-
-
 
 \section{Peer Assessment}
 %In a simple table, allocate the 100 ‘points’ you are given to each team member. Valid values range from 0 to 100 inclusive. You may assign decimal values, but the entire points must add up to precisely 100.
