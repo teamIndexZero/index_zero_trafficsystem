@@ -350,22 +350,6 @@ By having traffic generators automatically placed at any dangling links, any OSM
   	\vspace{1.5em}
 \end{figure}
 
-\subsubsection{Traffic Lights}
-\begin{itemize}
-    \item two types of traffic lights: singles and those in one junction set
-    \item all traffic lights work autonomously
-	\item traffic light state: discussion whether traffic light State should be boolean or enum \(everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum\)
-\end{itemize}
-
-\begin{itemize}
-        \item traffic lights rules are basic, they do not change states according to the traffic (not intelligent traffic lights)
-        \item only two states in traffic lights: red and green, we do not have early/late yellow etc.
-\end{itemize}
-     
-\begin{itemize}
-	\item serialization/de-serialization
-\end{itemize}
-
 \subsubsection{Caveats}
 \begin{itemize}
 	\item Problems:
@@ -645,6 +629,25 @@ In the event that no configuration file is found a default one is created that i
 	OUTPUT=<TERMINAL,Console>
 	OUTPUT=<TXT,log>
 \end{lstlisting}
+
+
+\section{Pending Implementations - to sort out}
+
+\subsubsection{Traffic Lights}
+\begin{itemize}
+    \item two types of traffic lights: singles and those in one junction set
+    \item all traffic lights work autonomously
+	\item traffic light state: discussion whether traffic light State should be boolean or enum \(everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum\)
+\end{itemize}
+
+\begin{itemize}
+        \item traffic lights rules are basic, they do not change states according to the traffic (not intelligent traffic lights)
+        \item only two states in traffic lights: red and green, we do not have early/late yellow etc.
+\end{itemize}
+     
+\begin{itemize}
+	\item serialization/de-serialization
+\end{itemize}
 
 \section{Team Work}
 %Describe how you worked together, including the tools and processes you used to facilitate group work.
