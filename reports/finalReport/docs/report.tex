@@ -30,6 +30,15 @@
 		\item Maps can also be created synthetically as long as the format is the same
 		\item allows for real world usage off-the-shelf
 		\item PIC of the app!!!
+		\begin{figure}[h]
+        	\vspace{1.5em}
+            \caption{Screen capture of the main application window depicting car moving at Aldwych}
+            \label{fig:screenshot}
+            \centering
+            \includegraphics[width=1\textwidth]{figs/mainWindowWithStrand.png}
+            \vspace{1.5em}
+        \end{figure}
+
 	\end{itemize}
 \end{itemize}
 
@@ -166,7 +175,7 @@ $ osmosis --read-xml file=INPUT_LARGE_FILE.osm enableDateParsing=no
 
 Figure \ref{fig:thirdPartyToolsOSMPreparation} summarizes steps performed during prelminary file preparation process.
 \begin{figure}[h]
-    \caption{Process of preparing the OSM xml file using OSM tools}
+    \caption{OpenStreetMap file preparation}
     \label{fig:thirdPartyToolsOSMPreparation}
     \centering
     \includegraphics[width=0.8\textwidth]{../../uml_diagrams/thirdPartyToolsDataLoading.png}
@@ -218,7 +227,7 @@ Following problems were encountered and solved during the implementation of the 
 \begin{itemize}
     \item Coordinate conversions. Since the Mercator projection with spherical geoid simplification is used, there is certain inaccuracy in coordinates converted to meters offset.
     \item Splitting roads having junctions in the middle of the road. Rather a technical complexity, it led to a cumbersome algorithm, since the processing of the roads and junctions happened at the same time, so in case of the split it is required to ensure that all references to split road are updated to either part of it.
-    \item Link descriptions. Initially, it was anticipated that another type of descriptors - Link descriptors - would be created to mark the places where two parts of the road are connected (for example, pedestrian crossing on a straight road). However, after the implementation of the data loading found out a need for road splitting, Link descriptors had to be abandoned in favour of more general idea of junction descriptors having only two roads connected. Otherwise, the edge-case situation of a link descriptor created in a geographical point, which was later to be found to be in the middle of another road led to an overly complex code handling this edge cases. This conversion only positively reflected on the overall design of the system, following "keep it simple" rule. Later stage of the graph construction and actual simulation were found working perectly with junctions of two roads acting as links.
+    \item Link descriptors. Initially, it was anticipated that another type of descriptors - Link descriptors - would be created to mark the places where two parts of the road are connected (for example, pedestrian crossing on a straight road). However, after the implementation of the data loading found out a need for road splitting, Link descriptors had to be abandoned in favour of more general idea of junction descriptors having only two roads connected. Otherwise, the edge-case situation of a link descriptor created in a geographical point, which was later to be found to be in the middle of another road led to an overly complex code handling this edge cases. This conversion only positively reflected on the overall design of the system, following "keep it simple" rule. Later stage of the graph construction and actual simulation were found working perectly with junctions of two roads acting as links.
     \item Lane construction. Deriving from a single zero-width road polyline a set of lane polylines which are offset into appropriate direction (perpendicular to the segment).
 \end{itemize}
 
@@ -297,10 +306,6 @@ Paths are calculated after lane linkage has been done. All entry points are conn
   	\vspace{1.5em}
 \end{figure}
 
-\begin{itemize}
-	\item link descriptions are depreciated after work on the OSM showed that universal linkage with junctions were for easier to do then identifying what was 1-to-1 link or a junction from the OSM data
-\end{itemize}
-
 \subsubsection{Traffic Generators}
 
 Traffic generators were originally designed to only produce traffic but evolved to also take receipt of it thus taking on the responsibility of deleting vehicles as they exited the boundaries of the simulated map. This ensures that vehicles cannot keep going (graphically) and disappears at the designated boundaries. This also allows to keep track on the numbers of vehicles produced and received at those points (see Figure~\ref{fig:boundaryTF}).
@@ -345,52 +350,101 @@ By having traffic generators automatically placed at any dangling links, any OSM
   	\vspace{1.5em}
 \end{figure}
 
-\subsubsection{Traffic Lights}
-\begin{itemize}
-    \item two types of traffic lights: singles and those in one junction set
-    \item all traffic lights work autonomously
-	\item traffic light state: discussion whether traffic light State should be boolean or enum \(everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum\)
-\end{itemize}
-
-\begin{itemize}
-        \item traffic lights rules are basic, they do not change states according to the traffic (not intelligent traffic lights)
-        \item only two states in traffic lights: red and green, we do not have early/late yellow etc.
-\end{itemize}
-     
-\begin{itemize}
-	\item serialization/de-serialization
-\end{itemize}
-
 \subsubsection{Caveats}
-\begin{itemize}
-	\item Problems:
-	\item > issues streaming from the OSM data leads to bug where in a round about a incoming road cannot be connected up
-	\item > Example!! + PIC + explanation as to why exactly
-\end{itemize}
+There is one problem stemming from the way the OSM data is laid out. It manifests itself most commonly in round-about situations. In cases, some incoming lanes belonging to a road going into a round-about cannot be connected in a directed fashion as the entry into the roundabout goes contra-way to that road. A good example of this issue is the Waterloo roundabout (see Figure~\ref{fig:roundAbout}).
 
+\begin{figure}[!h]
+	\vspace{1.5em}
+  	\caption{Round-about problem}
+  	\label{fig:roundAbout}
+  	\centering
+	\includegraphics[width=0.4\textwidth]{figs/graphConstruction/RoundAbout1.png}
+	\hspace{0.2em}
+	\includegraphics[width=0.40\textwidth]{figs/graphConstruction/RoundAbout2.png}
+  	\vspace{1.5em}
+\end{figure}
+
+The most obvious way to deal with this would be to detect roundabouts at the post OSM data import and recreate a viable set of descriptors that would not produce this errors. This would, however, add an additional overhead as all link and feature descriptors would need to be examined alongside their geographical relationships. At the moment, since we detect that there are only incoming lanes to the point of connection, a traffic generator is automatically added to the junction to take receipt of the traffic.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Alex part
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Map visualisation}
-\begin{itemize}
-    \item Map visualisation
-    \begin{itemize}
-        \item Coordinate conversion - meters-offset to pixels x/y (on-screen). This is the view-centric coordinate system which depends on scale, movement, size of window.
-        \item Vehicle specific coordinates: lane it belongs to AND position along the polyline.
-        \item GUI features: map zoom, pan, scale.
-            \begin{figure}[!h]
-                \vspace{1.5em}
-                \caption{Map zoom options}
-                \label{fig:mapZoomOptions}
-                \centering
-                \includegraphics[width=0.4\textwidth]{figs/road/zoom_dots.png}
-                \hspace{0.2em}
-                \includegraphics[width=0.4\textwidth]{figs/road/zoom_cars.png}
-            \end{figure}
+As soon as map is constructed, we have an in-memory representation of the road network graph which acts as a base for simulation. Roads, consisting of lanes, connect up to junctions, roads and lanes have polylines. All the coordinates in simulation space are provided in meters offset cartesian coordinates - that is, horizontal and vertical meters offset from (0,0) bottom left point, as outlined in Figure \ref{fig:coordinateConversions}.
 
-    \end{itemize}
+In order for these objects to be visualized, their coordinates in simulation space need to be transformed to the on-screen coordinates. Java graphics API uses pixel coordinates, with origin point being top-left, and vertical axis pointing down.
+
+In addition to that, user is provided with comprehensive tools to control the viewport: zoom in and out with mouse scroll and pan with mouse drag gestures. These gestures control offset point and scale factor of the meters to screen coordinate conversion function. In addition to being natural, such coordinate system separation (meters offset in simulation and pixels in view), allow to inspect the details of the simulation even when it is paused, while also providing an ability to see overall picture.
+
+Whilst being useful to a user, such conversion poses not only technical, but also design challenges. Since the primary interest is on vehicles and UI supports different scale, there was a need to come up with design decision to allow car inspection on different zoom levels. When the zoom level allows for rather detailed drawing of vehicles, they are representing in their bounding rectangles. When user zooms out too far, cars collapse to dots to make the overall road network visually readable. Figure \ref{fig:mapZoomOptions} has both options on display.
+\begin{figure}[!h]
+    \vspace{1.5em}
+    \caption{Map zoom options}
+    \label{fig:mapZoomOptions}
+    \centering
+    \includegraphics[width=0.4\textwidth]{figs/road/zoom_dots.png}
+    \hspace{0.2em}
+    \includegraphics[width=0.4\textwidth]{figs/road/zoom_cars.png}
+\end{figure}
+
+
+In addition to display functionality, the map provides interactive feedback. When the vehicles are visible, clicking it would select the vehicle both in inspection pane and on-map. When junctions are visible, clicking on a particular junction would reveal its incoming and outgoing road angles. While helpful for an inspection of map particularities, this feature was extremely useful for debugging vehicle movement code. Such interlinked functionality between multiple representations (vehicle list and the map panel, map feature list and map panel and vice versa) is possible due to implementation of Model-View-Controller design pattern in the UI section. Figure \ref{fig:guiMVC} displays class diagram for GUI module of the traffic simulation system.
+
+\begin{figure}[h]
+    \vspace{1.5em}
+    \caption{Graphical user interface class diagram: MVC pattern.}
+    \label{fig:guiMVC}
+    \centering
+    \includegraphics[width=0.75\textwidth]{../../uml_diagrams/GUI.png}
+\end{figure}
+
+\subsubsection{Optimizations}
+For the simulation to run smoothly from the visual standpoint, it needs to update frames often. The overall user experience is affected by two bulky processes:
+\begin{itemize}
+    \item Simulation. Happens in meters offset coordinate space, this is the where the logic of the simulation happens - vehicles move along the lanes, make and implement decisions of changing lanes, accelerating and decelerating. Simulation happens in a separate background thead, as soon as one time-step of simulation is completed, simulator invokes GuiModel's callback method, which leads to the model change event to be sent to all subscribed listeners. The event is posted on the UI thread.
+    \item Visualisation. When the change event is received in MapPanel, it does the job of drawing the actual simulation objects on screen, applying the coordinate conversion throughout. Visualisation happens on UI thread. Actual drawing is performed not on a panel, but on an in-memory image, which allows for future extraction of visualisation code to another thread as well.
+\end{itemize}
+
+Since the data set may be quite big, some optimizations were introduced to impove overall experience:
+\begin{itemize}
+    \item Limiting frame rate. There is no practical point drawing the image more often than user can normally understand, so the extra unneeded requests for draw are simply omitted:
+    \begin{lstlisting}[language=java]
+        public void redraw() {
+            if (System.currentTimeMillis() - lastDrawnTimestamp < 1000 / MAX_FRAME_RATE) {
+                LOG.log_Warning("Skipping drawing because of FPS limitation.");
+                return;
+            }
+            lastDrawnTimestamp = System.currentTimeMillis();
+            // ...
+            // Actual drawing code.
+    \end{lstlisting}
+
+    \item Caching the static objects image (roads, lanes, junctions etc.) into another in-memory image and only re-drawing it when the viewport parameters such as zoom or scale, or visualisation parametrs change. The invalidation check is performed with the custom hash function taking model and viewport model as arguments. Listing below provides a pseudo-code for lazy static objects draw optimization:
+    \begin{lstlisting}[language=java]
+        // ... checking if the viewport has changed somehow:
+        if (lastViewportHashcode != model.getViewHashCode()) {
+            // saving hashcode of the model+viewport just drawn for future check
+            lastViewportHashcode = model.getViewHashCode();
+            Graphics2D roadGraphics = (Graphics2D) roadsImage.getGraphics();
+            //...
+            drawAllRoads(roadGraphics);
+            primitives.drawScaleOf30Meters(roadGraphics);
+        }
+        // regardless of change, stamp over the cached image of roads onto resulting image
+        graphics.drawImage(roadsImage, 0, 0, null);
+    \end{lstlisting}
+    \item Extensive caching of smaller helper object (java.awt.Stroke, java.awt.Color). Since most of the drawing is using line widhts dependent on the zoom level, it is beneficial to store static objects such as colors and stroke styles in caching maps for future re-use.
+    \begin{lstlisting}[language=java]
+        private Stroke getStrokeByWidthPixels(int width) {
+            if (!strokeCache.containsKey(width)) {
+                strokeCache.put(width, new BasicStroke(width, ...));
+            }
+            return strokeCache.get(width);
+        }
+    \end{lstlisting}
+
+
 \end{itemize}
 
 
@@ -398,55 +452,94 @@ By having traffic generators automatically placed at any dangling links, any OSM
 % Alex part
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Vehicle movement}
-\begin{itemize}
-    \item How vehicle moves: physical model (speed, acceleration, direction, distance.)
-    \item Speed limits, two types of cars
-    \item Car belongs to a lane. How coordinate conversion happens (poing, angles, distnace.)
-    \item Moving on a lane, changing lanes:
-        \begin{figure}[!h]
-            \caption{Car changing lane}
-            \label{fig:carKeepingDistance}
-            \centering
-            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_keeping_distance_to_other.png}
-            \hspace{0.2em}
-            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_before.png}
-            \hspace{0.2em}
-            \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_after.png}
-        \end{figure}
+\subsection{Traffic simulation}
+Actual traffic simulation requires an already completed and linked simulation map: an in-memory data graph data structure consisting of differen map features, such as roads, junctions or traffic generators. Simulation has certain parameters, such as duration of single simulation step (tick), total number of ticks to run and simulation time start. Notion of simulated time is maintained - in addition to discrete tick number, each moment of time contains a simulated time stamp. This may be required in future for more complex behavior, such as changing environment perception parameters according to the time of the day, or profiling the traffic load to the real-like commute patterns.
 
-    \item What vehicle should do when reaching junctions
-    \item Junctions and possible outcomes for vehicle
-        \begin{figure}[!h]
-            \caption{Junctions found in real life}
-            \label{fig:junctionTypes}
-            \centering
-            \includegraphics[width=0.4\textwidth]{figs/junction/junction_5_roads.png}
-            \hspace{0.2em}
-            \includegraphics[width=0.4\textwidth]{figs/junction/junction_two_roads.png}
-        \end{figure}
+\subsubsection{Simulation loop and time}
+Simulation is performed in discrete steps. On each simulation steps, we create a simulation timestamp (tick) object, and pass it down to all the interested listeners, which need to implement ISimulationAware interface. Each of them does what is needed on that level. For example, traffic lights might change their state basing on a tick, cars may change their speed, position and acceleration, traffic generators may insert the new cars onto connected outflow lanes.
 
-        \begin{figure}[!h]
-            \caption{Types of forks found in real life }
-            \label{fig:forkTypes}
-            \centering
-            \includegraphics[width=0.4\textwidth]{figs/junction/junction_oneway_to_fork.png}
-            \hspace{0.2em}
-            \includegraphics[width=0.4\textwidth]{figs/junction/junction_two_way_to_fork.png}
-        \end{figure}
+\begin{figure}[h]
+    \vspace{1.5em}
+    \caption{Simulation class diagram.}
+    \label{fig:simulationClassDiagram}
+    \centering
+    \includegraphics[width=0.75\textwidth]{../../uml_diagrams/simulatorClassDiagram.png}
+\end{figure}
 
-    \begin {itemize}
-        \item our model: junctions 1-type: only 2 roads connected
-        \item our model: junction 2-type: more than 2 roads connected (actual junctions)
-            \begin{figure}[h]
-                \caption{Junction forward or turn options depending on angle }
-                \label{fig:forwardOrTurnOption}
-                \centering
-                \includegraphics[width=0.4\textwidth]{figs/junction/junction_car_incoming_angle_with_turn_sectors.png}
-            \end{figure}
-        \item explain incoming lane angle, outgoing angles and its effect on vehicle movement - what is considered straight movement, and what is considered turn. >110 is prohibited, 110-30 is turn 30-0 is straight. This enforces us to skip weird turns at forks, for example.
-    \end {itemize}
-\end{itemize}
+Since the Simulator has control over what are the parameters ticks are created with, it is possible to control time granularity or speed. At the same time such approach causes some limitations: as such, if the tick duration is too long, for example, traffic lights might be able to update.
+Diagram in Figure \ref{fig:simulationClassDiagram} details main classes forming structure for the actual movement simulation.
+
+\subsubsection{Movement within the single road}
+Vehicles are modeled using different physical parameters. At each simulation time moment, vehicle can have certain speed and acceleration values. Using the speed and tick duraction, vehicle can determine its next position along the lane, and move there. Using the acceleration, same process is applied to the speed value. Vehicle determines what to do, depending on current road conditions it is in. For example, if it approaches a crossing, it needs to slow down.
+
+There are two types of vehicles introduced to the system: passenger cars and trucks. They share different intialization parameters: trucks are bigger in metric sizes, slower, having way lower maximum acceleration and lower maximum speed than passenger cars.
+
+Vehicles move within and along the lane. Since lane is represented with the polyline, having certain width, vehicle can easily place itself within the one-dimensional coordinate space, the only coordinate being the distance along the polyline from its start. In such a coordinate system, movement looks like a movement along the straight line, and the polyline determines actual change in bearing and meters offset coordinate system.
+
+There might be cases when the vehicle may want to change lane. For example, consider slower truck moving ahead of faster passenger car. As soon as car reaches certain distance to the truck, it might want to change the lane to adjacent one in order to continue moving with higher speed. Vehicles maintain a certain distance to next object which is dependant on speed. All three stages of lane changing are displayed in Figure \ref{fig:carKeepingDistance}. Vehicle color hue depends on the speed, and circle with the bearing vector in it represents the car movement direction and distance to keep to next one.
+\begin{figure}[!h]
+    \caption{Car changing lane}
+    \label{fig:carKeepingDistance}
+    \centering
+    \includegraphics[width=0.3\textwidth]{figs/carMovement/car_keeping_distance_to_other.png}
+    \hspace{0.2em}
+    \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_before.png}
+    \hspace{0.2em}
+    \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_after.png}
+\end{figure}
+
+Definitely, it is not always the case that changing lane is possible. For example, there may be no adjacent lane, or both the adjacent lanes are buys. Following is the process of lane changing represented as decision flow:
+\begin{enumerate}
+    \item If there is vehicle (any part of it) in current lane within distance to keep,
+    \item Check if there is a lane to the inner side of the road. If it exists, and it is free for distance to keep in front and back, change there.
+    \item If that did not succeed, apply same procedure for the outer lane.
+    \item If that did not succeed, decelerate.
+\end{enumerate}
+
+Depending on the data obtained from the OSM file, roads can be one-way roads or bi-directional roads. As a pleasant bonus the software is mostly capable of working with both the right hand side movement and left hand side. The direction of the road is established by sequence of the nodes in polyline. One way roads then become a collection of lanes running in that way. For the two-way roads, the opposite set of lanes is created.
+
+\subsubsection{Movement in junction}
+In the current implementation of traffic simulator, junction is purely logical: it is a point where multiple roads having some lanes connect. When a car reaches this point, it can take a decision (within certain limits) what next lane to switch to. All possible paths are pre-computed using the graph tool in the graph construction phase. At the same time, vehicle can, and should have certain specifics and limitations as to what are the possible actions. Consider a kerb to kerb turn radius: a minimal U-turn possible for a Mini Cooper is hard to imagine for 6-axis truck.
+
+When reaching a junction, vehicle needs to decide first what is the plan\footnote{Actual decision process is implemented with weighted random selection, with some preference given to 'move straight' mode. This is the good place to introduce route planning and traffic profiling}. There are two options possible: vehicle wants to carry on in roughly the same direction, or it wants to turn. In real life data, the 'same direction' does not necessarily mean same bearing of the adjacent road segments, sometimes these may be considerably different. In order to attack this problem, an empyrical rule was established, which classifies all available junction proceedings whose angle between incoming and outgoing vector is less than 30\degspc  as 'moving straight', and ones with angle between 100\degspc  and 30\degspc as turns. Everything requiring turn with an angle larger than 110\degspc is considered a prohibited turn. As a result, U-turns are not allowed in simulation.
+
+Upon switching to the new lane, car continues to move along it in the same mode as described in previous section.
+
+Figure \ref{fig:forwardOrTurnOption} displays the forward and turn sectors for the car approaching crossing. The crossing itself is displayed as a white circle in the center. Small car is approaching the crossing from the east. The car is following an inbound lane with the bearing at the junction of 15.9\degspc. The junction iteslf, in addition to two incoming lanes at 15.9\degspc and 158.7\degspc, has two outgoing lanes: one at 19.7\degspc, and one at 107.4\degspc. For the Car 46 approaching the junction, possible forward and turn outcomes are displayed on the overlay disc: red segments represent prohibited proceedings, yellow ones represent turns, and green ones represent forward movement. For this very scenario, Car 46 has an option to go forward with the 19.7\degspc exit, and an option to turn left with 107.4\degspc exit.
+
+\begin{figure}[h]
+    \caption{Junction forward or turn options depending on angle }
+    \label{fig:forwardOrTurnOption}
+    \centering
+    \includegraphics[width=0.4\textwidth]{figs/junction/junction_car_incoming_angle_with_turn_sectors.png}
+\end{figure}
+
+In real mapping data junctions can take variuos forms. Figure \ref{fig:junctionTypes} displays two commonly found types of junctions: a simple connection of two roads, which is quite possible one road split by a traffic light and pedestrian crossing, and more complex jucntion having 5 streets connected to it. Using the method specified above, car can conveniently move across this junction, either moving forward or attempting a turn in any of the allowed directions.
+
+Within this model, roundabout is established as a set of short one-way connected roads forming a circular structure. Right image in Figure \ref{fig:junctionTypes} shows a typical roundabout, with the road debug display setting enabled, where each individual lane is painted with new color in round-robin manner. One can clearly see where and how the roads connect.
+
+\begin{figure}[h]
+    \caption{Junctions found in real mapping data}
+    \label{fig:junctionTypes}
+    \centering
+    \includegraphics[width=0.3\textwidth]{figs/junction/junction_5_roads.png}
+    \hspace{0.2em}
+    \includegraphics[width=0.3\textwidth]{figs/junction/junction_two_roads.png}
+    \hspace{0.2em}
+    \includegraphics[width=0.3\textwidth]{figs/junction/roundabout.png}
+\end{figure}
+
+A more subtle subtype of junctions is a fork, commonly found in proximity to roundabouts. Fork usually consist of multiple inflow or outflow features connected to a junction with a slight difference in degree with single outflow or inflow feature, respectviely. Figure \ref{fig:forkTypes}, left, depicts a collecting fork joining two 2-lane one-way roads into the bridge road. The right image displays an actual two-lane two-way road splitting each lane into the two-lane one-way road.
+
+\begin{figure}[h]
+    \caption{Forks found in real mapping data}
+    \label{fig:forkTypes}
+    \centering
+    \includegraphics[width=0.4\textwidth]{figs/junction/junction_oneway_to_fork.png}
+    \hspace{0.2em}
+    \includegraphics[width=0.4\textwidth]{figs/junction/junction_two_way_to_fork.png}
+\end{figure}
+
 
 
 \subsection{Logger}
@@ -478,14 +571,14 @@ Messages to the logger, whether actual messages or exceptions, all carry certain
 \begin{itemize}
 	\item A session message number,
 	\item the date/time stamp of the message,
-	\item the origin of the message (the class's name usually - see code snippet~\ref{code:loggerAccess})
+	\item the origin of the message (the class's name usually)
 \end{itemize}
-
-An actual message will also include its level with the message description whilst and exception message will just carry the stack trace of the exception.
 
 \begin{lstlisting}[language=java]
 	private static Logger_Interface LOG = Logger.getLoggerInstance(Road.class.getSimpleName());
 \end{lstlisting}
+
+An actual message will also include its level with the message description whilst and exception message will just carry the stack trace of the exception.
 
 Since in Java most types are children of the Object class and we have 'autoboxing'\cite{Oracle1995} for primitive types we can use <Object> as the type for the signature of the method that are called to pass a message. In logging messages there are no set number of arguments for the description so there are two options opened to us: Allow strings only or allow any number of arguments to be passed to the methods for the log calls. The latter was chosen for flexibility's sake in order to be able to pass dynamic variables directly. 
 
@@ -545,16 +638,41 @@ In the event that no configuration file is found a default one is created that i
 	OUTPUT=<TXT,log>
 \end{lstlisting}
 
+
+\section{Pending Implementations - to sort out}
+
+\subsubsection{Traffic Lights}
+\begin{itemize}
+    \item two types of traffic lights: singles and those in one junction set
+    \item all traffic lights work autonomously
+	\item traffic light state: discussion whether traffic light State should be boolean or enum \(everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum\)
+\end{itemize}
+
+\begin{itemize}
+        \item traffic lights rules are basic, they do not change states according to the traffic (not intelligent traffic lights)
+        \item only two states in traffic lights: red and green, we do not have early/late yellow etc.
+\end{itemize}
+     
+\begin{itemize}
+	\item serialization/de-serialization
+\end{itemize}
+
 \section{Team Work}
 %Describe how you worked together, including the tools and processes you used to facilitate group work.
+
+\subsection{Tools and processes}
+
+Kanban\cite{Peterson2015, Radig2016}
+
+
 
 \begin{itemize}
     \item learned how to properly use team-collaborative tools
     \begin{itemize}
-            \item IntelliJ Idea
+            \item IntelliJ Idea\footnote{https://www.jetbrains.com/idea/}
             \item >facilitated git work through their embedded VCS module
             \item >Very nice code/doc and test outline generation. Enables user to focus on the important stuff instead of boilerplate code
-            \item Trello
+            \item Trello\footnote{https://trello.com} (see Figure~\ref{fig:trello}
             \item >Originally used to help with Kanban process but as the updates inside and usage were sporadic and only done by some members of the group it didn't live up to its fullest potential.
             \item Hipchat
             \item > Useful for day to day communication and updates with the github/trello plug-in to keep an overview on the activities done within the group
@@ -572,6 +690,20 @@ In the event that no configuration file is found a default one is created that i
     \item > Individual strengths can be shared in a group setting
 \end {itemize}
 
+\begin{figure}[!h]
+	\vspace{1.5em}
+  	\caption{Snapshot of the Trello board during development}
+  	\label{fig:trello}
+  	\centering
+	\includegraphics[width=1\textwidth]{figs/Tools/trello.png}
+  	\vspace{1.5em}
+\end{figure}
+
+
+\subsection{Learning outcomes}
+
+
+\subsection{Team performance evaluation}
 Problems:
 \begin{itemize}
     \item procrastination and lack of pro-activity were a problem.
@@ -582,46 +714,28 @@ Problems:
     \item combination of these issues lead to an asymmetric distribution of work input on the project
 \end{itemize}
 
-\section{Evaluation}
+
+\section{Project Evaluation}
 %Critically evaluate your project: what worked well, and what didn’t? How did you do relative to your plan? what changes were the result of improved thinking and what changes were forced upon you? how did your team work together? etc. Note that you need to show that you understand the weaknesses in your work as well as its strengths. You may wish to identify relevant future work that could be done on your project.
-\subsection{Possible further development}
+
 \begin{itemize}
-	\item Scaling number of cars to the size of the graph  (map)
-	\item Round about issue with importing OSM data made by humans 
-	\item -> allow export from other sources /API calls (gmap?)
-	\item -> allow for manual editing of the graph from the GUI view?
-	\item As skirting into hybrid model, detailing such as car sprites, road graphics, etc could be added as zoom factor increases, maybe show lanes from medium zoom and abstract into dots and coloured roads at low zoom
-	\item addition of plug-in capability to add different metrics/behaviours as required by the user
-	\item creation of vehicles with specs based off real life data
-	\item >pollution based on vehicle profile
-	\item manual addition of temporary block on map so modify traffic flow (construction/road works/accidents/etc..)
-	\item Simulation recorder/player - large simulations can be run prior then played and analysed later
-	\item NOTE: Traffic lights??
+	\item what worked well
+	\item what didn't
+	\item comparison of now and original plan (maybe use the table from first report to compare?)
+	\item Pros/cons of model and work done generally
 \end{itemize}
 
-\begin{itemize}
-    \item Log module expansion
-    \begin{itemize}
-        \item coloured terminal window if more time,
-        \item >easier to read
-        \item >segregated from the console
-        \item Custom Filters
-        \item >filtering based on class name (origin)
-        \item >filtering based on selection of multiple non-sequential log levels instead of everything below the set global level (granular control)
-    \end{itemize}
-\end{itemize}
 
-\subsection{Performance}
-After the implementation of main application, performance measurements were taken.
+\subsection{Application performance}
+After the implementation of main application, performance measurements were taken. The parts of the functionality carrying most of the compuatational load were wrapped in time marker code and their performance was measured. Single sample was taken each time, since performing subsequent measurements yielded exaclty the same results. Following are some details on the time measurement procedures undertaken:
 
 \begin{itemize}
-    \item Measurements: what are we measuring.
-    \item Method: just one sample, since the time is constant and independent, cold JVM, measurement using System.currentTimeMillis() on entrance and exit to corresponding method.
-    \item Results are provided in Table \ref{table:performanceComparison}
+    \item Time recording. In order to circumvent the possible observer bias, the simplest possible measure method was chosen. The code was augmented to record the timestamp with System.currentTimeMillis() before running the method of interest, and taking the sample after it. The difference was computed, and echoed to the standard output with System.out.println().
+    \item Logging was disabled at all during performance measures (level set to OFF).
     \item Test machine: OS X, Intel Core I7-4770HQ, 2.2 GHz, 16GB RAM, SSD
+    \item As measurements have shown, the software is capable is deliver a useable experience for a decent size data set (in our example all primary, secondary and tertiary roads in Greater London, totalling 31101 road and 24314 junction descriptions), as described in Table \ref{table:performanceComparison}
+    \item Application of the visualisation optimization of caching the static image file allowed for fast functioning of the software for still viewport.
 \end{itemize}
-
-
 
 \begin{center}
 \begin{longtabu} to \textwidth {|
@@ -642,22 +756,61 @@ Buckingham Palace& 275 road and 176 junction, 1032 mapFeatures, 68 mapLinks, 41 
 Whole Manhattan & 14763 road and 10429 junction, 58394 mapFeatures, 1055 mapLinks, 596 traffic generators & 13607 & 468 & 531 \\ \hline
 Whole Greater London & 31101 road and 24314 junction, 120672 mapFeatures, 547 mapLinks, 391 traffic generators & 32911 & 644 & 1087 \\ \hline
 
-\caption{Load and render times for different map samples}
+\caption{Performance metrics of the loading and rendering methods for different map samples}
 \label{table:performanceComparison}
 \end{longtabu}
 \end{center}
 
 
+\subsection{Possible further development}
+
+
+
+\begin{itemize}
+	\item Scaling number of cars to the size of the graph  (map)
+	\item Round about issue with importing OSM data made by humans 
+	\item -> allow export from other sources /API calls (gmap?)
+	\item -> allow for manual editing of the graph from the GUI view?
+	\item As skirting into hybrid model, detailing such as car sprites, road graphics, etc could be added as zoom factor increases, maybe show lanes from medium zoom and abstract into dots and coloured roads at low zoom
+	\item addition of plug-in capability to add different metrics/behaviours as required by the user
+	\item creation of vehicles with specs based off real life data
+	\item >pollution based on vehicle profile
+	\item manual addition of temporary block on map so modify traffic flow (construction/road works/accidents/etc..)
+	\item Simulation recorder/player - large simulations can be run prior then played and analysed later
+	\item NOTE: Traffic lights??
+	\item Alex: would be good to mention something about architecture life: we started with a nice clean idea which had to evolve (i.e. I know at least of 2 places which beg for refactoring: especially the awkward movement-along-the-lane bit where for reverse lanes car moves backwards from the end of hte lane, and all need to remember about that)
+\end{itemize}
+
+\begin{itemize}
+    \item Log module expansion
+    \begin{itemize}
+        \item coloured terminal window if more time,
+        \item >easier to read
+        \item >segregated from the console
+        \item Custom Filters
+        \item >filtering based on class name (origin)
+        \item >filtering based on selection of multiple non-sequential log levels instead of everything below the set global level (granular control)
+    \end{itemize}
+\end{itemize}
+
 \section{Peer Assessment}
 %In a simple table, allocate the 100 ‘points’ you are given to each team member. Valid values range from 0 to 100 inclusive. You may assign decimal values, but the entire points must add up to precisely 100.
+Table \ref{table:peerAssesment} is the Peer Assesment table as required by the project description.
 
- \begin{itemize}
-        \item Kumar Awijeet
-		\item Oleksandr Cherednychenko
-		\item Esmond A. Davison
-		\item Jacek Krupski
-		\item Farhad Rahimli
-    \end{itemize}
+\begin{table}[hb]
+\centering
+\caption{Peer assesment}
+\label{table:peerAssesment}
+\begin{tabular}{lc}
+\hline
+Esmond Davison &  0 \\
+Farhad Rahimli & 0 \\
+Kumar Awijeet &  0\\
+Jacek Krupski &  0 \\
+Oleksandr Cherednychenko &  0 \\
+\hline
+\end{tabular}
+\end{table}
 
 % Apply paragraph spacing only for the main report body %
 \setlength{\parskip}{0em}
