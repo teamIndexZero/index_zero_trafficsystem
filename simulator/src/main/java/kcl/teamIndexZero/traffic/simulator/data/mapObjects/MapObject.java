@@ -19,20 +19,10 @@ import java.awt.*;
  */
 public abstract class MapObject implements ISimulationAware {
 
-    /* Random color selection*/
-    public static final Color[] COLORS = {
-            new Color(230, 0, 0),
-            new Color(230, 150, 0),
-            new Color(150, 0, 150),
-            new Color(0, 150, 150),
-            new Color(0, 160, 0),
-            new Color(0, 0, 210)
-    };
-
     protected static Logger_Interface LOG = Logger.getLoggerInstance(MapObject.class.getSimpleName());
     protected Lane lane;
     protected String name;
-    protected double positionOnRoad = 0;
+    protected double positionOnLane = 0;
     protected SimulationMap map;
     private Color color;
     private ID id;
@@ -43,23 +33,13 @@ public abstract class MapObject implements ISimulationAware {
      *
      * @param name name of the object (to be shown in simulation maps)
      * @param lane lane to stay on initially
+     * @param id   id of the object. Should be unique!
      */
     public MapObject(ID id, String name, Lane lane) {
         this.name = name;
         this.lane = lane;
         this.id = id;
-        this.color = MapObject.getRandomColor();
-    }
-
-    /**
-     * Getting random color from the list.
-     *
-     * @return in of the {@link Color} instances to draw
-     */
-    public static Color getRandomColor() {
-        return COLORS[Math.min(
-                COLORS.length - 1,
-                (int) Math.round(Math.random() * COLORS.length))];
+        this.color = Color.BLACK;
     }
 
     public ID getID() {
@@ -74,10 +54,6 @@ public abstract class MapObject implements ISimulationAware {
         return color;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
     public void setMap(SimulationMap map) {
         this.map = map;
     }
@@ -90,11 +66,42 @@ public abstract class MapObject implements ISimulationAware {
         this.name = name;
     }
 
+    /**
+     * Get a name of the object with extra details - road this object belongs to.
+     *
+     * @return object name and road.
+     */
     public String getNameAndRoad() {
-        return name + " " + lane.getRoad().getName();
+        return String.format("%s at %s", name, lane.getRoad().getName());
     }
 
+    /**
+     * Get position on the map (in meters-offset notation). It is coming from the lane this object is attached to, and
+     * the location within this lane
+     *
+     * @return position on map
+     */
     public GeoPoint getPositionOnMap() {
-        return lane.getPolyline().getGeoPointAtDistanceFromStart(positionOnRoad);
+        return lane.getPolyline().getGeoPointAtDistanceFromStart(positionOnLane);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MapObject mapObject = (MapObject) o;
+
+        return id != null ? id.equals(mapObject.id) : mapObject.id == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
+    public double getPositionOnLane() {
+        return positionOnLane;
     }
 }

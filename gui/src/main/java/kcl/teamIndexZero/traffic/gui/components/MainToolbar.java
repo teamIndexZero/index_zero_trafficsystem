@@ -98,6 +98,12 @@ public class MainToolbar extends JToolBar implements GuiModel.ChangeListener {
     /**
      * Helper method to create button. We are using our own {@link Callback} interface within to ensure the flow is
      * transferred to where it should belong.
+     *
+     * @param imageName      name of the image file within icons folder (without extension)
+     * @param toolTipText    text of the tooltip to show over icon
+     * @param altText        what to show if no image found
+     * @param actionListener what to invoke when clicked
+     * @return new button
      */
     protected JButton makeButton(String imageName,
                                  String toolTipText,

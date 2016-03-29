@@ -14,6 +14,8 @@ public class SimulationDelay implements ISimulationAware {
 
     /**
      * Constructor.
+     *
+     * @param model model to work with
      */
     public SimulationDelay(GuiModel model) {
         this.model = model;

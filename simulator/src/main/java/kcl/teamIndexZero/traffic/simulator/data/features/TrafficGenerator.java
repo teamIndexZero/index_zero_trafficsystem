@@ -31,10 +31,12 @@ public class TrafficGenerator extends Feature {
     private java.util.List<Link> incoming = new ArrayList<>();
     private java.util.List<Link> outgoing = new ArrayList<>();
     private List<Vehicle> vehiclesToDelete = new ArrayList<>();
+
     /**
      * Constructor
      *
-     * @param id Feature ID tag
+     * @param id       Feature ID tag
+     * @param geoPoint geographical location of TG
      */
     public TrafficGenerator(ID id, GeoPoint geoPoint) {
         super(id);
@@ -167,6 +169,8 @@ public class TrafficGenerator extends Feature {
      * Gets a random lane to place a vehicle onto
      *
      * @return Random Lane
+     * @throws JunctionPathException   if there is no path from junction this TG is connected to
+     * @throws DeadEndFeatureException in case we got to dead end.
      */
     public Lane getRandomLane() throws JunctionPathException, DeadEndFeatureException {
         Link outboundLink = outgoing.get((int) (Math.random() * outgoing.size() - 1));
@@ -201,6 +205,7 @@ public class TrafficGenerator extends Feature {
         // remove the cars which have 'arrived' into this TG
         if (!this.vehiclesToDelete.isEmpty()) {
             this.vehiclesToDelete.forEach(vehicle -> {
+                vehicle.getLane().removeVehicle(vehicle);
                 super.getMap().removeMapObject(vehicle.getID());
             });
             this.vehiclesToDelete.clear();
@@ -216,9 +221,21 @@ public class TrafficGenerator extends Feature {
             if (Math.random() > 0.04) {
                 return;
             }
-            Vehicle v = null;
             try {
-                v = new Vehicle(new ID("Vehicle::" + this.getID() + "::" + globalCreationCounter), "Vehicle " + globalCreationCounter, getRandomLane());
+                Lane l = getRandomLane();
+                boolean hasLaneFreeSpace = l.isClearAhead(null, l.isForwardLane() ? 0 : l.getLength(), 10);
+                if (!hasLaneFreeSpace) {
+                    return;
+                }
+                Vehicle v = Math.random() > 0.7
+                        ? Vehicle.createTruck(new ID("Truck::" + this.getID() + "::" + globalCreationCounter), "Truck " + globalCreationCounter, getRandomLane())
+                        : Vehicle.createPassengerCar(new ID("Car::" + this.getID() + "::" + globalCreationCounter), "Car " + globalCreationCounter, getRandomLane());
+
+                super.getMap().addMapObject(v);
+                globalCreationCounter++;
+                thisGeneratorCreationCounter++;
+                LOG.log_Trace("TrafficGenerator '", this.getID(), "' created '", v.getName(), "'.");
+
             } catch (JunctionPathException e) {
                 LOG.log_Fatal("Trying to get a path to a lane to pass the new vehicle onto through the Junction failed.");
                 LOG.log_Exception(e);
@@ -226,10 +243,6 @@ public class TrafficGenerator extends Feature {
                 LOG.log_Fatal("Trying to get a lane to pass the new vehicle onto out of the TrafficGenerator ('", this.getID(), "') failed.");
                 LOG.log_Exception(e);
             }
-            super.getMap().addMapObject(v);
-            globalCreationCounter++;
-            thisGeneratorCreationCounter++;
-            LOG.log_Trace("TrafficGenerator '", this.getID(), "' created '", v.getName(), "'.");
         }
     }
 

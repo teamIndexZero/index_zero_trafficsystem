@@ -8,9 +8,13 @@ import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPoint;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoPolyline;
 import kcl.teamIndexZero.traffic.simulator.data.geo.GeoSegment;
 import kcl.teamIndexZero.traffic.simulator.data.links.Link;
+import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 
 import java.awt.*;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -25,11 +29,15 @@ public class Lane extends Feature {
     private Color color;
     private Link nextLink;
     private Link previousLink;
+    private Set<Vehicle> carsOnThisLane = new HashSet<>();
 
     /**
      * Constructor
      *
-     * @param road_specs Road specifications
+     * @param id                   an identifier of the lane
+     * @param road_specs           Road specifications
+     * @param parent               the {@link DirectedLanes} object this lane belongs to
+     * @param indexInDirectedLanes is the index within directed lanes, with 0 being innermost
      */
     public Lane(ID id, RoadSpecs road_specs, DirectedLanes parent, int indexInDirectedLanes) {
         super(id);
@@ -73,7 +81,7 @@ public class Lane extends Feature {
     void constructPolyline() {
         double totalRoadWidth = lanes.getRoad().getRoadWidth();
         double laneWidth = getWidth();
-        int laneInRoadPosition = getRoad().getForwardSide().getLanes().contains(this)
+        int laneInRoadPosition = isForwardLane()
                 ? getRoad().getForwardSide().getLanes().indexOf(this)
                 : getRoad().getForwardSide().getLanes().size() + getRoad().getBackwardSide().getLanes().indexOf(this);
         double metersOffsetAlongNormalVector = -totalRoadWidth / 2 + laneWidth / 2 + laneInRoadPosition * laneWidth;
@@ -94,13 +102,13 @@ public class Lane extends Feature {
         polyline = new GeoPolyline(segmentList);
 
         // set color
-        if (getRoad().getForwardSide().getLanes().contains(this)) {
+        if (isForwardLane()) {
             // forward side
             int strength = 150 + (20 * getRoad().getForwardSide().getLanes().indexOf(this)) % 105;
             color = new Color(strength, strength, 40);
         } else {
             int strength = 150 + (20 * getRoad().getBackwardSide().getLanes().indexOf(this)) % 105;
-            color = new Color(strength, 40, strength);
+            color = new Color(strength, strength, strength);
         }
     }
 
@@ -213,10 +221,148 @@ public class Lane extends Feature {
     }
 
     /**
-     * {@inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public String toString() {
         return String.format("{Lane in %s}", lanes);
     }
+
+    /**
+     * Try to get a lane which is ot the outer side of current one.
+     *
+     * @return null if none, {@link Lane} if there is one to the outer side.
+     */
+    public Lane tryGetLaneToOuterSide() {
+        if (getLanes().getNumberOfLanes() > indexInDirectedLanes + 1) {
+            return getLanes().getLanes().get(indexInDirectedLanes + 1);
+        }
+        return null;
+    }
+
+    /**
+     * Try to get lane which is to the inner side of the road.
+     *
+     * @return null if none, {@link Lane} if there is one to the left (in UK).
+     */
+    public Lane tryGetLaneToInnerSide() {
+        if (indexInDirectedLanes - 1 >= 0) {
+            return getLanes().getLanes().get(indexInDirectedLanes - 1);
+        }
+        return null;
+    }
+
+    /**
+     * According to the road direction, is this lane forward lane?
+     *
+     * @return true if corresponding to the road direction.
+     */
+    public boolean isForwardLane() {
+        return getRoad().getForwardSide().getLanes().contains(this);
+    }
+
+    /**
+     * True if according to the road direction, this one goes reverse.
+     *
+     * @return true if the direction of lane is opposite to the road direction.
+     */
+    public boolean isBackwardLane() {
+        return getRoad().getBackwardSide().getLanes().contains(this);
+    }
+
+    /**
+     * Add a vehicle to the lane.
+     *
+     * @param v vehicle to add.
+     */
+    public void addVehicle(Vehicle v) {
+        carsOnThisLane.add(v);
+    }
+
+    /**
+     * Remove vehicle from the lane, ex. when it goes to junction or traffic receiver.
+     *
+     * @param v vehicle to remove.
+     */
+    public void removeVehicle(Vehicle v) {
+        carsOnThisLane.remove(v);
+    }
+
+    /**
+     * Given start and end parameters, which are distance from lane start, give a subset of vehicles belonging to this
+     * lane which fall in between start and end.
+     * <p>
+     * One can mix and swap start and end.
+     *
+     * @param exceptFor a vehicle to exclude from check. When looking around for free spots, we do not refer ourselves
+     *                  as an obstacle
+     * @param start     segment start
+     * @param end       segment end
+     * @return set of vehicles on that segment.
+     */
+    public Collection<Vehicle> getVehiclesAtSegment(final Vehicle exceptFor, double start, double end) {
+        // just in case the start and end are swapped, swap them back.
+        if (start > end) {
+            double t = end;
+            end = start;
+            start = t;
+        }
+        final double s = start;
+        final double e = end;
+        return carsOnThisLane
+                .stream()
+                .filter(vehicle -> {
+                    if (vehicle.equals(exceptFor))
+                        return false;
+                    double vehicleFront = vehicle.getPositionOnLane();
+                    double vehicleBack = isForwardLane()
+                            ? vehicleFront - vehicle.getLengthMeters()
+                            : vehicleFront + vehicle.getLengthMeters();
+                    return (vehicleFront < e && vehicleFront > s)
+                            || (vehicleBack < e && vehicleFront > s);
+                })
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * For a vehicle, check if it is clear ahead for a specific amount of meters.
+     *
+     * @param exceptFor   omit this car from check
+     * @param position    vehicle position.
+     * @param metersAhead how far ahead to look.
+     * @return true if there is no other vehicle
+     */
+    public boolean isClearAhead(Vehicle exceptFor, double position, double metersAhead) {
+        double endSegment = position + (isForwardLane() ? 1 : -1) * metersAhead;
+        return getVehiclesAtSegment(exceptFor, position, endSegment).isEmpty();
+    }
+
+    /**
+     * Look back, check if it is clear behind there for a specific amount of meters.
+     *
+     * @param exceptFor    remove this vehicle from check (usuall self)
+     * @param position     vehicle position.
+     * @param metersBehind meters to check behind
+     * @return true if no one is there behind.
+     */
+    public boolean isClearBehind(Vehicle exceptFor, double position, double metersBehind) {
+        double endSegment = position + (isForwardLane() ? -1 : 1) * metersBehind;
+        return getVehiclesAtSegment(exceptFor, position, endSegment).isEmpty();
+    }
+
+    /**
+     * Get bearing on the point in lane. It comes from polyline, but for the case of reversed lane, bearing should be
+     * reversed too.
+     *
+     * @param distanceFromStart distance from start of lane.
+     * @return bearing (angle to base vector of 1, 0
+     */
+    public double getBearingAtDistanceFromStart(double distanceFromStart) {
+        double angle = polyline.getBearingAtDistanceFromStart(distanceFromStart);
+        if (isBackwardLane()) {
+            angle = (angle + Math.PI) % (Math.PI * 2);
+        }
+        return angle;
+    }
+
 }

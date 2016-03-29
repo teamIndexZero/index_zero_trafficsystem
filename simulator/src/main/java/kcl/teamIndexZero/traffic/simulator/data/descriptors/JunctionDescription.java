@@ -21,6 +21,7 @@ public class JunctionDescription {
      * @param id                Junction's ID tag
      * @param connectedRoadIDs  Connected road IDs
      * @param trafficLight_flag Traffic light on the junction flag
+     * @param geoPoint          a geographical location of the center of junction
      */
     public JunctionDescription(ID id, Map<ID, RoadDirection> connectedRoadIDs, boolean trafficLight_flag, GeoPoint geoPoint) {
         this.id = id;
