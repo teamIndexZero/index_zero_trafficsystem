@@ -364,14 +364,14 @@ There is one problem stemming from the way the OSM data is laid out. It manifest
   	\vspace{1.5em}
 \end{figure}
 
-The most obvious way to deal with this would be to detect roundabouts at the post OSM data import and recreate a viable set of descriptors that would not produce this errors. This would, however, add an additional overhead as all link and feature descriptors would need to be examined alongside their geographical relationships. At the moment, since we detect that there are only incoming lanes to the point of connection, a traffic generator is automatically added to the junction to take receipt of the traffic.
+The most obvious way to deal with this would be to detect roundabouts at the post OSM data import and recreate a viable set of descriptors that would not produce this errors. This would, however, add an additional overhead as all link and feature descriptors would need to be examined alongside their geographical relationships. At the moment, since only incoming lanes are detected at the point of connection, a traffic generator is automatically added to the junction to take receipt of the traffic.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Alex part
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Map visualisation}
-As soon as map is constructed, we have an in-memory representation of the road network graph which acts as a base for simulation. Roads, consisting of lanes, connect up to junctions, roads and lanes have polylines. All the coordinates in simulation space are provided in meters offset cartesian coordinates - that is, horizontal and vertical meters offset from (0,0) bottom left point, as outlined in Figure \ref{fig:coordinateConversions}.
+As soon as map is constructed, a representation of the road network graph which acts as a base for simulation is placed in memory. Roads, consisting of lanes, connect up to junctions, roads and lanes have polylines. All the coordinates in simulation space are provided in meters offset cartesian coordinates - that is, horizontal and vertical meters offset from (0,0) bottom left point, as outlined in Figure \ref{fig:coordinateConversions}.
 
 In order for these objects to be visualized, their coordinates in simulation space need to be transformed to the on-screen coordinates. Java graphics API uses pixel coordinates, with origin point being top-left, and vertical axis pointing down.
 
@@ -456,7 +456,7 @@ Since the data set may be quite big, some optimizations were introduced to impov
 Actual traffic simulation requires an already completed and linked simulation map: an in-memory data graph data structure consisting of differen map features, such as roads, junctions or traffic generators. Simulation has certain parameters, such as duration of single simulation step (tick), total number of ticks to run and simulation time start. Notion of simulated time is maintained - in addition to discrete tick number, each moment of time contains a simulated time stamp. This may be required in future for more complex behavior, such as changing environment perception parameters according to the time of the day, or profiling the traffic load to the real-like commute patterns.
 
 \subsubsection{Simulation loop and time}
-Simulation is performed in discrete steps. On each simulation steps, we create a simulation timestamp (tick) object, and pass it down to all the interested listeners, which need to implement ISimulationAware interface. Each of them does what is needed on that level. For example, traffic lights might change their state basing on a tick, cars may change their speed, position and acceleration, traffic generators may insert the new cars onto connected outflow lanes.
+Simulation is performed in discrete steps. On each simulation steps a simulation timestamp (tick) object is created and passed down to all the interested listeners, which need to implement ISimulationAware interface. Each of them does what is needed on that level. For example, traffic lights might change their state basing on a tick, cars may change their speed, position and acceleration, traffic generators may insert the new cars onto connected outflow lanes.
 
 \begin{figure}[h]
     \vspace{1.5em}
@@ -580,7 +580,7 @@ Messages to the logger, whether actual messages or exceptions, all carry certain
 
 An actual message will also include its level with the message description whilst and exception message will just carry the stack trace of the exception.
 
-Since in Java most types are children of the Object class and we have 'autoboxing'\cite{Oracle1995} for primitive types we can use <Object> as the type for the signature of the method that are called to pass a message. In logging messages there are no set number of arguments for the description so there are two options opened to us: Allow strings only or allow any number of arguments to be passed to the methods for the log calls. The latter was chosen for flexibility's sake in order to be able to pass dynamic variables directly. 
+Since, in Java, most types are children of the Object class and 'autoboxing'\cite{Oracle1995} is available for primitive types, <Object> can be used as the type for the signature of the method that are called to pass a message. In logging messages there are no set number of arguments for the description so there are two options opened to us: Allow strings only or allow any number of arguments to be passed to the methods for the log calls. The latter was chosen for flexibility's sake in order to be able to pass dynamic variables directly. 
 
 \begin{lstlisting}[language=Java]
 	LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links (Back). ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");
