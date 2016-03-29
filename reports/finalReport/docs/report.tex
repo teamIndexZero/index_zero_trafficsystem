@@ -783,36 +783,40 @@ Whole Greater London & 31101 road and 24314 junction, 120672 mapFeatures, 547 ma
 \end{center}
 
 
-\subsection{Possible further development}
+\subsection{Possible further development and improvements}
 
+As the core design of the project offers a strong basis for further development there are many avenues of improvement opened that could be taken up.
 
-
-\begin{itemize}
-	\item Scaling number of cars to the size of the graph  (map)
-	\item Round about issue with importing OSM data made by humans 
-	\item -> allow export from other sources /API calls (gmap?)
-	\item -> allow for manual editing of the graph from the GUI view?
-	\item As skirting into hybrid model, detailing such as car sprites, road graphics, etc could be added as zoom factor increases, maybe show lanes from medium zoom and abstract into dots and coloured roads at low zoom
-	\item addition of plug-in capability to add different metrics/behaviours as required by the user
-	\item creation of vehicles with specs based off real life data
-	\item >pollution based on vehicle profile
-	\item manual addition of temporary block on map so modify traffic flow (construction/road works/accidents/etc..)
-	\item Simulation recorder/player - large simulations can be run prior then played and analysed later
-	\item NOTE: Traffic lights??
-	\item Alex: would be good to mention something about architecture life: we started with a nice clean idea which had to evolve (i.e. I know at least of 2 places which beg for refactoring: especially the awkward movement-along-the-lane bit where for reverse lanes car moves backwards from the end of the lane, and all need to remember about that)
-\end{itemize}
+\underline{GUI}
 
 \begin{itemize}
-    \item Log module expansion
-    \begin{itemize}
-        \item coloured terminal window if more time,
-        \item >easier to read
-        \item >segregated from the console
-        \item Custom Filters
-        \item >filtering based on class name (origin)
-        \item >filtering based on selection of multiple non-sequential log levels instead of everything below the set global level (granular control)
-    \end{itemize}
+	\item As the design skirts into a hybrid model, visual detailing such as car sprites, road graphics, etc... could ostensibly be added and removed dynamically as the zoom factor on the map is changed. I.e.: when the zoom factor is increases beyond a threshold the dots representing the vehicles are changed to sprites matching their descriptions.
+	\item A point/click interface for adding static map objects to the graph via the GUI such as road block, construction work or broken down cars,
+	\item A GUI map editor for easy OSM error corrections or synthetic map creation,
 \end{itemize}
+
+\underline{Simulator}
+\begin{itemize}
+	\item Traffic-light integration
+	\item Vehicle production on the graph scaled to the size of the map instead of a hard limit (currently 500),
+	\item Specification of the vehicles produced based on real-life data,
+	\item Plug-in capability so that 3rd party development of behaviour and metric recorders can be added easily,
+	\item Pollution profiler with heat map visualisation for the GUI based on the vehicle specifications and numbers,
+\end{itemize}
+
+\underline{Miscellaneous}
+\begin{itemize}
+	\item Import from other sources such as Google Maps,
+	\item Simulation recorder on the simulator side to save large simulations to files and a player on the GUI side to read those files.
+\end{itemize}
+
+\underline{Logger}
+\begin{itemize}
+	\item Coloured terminal output callable from the GUI
+	\item Custom log message filters (based on origin, granular individual log level control)
+\end{itemize}
+
+>>>Alex: would be good to mention something about architecture life: we started with a nice clean idea which had to evolve (i.e. I know at least of 2 places which beg for refactoring: especially the awkward movement-along-the-lane bit where for reverse lanes car moves backwards from the end of the lane, and all need to remember about that)
 
 \section{Peer Assessment}
 %In a simple table, allocate the 100 ‘points’ you are given to each team member. Valid values range from 0 to 100 inclusive. You may assign decimal values, but the entire points must add up to precisely 100.
