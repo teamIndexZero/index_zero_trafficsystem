@@ -48,14 +48,29 @@ public class Lane extends Feature {
         LOG.log("New lane (", id.toString(), ") created: length=", this.roadSpecs.length, "m, width=", this.roadSpecs.width, "m.");
     }
 
+    /**
+     * Gets the colour of the lane
+     *
+     * @return Lane colour
+     */
     public Color getColor() {
         return color;
     }
 
+    /**
+     * Gets the index of the directed lane where the lane belongs in
+     *
+     * @return Directed lane index
+     */
     public int getIndexInDirectedLanes() {
         return indexInDirectedLanes;
     }
 
+    /**
+     * Gets the polyline for the lane
+     *
+     * @return Lane's GeoPolyline
+     */
     public GeoPolyline getPolyline() {
         return polyline;
     }
@@ -115,6 +130,11 @@ public class Lane extends Feature {
         return this.roadSpecs.length;
     }
 
+    /**
+     * Gets the Lane's description for HTML use
+     *
+     * @return Description of the lane
+     */
     @Override
     public String toHTMLString() {
         return toString();
