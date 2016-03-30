@@ -209,17 +209,17 @@ The following problems were encountered and solved during the implementation of 
 
 At the same time, extending the map data loader with extra functionality, such as maintaining pedestrian crossing information or traffic lights information, would provide system with some benefits, there is a clear potential for improvement on this side.
 
-\subsection{Graph construction}
+\subsection{Graph Construction}
 
-Graph construction is done prior to the simulation running rather than during (JIT). This approach moves the performance penalty away from the live simulation leaving some overhead for large workload heavy maps. it also, conceptually, makes for easier storage of map states on every tick as, once the graph is set, the only changes are in the counters, link states (e.g.: such as traffic lights being red/green) and the map objects travelling on the graph.
-From the previously created descriptors, the graph constructor creates the features and links of the graph and links them together in this order (see Figure~\ref{fig:graphConstructSeqDiag} and ~\ref{fig:roadConstructSeqDiag} in Appendix~\ref{sec:roadConstructionSequences}):
+Graph construction is done prior to the simulation running rather than during (Just In Time). This approach moves the performance penalty away from the live simulation leaving some overhead for a large workload with heavy maps. It also, conceptually, makes for easier storage of map states on every tick as, once the graph is set, the only changes are in the counters, link states (e.g.: such as traffic lights being red/green) and the map objects travelling on the graph.
+From the previously created descriptors, the graph constructor creates the features and links of the graph and actually connects them toghether in memory in this order (see Figure~\ref{fig:graphConstructSeqDiag} and ~\ref{fig:roadConstructSeqDiag} in Appendix~\ref{sec:roadConstructionSequences}):
 \begin{enumerate}
 	\item Roads, their directed lane groups and individual lanes are created,
 	\item Junctions are created and the roads branching off them connected,
 	\item Traffic generators are placed.
 \end{enumerate}
 
-\subsubsection{Feature creation and linkage}
+\subsubsection{Feature Creation and Linkage}
 
 Originally the graph was kept abstract with features connected via links (see Figure~\ref{fig:FeatureConnect}). These features could be either junctions or roads. Roads were connected as whole features (see Figure~\ref{fig:RoadsOriginal}).
 
@@ -254,7 +254,7 @@ As more work was done it became clear that this high level of abstraction on the
 
 Although roads and lane groups are not directly connected up in the graph, the belonging lanes can back reference those enabling travelling objects to access their properties. I.e.: A vehicle on a lane can find out the Road's name or ID as well as what direction it belongs to.
 
-Junctions were developed around this exploded view of the road feature. Lanes are connected up to junctions via special junction specific links that give access to available paths from that particular entry point with the <getLinks()> method for any passing objects (see Figure~\ref{fig:junction}).
+Junctions were developed around this exploded view of the road feature. Lanes are connected up to junctions via special junction-specific links that give access to available paths from that particular entry point with the <getLinks()> method for any passing objects (see Figure~\ref{fig:junction}).
 
 \begin{lstlisting}[language=Java]
     public List<Link> getLinks() {
@@ -262,7 +262,7 @@ Junctions were developed around this exploded view of the road feature. Lanes ar
             return junction.getNextLinks(super.getID());
         } catch (JunctionPathException e) {
             LOG.log_Fatal("No exit link from the junction were found! i.e.: Car is stuck!");
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 \end{lstlisting}
@@ -284,12 +284,12 @@ Paths are calculated after lane linkage has been done. All entry points are conn
 
 \subsubsection{Traffic Generators}
 
-Traffic generators were originally designed to only produce traffic but evolved to also take receipt of it thus taking on the responsibility of deleting vehicles as they exited the boundaries of the simulated map. This ensures that vehicles cannot keep going (graphically) and disappears at the designated boundaries. This also allows to keep track on the numbers of vehicles produced and received at those points (see Figure~\ref{fig:boundaryTF}).
+Traffic generators were originally designed to only produce traffic but evolved to also take receipt of it thus taking on the responsibility of deleting vehicles as they exited the boundaries of the simulated map. This ensures that vehicles disappear at the designated boundaries and cannot keep going forward (graphically). This also allows to keep track on the numbers of vehicles produced and received at those points (see Figure~\ref{fig:boundaryTF}).
 
 During development two corner cases were encountered:
 \begin{enumerate}
-	\item Junctions were there were only incoming lanes connected to,
-	\item Junctions were there were only incoming lanes connected to save for one road.
+	\item Junctions where there were only incoming lanes connected to,
+	\item Junctions where there were only incoming lanes connected to save for one road.
 \end{enumerate}
 
 In the first case, vehicles from all lanes had no where to go. In the second case, where the traffic came into the junction from the lone road with both direction included, the traffic had also no where to go since the only way out would have been a u-turn which is not allowed.
@@ -516,17 +516,15 @@ A more subtle subtype of junctions is a fork, commonly found in proximity to rou
     \includegraphics[width=0.4\textwidth]{figs/junction/junction_two_way_to_fork.png}
 \end{figure}
 
-
-
 \subsection{Logger}
 
 A logger was created at the beginning to help over the life of the development process. As one of the three major resources available for debugging (the others being in-line print and exceptions) it was viewed as an essential to have for the project. A home-brewed logger was chosen over a ready-made one to keep the functionalities to those required and, also, as it was a good addition to the code base.
 
-The logger was used extensively to keep track of what was happening during runtime and have a way to keep a non-volatile record of states during each run for errors/bugs that were hard to reproduce. Although simple, the architecture was designed to be flexible allowing further developments of outputs and formatters (see Figure~\ref{fig:logger_overview}).
+The logger was used extensively to keep track of what was happening during runtime and have a way to keep a permanent record of states during each run for errors/bugs that were hard to reproduce. Although simple, the architecture was designed to be flexible allowing further developments of outputs and formatters (see Figure~\ref{fig:logger_overview}).
 
 \begin{figure}[!h]
 	\vspace{1.5em}
-  	\caption{Logger overview}
+  	\caption{Logger Overview}
   	\label{fig:logger_overview}
   	\centering
 	\includegraphics[width=0.75\textwidth]{figs/logger/LogModuleObjectDiagram.png}
@@ -534,7 +532,7 @@ The logger was used extensively to keep track of what was happening during runti
 \end{figure}
 
 \subsubsection{Log Messages}
-The logger allows for various types (importance level) of messages which are all defined as calls in the interface:
+The logger allows for various types (importance levels) of messages which are all defined as calls in the interface:
 \begin{itemize}
 	\item Fatal messages: for unrecoverable errors (program crashes),
 	\item Error messages: for recoverable errors (program can continue somehow),
@@ -554,9 +552,9 @@ Messages to the logger, whether actual messages or exceptions, all carry certain
 	private static Logger_Interface LOG = Logger.getLoggerInstance(Road.class.getSimpleName());
 \end{lstlisting}
 
-An actual message will also include its level with the message description whilst and exception message will just carry the stack trace of the exception.
+An actual message also includes its level with the message description whilst an exception message just carries the stack trace of the exception.
 
-Since, in Java, most types are children of the Object class and 'autoboxing'\cite{Oracle1995} is available for primitive types, <Object> can be used as the type for the signature of the method that are called to pass a message. In logging messages there are no set number of arguments for the description so there are two options opened to us: Allow strings only or allow any number of arguments to be passed to the methods for the log calls. The latter was chosen for flexibility's sake in order to be able to pass dynamic variables directly. 
+Since, in Java, most types are children of the Object class and 'autoboxing'\cite{Oracle1995} is available for primitive types, <Object> can be used as the type for the signature of the method that are called to pass a message. In logging messages there are no set number of arguments for the description so there are two options opened to us: allow strings only or allow any number of arguments to be passed to the methods for the log calls. The latter was chosen for flexibility's sake in order to be able to pass dynamic variables directly.
 
 \begin{lstlisting}[language=Java]
 	LOG.log_Error("Road '", lanes.getRoad().getID(), "' has group of directed lanes with partly implemented Links (Back). ", link_count, "/", lanes.getNumberOfLanes(), " Lanes connected to a link.");
@@ -615,9 +613,11 @@ In the event that no configuration file is found a default one is created that i
 \end{lstlisting}
 
 
-\section{Pending Implementations - to sort out}
+\section{Incomplete Functionalities}
 
-We could have improved our program by adding Traffic lights module. The figure below shows the prepared class diagram. All management should have been in traffic light controller class. The rules for changing traffic lifht's states were suppose to be in TrafficLightRule and TrafficLightsSetRule classes.
+\subsection{Traffic Lights}
+
+We could have improved our program by adding Traffic lights module. The figure below shows the prepared class diagram. All management should have been in traffic light controller class. The rules for changing traffic lights' states were supposed to be in TrafficLightRule and TrafficLightsSetRule classes.
 
 \begin{figure}[!h]
 	\vspace{1.5em}
@@ -628,32 +628,28 @@ We could have improved our program by adding Traffic lights module. The figure b
   	\vspace{1.5em}
 \end{figure}
 
-The idea of Traffic light module contained the following issues.
-
-\subsection{Traffic Lights}
+The idea of Traffic light module contained the following issues:
 \begin{itemize}
     \item Two types of traffic lights: singles and those in one junction set.
     \item All traffic lights work autonomously.
-    \item Traffic lights in one junction set would have the same ID as Juntion.
+    \item Traffic lights in one junction set would have the same ID as Junction.
     \item The first idea was to create basic traffic lights rules, that do not change states according to the traffic (not intelligent traffic lights)
 \end{itemize}
 
 \subsection{Serialization}
-\begin{itemize}
-	\item During the development and testing it was understood that program compilation/running takes a lot of time and affects the performance. Therefore, an idea to save the current state of a map and load it later using GUI was introduced during the team meetings. Initial steps were done, but as project became more complex this feature was left undeveloped.
-\end{itemize}
+During the development and testing it was understood that program compilation/running takes a lot of time and affects the performance. Therefore, an idea to save the current state of a map and load it later using GUI was introduced during the team meetings. Initial steps were done, but as project became more complex this feature was left undeveloped.
 
 \subsection{GUI Primitives}
-Initially when we went for a micro  model we dealt with each car individually. Thus to reduce the overhead at the simulator, we planed to make a class with various functions that could be called to make the cars, and the roads, based on the location and other details of the same. This function was initially thought for drawing roads, cars, and trucks. It has an initial problem due to miscommunication, which led to a wrong design start. Upon rectifying out mistakes, we were again met with another problem of design, and implementation. The basic formula of the design was based around the coordinates of the placement of the car, thus it lead to cars being produced of different sizes based on the location on the map. Thus to remove the drawing issue it was decided to go with a picture of the car rather than a drawing, as it was an easier option. The image made a few things easier such as placement and sizing, but added new problems like initial direction of the image, and its background transparency. We had already spent a lot of time in this, and it was not getting to some concrete work. Even then we didn't loose hope and tried to get it working. As time progressed there were other problems with the code that had to be dealt with. The initial coding was very basic, and had to be streamlined and improved upon. This was added to the already existing list of problems to be dealt with. Once the code was streamlined, the next step initially was to make it log all the faliours it occurred while running. Upon this, just to check the performance of the code we ran a small test. The results were not what one would expect. The execution time for each iteration was very high. At this moment of time, the most important thing to be done was reduce the execution time, because with such long execution time the code couldn't be considered. It took us long to improve the execution time, and till then it was too late. While applying this whole concept we lost our way, and recovery was slow, may it be the initial misunderstanding or the latter neglect of the image while trying to reformat the code.
+Initially when we went for a micro  model we dealt with each car individually. Thus to reduce the overhead at the simulator, we planed to make a class with various functions that could be called to make the cars, and the roads, based on the location and other details of the same. This function was initially thought for drawing roads, cars, and trucks. It has an initial problem due to miscommunication, which led to a wrong design start. Upon rectifying out mistakes, we were again met with another problem of design, and implementation. The basic formula of the design was based around the coordinates of the placement of the car, thus it lead to cars being produced of different sizes based on the location on the map. Thus to remove the drawing issue it was decided to go with a picture of the car rather than a drawing, as it was an easier option. The image made a few things easier such as placement and sizing, but added new problems like initial direction of the image, and its background transparency. We had already spent a lot of time in this, and it was not getting to some concrete work. Even then we didn't loose hope and tried to get it working. As time progressed there were other problems with the code that had to be dealt with. The initial coding was very basic, and had to be streamlined and improved upon. This was added to the already existing list of problems to be dealt with. Once the code was streamlined, the next step initially was to make it log all the failures that occurred while running. Upon this, just to check the performance of the code we ran a small test. The results were not what one would expect. The execution time for each iteration was very high. At this moment of time, the most important thing to be done was to reduce the execution time, because with such long execution time the code couldn't be considered. It took us long to improve the execution time, and till then it was too late. While applying this whole concept we lost our way, and recovery was slow, may it be the initial misunderstanding or the latter neglect of the image while trying to reformat the code.
 
 \section{Team Work}
 %Describe how you worked together, including the tools and processes you used to facilitate group work.
-The initial start was really great for us, as we were following all the guidelines as the team. Our attendance to the weekly meetings was almost one hundred percent. The booking of rooms, and other miscellaneous works were never a problem, as one of us would always make sure it was done well in advance. The Interpretation of the meetings was taken differently by our team members, this was a bit of a concern.
+
 \subsection{Tools and processes}
 
-The team unanimously used IntelliJ IDEA\footnote{https://www.jetbrains.com/idea/} for coding and version control access. The IDE offers a wide array of development tools that automates a lot of "boiler-plate" things for Java enabling the user to focus on the more important aspects of development. It also has an integrated VCS module.
+The team unanimously used IntelliJ IDEA\footnote{https://www.jetbrains.com/idea/} for coding and version control access. The IDE offers a wide array of development tools that automate a lot of "boiler-plate" things for Java enabling the user to focus on the more important aspects of development. It also has an integrated VCS module.
 
-The team originally adopted a simplified Kanban\cite{Peterson2015, Radig2016} process toward Agile development where tasks are broken down and piled into a backlog where any member(s) of the team can take them on and move them to the "In progress" pile. Once tasks are done they can be moved to the "code-review" pile and finally to the "Done" pile.
+The team originally adopted a simplified Kanban\cite{Peterson2015, Radig2016} process towards Agile development where tasks are broken down and piled into a backlog where any member(s) of the team can take them on and move them to the "In progress" pile. Once tasks are done they can be moved to the "code-review" pile and finally to the "Done" pile.
 
 To aid in that process, Trello\footnote{https://trello.com} was used to keep track of the tasks (see Figure~\ref{fig:trello}). As time went on updates on the board became more sporadic and its usage amongst the team was not equally spread so it ended up not being used to its fullest potential. 
 
@@ -668,10 +664,10 @@ For day-to-day communication HipChat was used as the team's IM. It has both Trel
   	\vspace{1.5em}
 \end{figure}
 
+\subsection{Learning Outcomes}
 
-\subsection{Learning outcomes}
+Aside from the system-specific knowledge gained and previously outlined by creating a working traffic simulation application, the team's learning outcomes come in two major categories: technical and non-technical (soft skills).
 
-Aside from the system specific knowledge gained and previously outlined by creating a working traffic simulation application, the team's learning outcomes come in two major categories: technical and non-technical (soft skills).
 For the technical aspects:
 \begin{itemize}
 	\item Build systems (Gradle),
@@ -690,9 +686,9 @@ On the non-technical side:
 	\item Problems that occur within teams (as outlined in the next section).
 \end{itemize}
 
-\subsection{Team performance evaluation}
+\subsection{Team Performance Evaluation}
 
-The team originally set out for equal input in the project where both technical and non-technical tasks were viewed on the same scale. This would allow less technically experienced members to contribute on the same level as more experienced members. A plan was devised and parts for the project were broken down into specific tasks to be taken up based on expertise. If no one had the expertise it came down to whomever wasn't on a task at that particular time.
+The team originally set out for equal input in the project where both technical and non-technical tasks were viewed on the same scale. This would have allowed less technically experienced members to contribute on the same level as more experienced members. A plan was devised and parts for the project were broken down into specific tasks to be taken up based on expertise. If no one had the expertise it came down to whomever wasn't on a task at that particular time.
 
 Some of the aspects that worked well included:
 \begin{itemize}
@@ -706,11 +702,11 @@ Some of the aspects that worked well included:
 Unfortunately this methodology lost track over the course of the project's lifetime. Some of the problems identified were:
 \begin{itemize}
     \item Tendency towards procrastination and a lack of pro-activity in picking up tasks without prompting became evident,
-    \item Extended periods of low output for the project lead to loosing track of the changes and difficulty understanding current states of the project on a technical level for some of the members,
+    \item Extended periods of low output for the project led to loosing track of the changes and difficulty understanding current states of the project on a model level for some of the members,
     \item Other peripheral tasks (both technical and not - e.g. research, docs, report.. ) tended to be ignored or relegated to the low priority list in cases by part of the team with the assumption that it would get done by someone else,
     \item Code review was not as effective as it could have been in fostering legacy learning from more experienced members due to the sporadic contribution in cases,
     \item Tasks on the agenda where not always done prior to the meetings which delayed those in the pending stack even further,
-    \item Once the discussion section of the meeting sessions were finished, the rest of the time reserved which was meant for group coding was not as productive as it could have been.
+    \item Once the discussion section of the meeting sessions were finished, the rest of the time reserved which was meant for group coding was not used to its best.
     \item Although motivation to achieve and get work done for the project was at a high point at the end of meetings it didn't sustain for some members.
 \end{itemize}
 
@@ -742,9 +738,9 @@ The code, whilst based on a simple set of designs, was a driving force towards c
 
 Because of these changes whole sections of the code-base would become either redundant and deleted or modified to such extent that the original clean implementation had morphed into something less so. Given time those would need some refactoring to avoid the possibility of code-rot if this software was going to be further developed.
 
-One particular point of interest would be the movement along the lanes. Currently, as the offset construction of the individual lanes within a road is made based on the polyline, a vehicle when travelling on the backward lane requires a calculation that subtract from the total length whereas, on the forward direction, the calculation adds from 0. The latter being more natural.
+One particular point of interest would be the movement along the lanes. Currently, as the offset construction of the individual lanes within a road is made based on the polyline, a vehicle when travelling on the backward lane requires a calculation that subtracts from the total length whereas, on the forward direction, the calculation adds from 0. The latter being more natural.
 
-Certain planned functionalities were not achieved in the end as the work input capacity was not as originally anticipated and the creation of the graph from OSM data was more involved than previously thought. In the end most of the basic and advanced items planned were completed in addition of some extra ones (see Table~\ref{table:functionalities}).
+Certain planned functionalities were not achieved in the end as the work input capacity was not as originally anticipated and the creation of the graph from OSM data was more involved than previously thought. In the end most of the basic and advanced items planned were completed in addition to some extra ones (see Table~\ref{table:functionalities}).
 
 \begin{table}[!h]
 \vspace{1.5em}
@@ -775,15 +771,14 @@ Traffic behaviour: Lane changes                 &             & \checkmark  & \c
 \vspace{1.5em}
 \end{table}
 
-\subsection{Application performance}
-After the implementation of main application, performance measurements were taken. The parts of the functionality carrying most of the computational load were wrapped in time marker code and their performance was measured. Single sample was taken each time, since performing subsequent measurements yielded exactly the same results. Following are some details on the time measurement procedures undertaken:
+\subsection{Application Performance}
+After the implementation of the traffic simulator, performance measurements were taken. The parts of the functionality carrying most of the computational load were wrapped in time marker code and their execution time was measured. Single sample was taken each time, since performing subsequent measurements yielded exactly the same results. Following are some details on the time measurement procedure undertaken:
 
 \begin{itemize}
-    \item Time recording. In order to circumvent the possible observer bias, the simplest possible measure method was chosen. The code was augmented to record the timestamp with System.currentTimeMillis() before running the method of interest, and taking the sample after it. The difference was computed, and echoed to the standard output with System.out.println().
-    \item Logging was disabled at all during performance measures (level set to OFF).
+    \item Time recording. In order to circumvent the possible observer bias, the simplest possible measurement method was chosen. The code was augmented to record the timestamp with System.currentTimeMillis() before running the method of interest, and take the sample after it. The difference was computed, and echoed to the standard output with System.out.println().
+    \item Logging was disabled at all during performance measurement (level set to OFF).
     \item Test machine: OS X, Intel Core I7-4770HQ, 2.2 GHz, 16GB RAM, SSD
-    \item As measurements have shown, the software is capable is deliver a usable experience for a decent size data set (in our example all primary, secondary and tertiary roads in Greater London, totalling 31101 road and 24314 junction descriptions), as described in Table \ref{table:performanceComparison}
-    \item Application of the visualisation optimization of caching the static image file allowed for fast functioning of the software for still viewport.
+    \item As measurements have shown, the software is capable to deliver a usable experience for a decent sized data set (in our example all primary, secondary and tertiary roads in Greater London, totalling 31101 road and 24314 junction descriptions), as described in Table \ref{table:performanceComparison}
 \end{itemize}
 
 \begin{center}
@@ -811,11 +806,9 @@ Whole Greater London & 31101 road and 24314 junction, 120672 mapFeatures, 547 ma
 \end{center}
 
 
-\subsection{Possible further development and improvements}
+\subsection{Possible Further Development and Improvements}
 
 As the core design of the project offers a strong basis for further development there are many avenues of improvement opened that could be taken up.
-
-Firstly there was a possibility to improve the graphical interface of our program.
 
 \underline{GUI}
 
