@@ -48,7 +48,7 @@ One of the significant disadvantages of AIMSUN is that users are required to wri
 
 \subsection{SATURN}
 
-SATURN (Simulation and Assignment of Traffic to Urban Road Networks) is a macroscopic-based traffic simulator created by the Institute for Transport Studies in the University of Leeds. It is  popular in Europe and the UK. SATURN aims to simulate public transport traffic in urban areas. Since SATURN employs a macro-model, it allows observation of the large scale impact public transport can have. Possible parameters can be cost and duration of journey, vehicle price and configuration of fare zones. PT-SATURN, an addon, is available which provides simulation of the passenger behaviour within public transport. Problems like which transport to choose, where to travel, what route to take can also be incorporated in the simulation\cite{Shires2006}.
+SATURN (Simulation and Assignment of Traffic to Urban Road Networks) is a macroscopic-based traffic simulator created by the Institute for Transport Studies in the University of Leeds. It is popular in Europe and the UK. SATURN aims to simulate public transport traffic in urban areas. Since SATURN employs a macro-model, it allows observation of the large scale impact public transport can have. Possible parameters can be cost and duration of journey, vehicle price and configuration of fare zones. PT-SATURN, an addon, is available which provides simulation of the passenger behaviour within public transport. Problems like which transport to choose, where to travel, what route to take can also be incorporated in the simulation\cite{Shires2006}.
 
 \subsection{Summary}
 
@@ -61,16 +61,16 @@ There were no formal requirements specified at any stage. Instead, the team foll
 
 The requirements drove the evolution of the model and vice versa. The original cellular automata model was rather limiting, so with the introduction of enhanced model more things became possible (i.e. cars display in an angle following the road angle).
 
-Naturally, implementation of some features took place earlier, defining ongoing possibilities for other features to be implemented. As such,  free-form junctions demanded some test fixtures, which in turn led to requirement for loading external data files. At the same time, the GUI started to serve as a sort of visual inspector and debugger leading to an ever evolving design.
+Naturally, implementation of some features took place earlier, defining ongoing possibilities for other features to be implemented. As such, free-form junctions demanded some test fixtures, which in turn led to requirement for loading external data files. At the same time, the GUI started to serve as a sort of visual inspector and debugger leading to an ever evolving design.
 
-With such an evolutionary approach to requirements the specific attention has been paid to internal structure and architecture enabling easier new features implementation. Design methodologies such as separation of concerns, modularization and design patterns were used to make software more robust and maintainable in the course of unforseen changes.
+With such an evolutionary approach to requirements the specific attention has been paid to internal structure and architecture enabling easier new features implementation. Design methodologies such as separation of concerns, modularization and design patterns were used to make software more robust and maintainable in the course of unforeseen changes.
 
 Actual implemented features are listed in Table \ref{table:functionalities} in Section \ref{sec:projectEvaluation}.
 
 \section{Implementation}
-%Describe the most significant implementation details, focussing on those where unusual or detailed solutions were required. Quote code fragments where necessary, but remember that the full source code will be included as an appendix. Explain how you tested your software (e.g. unit testing) and the extent to which you tested it. If relevant to your project, explain performance issues and how you tackled them.
+%Describe the most significant implementation details, focusing on those where unusual or detailed solutions were required. Quote code fragments where necessary, but remember that the full source code will be included as an appendix. Explain how you tested your software (e.g. unit testing) and the extent to which you tested it. If relevant to your project, explain performance issues and how you tackled them.
 
-Whilst test driven development process was selected by the team initially, usage of proper unit testing declined over time due to looming  deadlines. Still, regular practice of writing tests for some parts of the system, especially core and complex ones, persisted.
+Whilst test driven development process was selected by the team initially, usage of proper unit testing declined over time due to looming deadlines. Still, regular practice of writing tests for some parts of the system, especially core and complex ones, persisted.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Alex part
@@ -128,7 +128,7 @@ Following is a compact overview of the pipeline the data follows from the OpenSt
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Preparing Data File}
-First of all, a user needs to decide on the actual geographical area they want to perform the simulation of. The area is uniquely defined by 2 pairs of geographical coordinates: (south-west lat, long) - (north-east lat,long). After that, user needs to either download the full planet.osm file (containing whole OSM data set), or an area excerpt containing the area of interest\footnote{Geofabrik is a reliable source for OSM excerpts with fresh data http://www.geofabrik.de}.
+First of all, a user needs to decide on the actual geographical area they want to perform the simulation of. The area is uniquely defined by 2 pairs of geographical coordinates: (south-west lat, long) - (north-east lat, long). After that, user needs to either download the full planet.osm file (containing whole OSM data set), or an area excerpt containing the area of interest\footnote{Geofabrik is a reliable source for OSM excerpts with fresh data http://www.geofabrik.de}.
 
 Following is the osmosis tool command line, which combines both cut and filter steps into single run:
 \begin{lstlisting}
@@ -195,7 +195,7 @@ The following problems were encountered and solved during the implementation of 
 \begin{itemize}
     \item Coordinate conversions: since the Mercator projection\footnote{https://en.wikipedia.org/wiki/Mercator\_projection} with spherical geoid simplification is used, there is a certain degree of inaccuracy in the coordinates converted to meters offset.
     \item Splitting roads when they happen to cross a junction in the middle (see Figure~\ref{fig:roadSplitting}): as it's a rather technically complex, it leads to a cumbersome algorithm. The reason being that the processing of the roads and junctions happened at the same time so, in case a split is required, the references must be found and updated to match the newly created parts based on the original road.
-    \item Link descriptors: initially, it was anticipated that another type of descriptor - <LinkDescription> - would be created to mark the places where two parts of the road are connected (for example, pedestrian crossing on a straight road). However, after the implementation of the data loading found a need for road splitting, Link descriptors were abandoned in favour of the more general idea of junction descriptors that had  only two roads connected. Otherwise, the edge-case situation of a link descriptor created in a geographical point, which was later to be found to be in the middle of another road, led to an overly complex code. This conversion positively reflected on the overall design of the system and  followed the "keep it simple" rule. At later stages, the graph construction and actual simulation were found to be working perfectly with " junctions with two roads" instead of a link.
+    \item Link descriptors: initially, it was anticipated that another type of descriptor - <LinkDescription> - would be created to mark the places where two parts of the road are connected (for example, pedestrian crossing on a straight road). However, after the implementation of the data loading found a need for road splitting, Link descriptors were abandoned in favour of the more general idea of junction descriptors that had only two roads connected. Otherwise, the edge-case situation of a link descriptor created in a geographical point, which was later to be found to be in the middle of another road, led to an overly complex code. This conversion positively reflected on the overall design of the system and followed the "keep it simple" rule. At later stages, the graph construction and actual simulation were found to be working perfectly with "junctions with two roads" instead of a link.
     \item Lane construction: deriving from a single zero-width road polyline a set of lane polylines which are offset into appropriate direction (perpendicular to the segment).
 \end{itemize}
 
