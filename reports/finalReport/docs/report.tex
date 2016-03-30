@@ -105,6 +105,9 @@ Problems like which transport to choose, where to travel, how to travel (routes)
 can be also simulated. [distillate.ac.uk].
 
 \section{Requirements and Design}
+%Describe the requirements you set for your project at the beginning and the design you have taken for your project. Focus on why you decided to tackle the problem in the way you did, and what effects that had on the design. You may also wish to mention the impact of team-working on your requirements and design.
+
+
 \begin{itemize}
     \item Flexible requirements - start with something basic, get to more complex (stage 2 possibilities.)
     \item Model evolved from simple cellular-automata with discrete cells occupied by cars (or free) to more physics-like model, with the cars having position and bearing in real world map, moving along the lanes, with position and sizes resembling real like and set as floating-point numbers
@@ -114,7 +117,6 @@ can be also simulated. [distillate.ac.uk].
 	\item >> focus on solid bases to enable expandability and real world usage?
 \end{itemize}
 
-%Describe the requirements you set for your project at the beginning and the design you have taken for your project. Focus on why you decided to tackle the problem in the way you did, and what effects that had on the design. You may also wish to mention the impact of team-working on your requirements and design.
 
 
 \section{Implementation}
@@ -651,7 +653,7 @@ In the event that no configuration file is found a default one is created that i
 
 \section{Pending Implementations - to sort out}
 
-\subsubsection{Traffic Lights}
+\subsection{Traffic Lights}
 \begin{itemize}
     \item two types of traffic lights: singles and those in one junction set
     \item all traffic lights work autonomously
@@ -742,12 +744,22 @@ In the end, the combination of these issues lead to an asymmetric distribution o
 \section{Project Evaluation}
 %Critically evaluate your project: what worked well, and what didn’t? How did you do relative to your plan? what changes were the result of improved thinking and what changes were forced upon you? how did your team work together? etc. Note that you need to show that you understand the weaknesses in your work as well as its strengths. You may wish to identify relevant future work that could be done on your project.
 
+Originally the project was to take up the cellular automata model for the simulation. As it became obvious this would cause a problem for vehicles especially at stop point where it would leave gaps between the objects due to the nature of static sized cells the project evolved towards an agent based model with coordinates for movement placement for a more granular and realistic simulation.
+
+The code, whilst based on a simple set of designs, was a driving force towards changes as flaws in the original ideas and design were discovered as development went. One example of this is the change from linking roads bidirectionally as whole features to creating lanes and moving the graph linkage to those.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!! One line example here
+>>>Alex: would be good to mention something about architecture life: we started with a nice clean idea which had to evolve (i.e. I know at least of 2 places which beg for refactoring: especially the awkward movement-along-the-lane bit where for reverse lanes car moves backwards from the end of the lane, and all need to remember about that)
+
+Because of these changes whole sections of the code-base would become either redundant and deleted or modified to such extent that the original clean implementation had morphed into something less so. Given time those would need some refactoring to avoid the possibility of code-rot if this software was going to be further developed.
+
 \begin{itemize}
 	\item what worked well
 	\item what didn't
 	\item comparison of now and original plan (maybe use the table from first report to compare?)
 	\item Pros/cons of model and work done generally
 \end{itemize}
+
 
 
 \subsection{Application performance}
@@ -838,8 +850,6 @@ Logger might have coloured the output callable from the GUI. It's messages might
 	\item Coloured terminal output callable from the GUI
 	\item Custom log message filters (based on origin, granular individual log level control)
 \end{itemize}
-
->>>Alex: would be good to mention something about architecture life: we started with a nice clean idea which had to evolve (i.e. I know at least of 2 places which beg for refactoring: especially the awkward movement-along-the-lane bit where for reverse lanes car moves backwards from the end of the lane, and all need to remember about that)
 
 \section{Peer Assessment}
 %In a simple table, allocate the 100 ‘points’ you are given to each team member. Valid values range from 0 to 100 inclusive. You may assign decimal values, but the entire points must add up to precisely 100.
