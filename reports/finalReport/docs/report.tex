@@ -9,50 +9,26 @@
 
 \section{Introduction}
 %Describe the context for the work and the problem you are addressing. Briefly summarise what you achieved in the project.
-The aim of this project was to simulate traffic in urban environment, enabeling us to gather some data with respect to the same. The data gainned would enable us to apply different situations to the test in the environment. We had orignally planned to go for a micro model, in this model we deal with each vehicle as a seperate entity, along with it's various charecteristics, like acceleration, direction of movement. We initially thought about implimenting a cell automata, which devided the roads into cells. To link roads we wanted to use graphs, thus getting a road with cells coneected to another by graphs. The main issues with our initial thought model was it's flexibility. The model was not scaleable to bigger regions.
 
-The goal of the project was to create an urban traffic simulation over the connected road network resembling ones found in real world. Such simulation would allow for inspecting different traffic properties such as vehicle throughput in key points and possible effect of changes in rules or road network topology on these properties. In addition to providing basic inspection properties, system would be easily extendable with extra, more complex observable properties such as pollution factors.
+The goal of the project was to create an urban traffic simulation over the connected road network resembling ones found in real world. Such simulation would allow for inspecting different traffic properties such as vehicle throughput in key points and possible effect of changes in rules or road network topology on these properties. In addition to providing basic inspection functionality, system would be easily extendable with extra, more complex observable properties such as pollution factors.
 
-Traffic model originated as cellular automata model with map represented as grid consisting of cells which may be either free or occupied by a car. Shortly after intial prototype implementation the real map data requirement was raised. The cellular automata model was found to be inflexible due to fixed size cells which did not pair well with the multitude of forms found in real maps, and had to be abandoned in favour of, or rather morphed into to more physical metric model. In this physical model vehicle bears real-life properties such as speed, acceleration, angle and position on the lane, and moves according to laws of mechanics, which uncovers a potential for further deatlisation of the physical model.
+Approach to traffic modeling originated as one following cellular automata model, with the map represented as grid consisting of cells maybe occupied by a car. Shortly after intial prototype implementation the requirement for real map data was raised. The cellular automata model was found to be too rough and inflexible inflexible due to fixed cell size. Such model did not pair well with the multitude of forms and combinations found in real maps, so it had to be abandoned in favour of, or rather morphed into, more physical metric model. In this physical model vehicle bears real-life properties such as speed, acceleration, angle and position on the lane, and moves according to laws of mechanics, which uncovers a potential for further deatlisation of the physical model. Junctions had inspection properties attached to them, namely vehicle counters, making the software a tool for inspection. Data import from Open Street Map format was added, which allows for interoperability with a vast tooling and data ecosystem already available, as well as convenience in creating a synthetic test examples.
+
+Vehicle behavior side - driving and reasoning about - received less attention than originally anticipated. At the same time some interesting driving behavior, such as acceleration and breaking taking road situation into account, turn decisions,  as well as lane changing, was implemented.
 
 A sophisticated user interface has been created, partly to facilitate need for visual inspection of various map data, but also useful for actual simulation runs. Example of main applcation window is shown in Figure \ref{fig:screenshot}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \vspace{1.5em}
     \caption{Screen capture of the main application window depicting car moving at Aldwych}
     \label{fig:screenshot}
     \centering
-    \includegraphics[width=1\textwidth]{figs/mainWindowWithStrand.png}
+    \includegraphics[width=0.75\textwidth]{figs/mainWindowWithStrand.png}
     \vspace{1.5em}
 \end{figure}
 
 
-While the implementation of the requirements can be named successfull, the accent was shifted from creating complex behavioral models for vehicles such as routing and implementing them as intelligent agents, to a different area of complexity: understanding, representing and displaying real world map data in a format compatible for traffic simulation. Still, vehicles operate in a rather autonomous ways, but they can not be classified as agents, since interface between environment and vehicle is not that well defined, and really cars are only capable of basic reactive behavior.
-
-
-\begin{itemize}
-	\item Context
-	\begin{itemize}
-		\item Road traffic simulator
-		\item Goal was to simulate road traffic on urban networks to enable some general data gathering and be able to plugin more specific metric recorder for pollutants, throughput load on junction, etc...
-		\item ES::NOTE: maybe do a comparison with the goals set out in the original report?
-		\item Originally started as a cell automata micro model
-		\item Model became too restrictive as cells were of fixed lengths and model was not easily scalable
-		\item Morphed to encompass features of macro model and agency principles
-	\end{itemize}
-	\item summary of chevos
-	\begin{itemize}
-		\item Hybrid model
-		\item map objects as agent that decide their behaviours based on environment
-		\item focus of design was about solid foundations so that the software can be expanded upon without any major structural changes
-		\item i.e.: very expandable without needing to change the core design
-		\item Maps imported from real-life OpenStreetMap (OSM) data so realistic
-		\item Maps can also be created synthetically as long as the format is the same
-		\item allows for real world usage off-the-shelf
-		\item PIC of the app!!!
-
-	\end{itemize}
-\end{itemize}
+During the course of implementation, accent was shifted from creating complex behavioral models for vehicles such as routing and implementing them as intelligent agents, to a different area of complexity: understanding, representing and displaying real world map data in a format required for traffic simulation. Still, vehicles operate in a rather autonomous ways, but they can not be classified as agents, since interface between environment and vehicle is not that well defined, and really cars are only capable of basic reactive behavior.
 
 \section{Review}
 %Describe related work.
@@ -60,7 +36,7 @@ While the implementation of the requirements can be named successfull, the accen
 \subsection{Research scope}
 
 Many different software traffic modelling systems were developed.
-Some of them are using classical software modelling approaches, some of them are based on innovative and hybrid approaches.[srvn]
+Some of them are using classical software modelling approaches, some of them are based on innovative and hybrid approaches \cite{Hawick2009}.
 Both have advantages and disadvantages.
 In this chapter we will briefly highlight strong and weak sides of that software  and a theory  aspects which they are implementing.
 
@@ -68,15 +44,15 @@ In this chapter we will briefly highlight strong and weak sides of that software
 \subsubsection{SUMO}
 
 Simulation of Urban Mobility (SUMO) is a popular open-source road traffic simulation software which was implemented using the aspects of microscopic flow behaviour model.
-The main idea is to simulate complex road networks. Any road network can be represented by importing or creating various sources [academia].
+The main idea is to simulate complex road networks. Any road network can be represented by importing or creating various sources \cite{Ismail2012}.
 Being a classical microscopic based simulator SUMO supports a simulation of such traffic's parts as ways, junctions, traffic lights, routes.
 Also appropriate demands can be created. Like physical properties of vehicle, logical parameters and vehicle type distribution.
 There are many different options supported by SUMO.
-SUMO is open and well studied software. Also it was implemented in different national projects like DRIVE C2X, COLOMBO and AMITRAN [main site].
+SUMO is open and well studied software. Also it was implemented in different national projects like DRIVE C2X, COLOMBO and AMITRAN \cite[TransportResearchattheGermanAerospaceCentre2016].
 
 Despite being widely used one of the most significant disadvantages of SUMO is its complexity.
 This requires users to spend more time in order accurately set
-all parameters and understand aspects of micro-simulation more comprehensively. [academia]
+all parameters and understand aspects of micro-simulation more comprehensively \cite{Ismail2012}.
 
 \subsubsection{AIMSUN}
 
@@ -84,7 +60,7 @@ AIMSUN is another popular and well studied, but in the same time commercial
 transport simulation software made by Transport Simulation Systems in Spain.
 It is commonly classified as a microscopic based simulator.
 Nevertheless, it also supports simulation of macro and meso models.
-Depending on which model a user is intended to simulate he/she can configure specific mode and manage the traffic flow[nz].
+Depending on which model a user is intended to simulate he/she can configure specific mode and manage the traffic flow \cite{Hawick2009}.
 Supporting a dynamic simulation AIMSUN can operate with larger road networks as highways, freeways, and ring roads.
 By default it has simulation scenarios which allows user to run experiments with specific parameters.
 
@@ -92,7 +68,7 @@ Another feature  supported by AIMSUN is 3d simulation which provides detailed po
 
 On of the significant disadvantages of AIMSUN is the longer coding phases which
 requires users to spend more time for coding rather than working with the settings.
-Also, as it was found the usage of 3d modes dramatically affects the performance.[masse.ac.nz]
+Also, as it was found the usage of 3d modes dramatically affects the performance \cite{Hawick2009}.
 
 \subsubsection{SATURN}
 
@@ -102,9 +78,20 @@ As for example, due to macroscopic approach SATURN allows to observe the impact 
 system in general. Such  values as cost of trips, spent time, cost of the vehicle and travelling zones provides the logic of this software.
 Also, there is an ad on  (PT-SATURN) which provides special simulation for the passengers behaviour in the public transport.
 Problems like which transport to choose, where to travel, how to travel (routes)
-can be also simulated. [distillate.ac.uk].
+can be also simulated \cite{Shires2006}.
+
+\subsubsection{Conclusion}
+
+During our research different problems of existed models and softwares were found. The advantage of each model dramatically depends on
+the final purpose. Surely, in case of the more detailed simulation a software based on microscopic model can achieve better results, on the contrary
+the intend to observe traffic paradigms and patterns will lead to the macroscopic models. In the same time, limit our software in the scopes of
+any of those model would not give expected result.
 
 \section{Requirements and Design}
+%Describe the requirements you set for your project at the beginning and the design you have taken for your project. Focus on why you decided to tackle the problem in the way you did, and what effects that had on the design. You may also wish to mention the impact of team-working on your requirements and design.
+
+
+
 \begin{itemize}
     \item Flexible requirements - start with something basic, get to more complex (stage 2 possibilities.)
     \item Model evolved from simple cellular-automata with discrete cells occupied by cars (or free) to more physics-like model, with the cars having position and bearing in real world map, moving along the lanes, with position and sizes resembling real like and set as floating-point numbers
@@ -114,7 +101,6 @@ can be also simulated. [distillate.ac.uk].
 	\item >> focus on solid bases to enable expandability and real world usage?
 \end{itemize}
 
-%Describe the requirements you set for your project at the beginning and the design you have taken for your project. Focus on why you decided to tackle the problem in the way you did, and what effects that had on the design. You may also wish to mention the impact of team-working on your requirements and design.
 
 
 \section{Implementation}
@@ -125,12 +111,18 @@ can be also simulated. [distillate.ac.uk].
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Technology and libraries}
-\begin{itemize}
-    \item Java SE 1.8
-    \item most of the actual simulation and drawing code is written manually
-    \item libraries used: main code: Java standard library \(rt.jar\), testing code: jUnit, Mockito, Fest-assert. Own logger used.
-    \item OSM for the import map data
-\end{itemize}
+Java Standard Edition version 1.8 has been chosen as an implementation platform, since Java is a language more or less familiar to all team members. At the same time it provides Graphical User Interface framework and an excellent tooling support. Gradle\footnote{Gradle is a modern build system for Java in tight integration with Groovy http://gradle.org} was used as build system to automate builds on Travis continuous integration server and also to produce various artifacts.
+
+There were no external libraries used for the actual application code, except for Java standard runtime library rt.jar.
+
+In order to enable more convinient testing, following libraries were used:
+\begin{enumerate}
+    \item Junit 4 as an actual test runner
+    \item Mockito\footnote{https://code.google.com/archive/p/mockito/} - easy mocks in java. Enables nicer separation of concepts and fluent invocation verification patterns
+    \item Fest assertions\footnote{https://github.com/alexruiz/fest-assert-2.x/wiki/One-minute-starting-guide} - library enabling writing comprehensive and convenient assertions.
+\end{enumerate}
+
+Build system using gradle was plugged in to automate builds and variuos artifact production. In order to work with OpenStreetMap files, appropriate standard OSM tools were used (namely, JOSM and osmosis), as detailed below in the report.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Alex part
@@ -517,7 +509,7 @@ Upon switching to the new lane, car continues to move along it in the same mode 
 
 Figure \ref{fig:forwardOrTurnOption} displays the forward and turn sectors for the car approaching crossing. The crossing itself is displayed as a white circle in the center. Small car is approaching the crossing from the east. The car is following an inbound lane with the bearing at the junction of 15.9\degspc. The junction itself, in addition to two incoming lanes at 15.9\degspc and 158.7\degspc, has two outgoing lanes: one at 19.7\degspc, and one at 107.4\degspc. For the Car 46 approaching the junction, possible forward and turn outcomes are displayed on the overlay disc: red segments represent prohibited proceedings, yellow ones represent turns, and green ones represent forward movement. For this very scenario, Car 46 has an option to go forward with the 19.7\degspc exit, and an option to turn left with 107.4\degspc exit.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \caption{Junction forward or turn options depending on angle }
     \label{fig:forwardOrTurnOption}
     \centering
@@ -651,7 +643,7 @@ In the event that no configuration file is found a default one is created that i
 
 \section{Pending Implementations - to sort out}
 
-\subsubsection{Traffic Lights}
+\subsection{Traffic Lights}
 \begin{itemize}
     \item two types of traffic lights: singles and those in one junction set
     \item all traffic lights work autonomously
@@ -742,12 +734,22 @@ In the end, the combination of these issues lead to an asymmetric distribution o
 \section{Project Evaluation}
 %Critically evaluate your project: what worked well, and what didn’t? How did you do relative to your plan? what changes were the result of improved thinking and what changes were forced upon you? how did your team work together? etc. Note that you need to show that you understand the weaknesses in your work as well as its strengths. You may wish to identify relevant future work that could be done on your project.
 
+Originally the project was to take up the cellular automata model for the simulation. As it became obvious this would cause a problem for vehicles especially at stop point where it would leave gaps between the objects due to the nature of static sized cells the project evolved towards an agent based model with coordinates for movement placement for a more granular and realistic simulation.
+
+The code, whilst based on a simple set of designs, was a driving force towards changes as flaws in the original ideas and design were discovered as development went. One example of this is the change from linking roads bidirectionally as whole features to creating lanes and moving the graph linkage to those.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!! One line example here
+>>>Alex: would be good to mention something about architecture life: we started with a nice clean idea which had to evolve (i.e. I know at least of 2 places which beg for refactoring: especially the awkward movement-along-the-lane bit where for reverse lanes car moves backwards from the end of the lane, and all need to remember about that)
+
+Because of these changes whole sections of the code-base would become either redundant and deleted or modified to such extent that the original clean implementation had morphed into something less so. Given time those would need some refactoring to avoid the possibility of code-rot if this software was going to be further developed.
+
 \begin{itemize}
 	\item what worked well
 	\item what didn't
 	\item comparison of now and original plan (maybe use the table from first report to compare?)
 	\item Pros/cons of model and work done generally
 \end{itemize}
+
 
 
 \subsection{Application performance}
@@ -822,8 +824,6 @@ The second group of possible improvements are those related to the simulator.
 	\item Coloured terminal output callable from the GUI
 	\item Custom log message filters (based on origin, granular individual log level control)
 \end{itemize}
-
->>>Alex: would be good to mention something about architecture life: we started with a nice clean idea which had to evolve (i.e. I know at least of 2 places which beg for refactoring: especially the awkward movement-along-the-lane bit where for reverse lanes car moves backwards from the end of the lane, and all need to remember about that)
 
 \section{Peer Assessment}
 %In a simple table, allocate the 100 ‘points’ you are given to each team member. Valid values range from 0 to 100 inclusive. You may assign decimal values, but the entire points must add up to precisely 100.
