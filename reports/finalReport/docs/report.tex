@@ -649,9 +649,10 @@ The idea of Traffic light module contained the following issues.
     \item Traffic lights in one junction set would have the same ID as Juntion.
     \item The first idea was to create basic traffic lights rules, that do not change states according to the traffic (not intelligent traffic lights)
 \end{itemize}
-     
+
+\subsection{Serialization}
 \begin{itemize}
-	\item serialization/de-serialization
+	\item During the development and testing it was understood that program compilation/running takes a lot of time and affects the performance. Therefore, an idea to save the current state of a map and load it later using GUI was introduced during the team meetings. Initial steps were done, but as project became more complex this feature was left undeveloped.
 \end{itemize}
 
 \subsection{GUI Primitives}
@@ -702,6 +703,7 @@ On the non-technical side:
 \end{itemize}
 
 \subsection{Team performance evaluation}
+
 The team originally set out for equal input in the project where both technical and non-technical tasks were viewed on the same scale. This would allow less technically experienced members to contribute on the same level as more experienced members. A plan was devised and parts for the project were broken down into specific tasks to be taken up based on expertise. If no one had the expertise it came down to whomever wasn't on a task at that particular time.
 
 Some of the aspects that worked well included:
@@ -743,7 +745,6 @@ Following are some numerical properties about project implementation course:
 \end{itemize}
 
 \section{Project Evaluation}
-\label{sec:projectEvaluation}
 %Critically evaluate your project: what worked well, and what didn’t? How did you do relative to your plan? what changes were the result of improved thinking and what changes were forced upon you? how did your team work together? etc. Note that you need to show that you understand the weaknesses in your work as well as its strengths. You may wish to identify relevant future work that could be done on your project.
 
 Originally the project was to take up the cellular automata model for the simulation. As it became obvious this would cause a problem for vehicles especially at stop point where it would leave gaps between the objects due to the nature of static sized cells the project evolved towards a more precise model with coordinates for movement placement allowing for a more granular and realistic simulation.
