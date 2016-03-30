@@ -1,5 +1,6 @@
 package kcl.teamIndexZero.traffic.log.fileIO;
 
+import kcl.teamIndexZero.traffic.log.FileIO.FileInput;
 import org.junit.After;
 import org.junit.Test;
 
@@ -24,7 +25,7 @@ public class FileInputTest {
 
     @Test
     public void testRead() throws Exception {
-        FileOutput out = new FileOutput("", "testRead.test");
+        kcl.teamIndexZero.traffic.log.fileIO.FileOutput out = new kcl.teamIndexZero.traffic.log.fileIO.FileOutput("", "testRead.test");
         out.appendString("String 1" + System.lineSeparator());
         out.appendString("String 2" + System.lineSeparator());
         out.appendString("String 3");

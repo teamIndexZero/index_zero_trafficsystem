@@ -1,5 +1,6 @@
-package kcl.teamIndexZero.traffic.log.fileIO;
+package kcl.teamIndexZero.traffic.log.FileIO;
 
+import kcl.teamIndexZero.traffic.log.fileIO.FileIO;
 import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
 
 import java.io.BufferedReader;

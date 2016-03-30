@@ -1,6 +1,6 @@
 package kcl.teamIndexZero.traffic.log;
 
-import kcl.teamIndexZero.traffic.log.fileIO.FileInput;
+import kcl.teamIndexZero.traffic.log.FileIO.FileInput;
 import kcl.teamIndexZero.traffic.log.fileIO.FileOutput;
 import kcl.teamIndexZero.traffic.log.microLogger.MicroLogger;
 import kcl.teamIndexZero.traffic.log.outputs.Output;

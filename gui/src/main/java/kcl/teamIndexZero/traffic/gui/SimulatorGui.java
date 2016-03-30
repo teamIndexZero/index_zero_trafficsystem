@@ -76,5 +76,4 @@ public class SimulatorGui {
             LOG.log_Exception(e);
         }
     }
-
 }

@@ -21,11 +21,30 @@ class GuiController {
  +pause()
 }
 
-class Simulator {
+class SimulationImageProducer {
++tick()
 }
-GuiController --> Simulator: Thread, \ncreate,\ncommand
-Simulator --> GuiController: Invoke tick() \nmethod on \nsimulation \nupdates
 
+class Primitives {
++drawLine(obj, pos, graphics)
++drawCurve(obj, pos, graphics)
++drawDoubleCrossRoad(obj, pos, graphics)
+}
+
+Simulator --> SimulationImageProducer: calls tick()
+
+
+GuiModel <-- SimulationImageProducer:update model \nwith new\nimages
+SimulationImageProducer -> Primitives
+
+
+class Simulator {
++start()
++stop()
++pause()
+}
+
+GuiController --> Simulator: Thread, \ncreate,\ncommand
 
 GuiController -> GuiModel: Update model state
 

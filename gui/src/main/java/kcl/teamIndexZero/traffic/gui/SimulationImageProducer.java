@@ -13,6 +13,7 @@ import kcl.teamIndexZero.traffic.simulator.data.mapObjects.Vehicle;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -43,6 +44,7 @@ public class SimulationImageProducer {
     };
     private static final Stroke BASIC_STROKE = new BasicStroke(1);
     protected static Logger_Interface LOG = Logger.getLoggerInstance(SimulationImageProducer.class.getSimpleName());
+    protected static Logger_Interface log;
     private final SimulationMap map;
     private final GuiModel model;
     private final Primitives primitives;
@@ -51,7 +53,6 @@ public class SimulationImageProducer {
     private BufferedImage image = null;
     private BufferedImage roadsImage = null;
     private Graphics2D graphics;
-
     //helper variable used to cycle colors when debugging road - helpful to spot issues in distribution.
     private int debugRoadsColorCounter;
 
@@ -190,12 +191,21 @@ public class SimulationImageProducer {
         map.getObjectsOnSurface().forEach(mapObject -> {
             Vehicle v = (Vehicle) mapObject;
             GeoPoint point = v.getPositionOnMap();
+            int x, y;
+            x = (int) point.xMeters;
+            y = (int) point.yMeters;
             if (point == null) {
                 return;
             }
-
+            GUI_Primitives cars = new GUI_Primitives();
             if (model.getViewport().getPixelsInMeter() < 1) {
-                primitives.drawCircle(graphics, point, 2, v.getColor(), true);
+                try {
+                    cars.drawSmallCar(x, y, 2, graphics);
+                } catch (IOException e) {
+                    log.log_Fatal(e.getMessage(), "SimulationImageProducer");
+
+                }
+                //primitives.drawCircle(graphics, point, 2, v.getColor(), true);
             } else {
                 double bearing = v.getBearing();
                 primitives.drawSegment(graphics,
@@ -209,16 +219,26 @@ public class SimulationImageProducer {
                         v.getColor(),
                         getStrokeByWidthMeters(v.getWidthMeters())
                 );
-                primitives.drawCircle(graphics, point, (int) (Math.floor(v.getWidthMeters() * model.getViewport().getPixelsInMeter())), Color.YELLOW, true);
+                try {
+                    cars.drawSmallCar(x, y, bearing, graphics);
+                } catch (IOException e) {
+                    log.log_Fatal(e.getMessage(), "SimulationImageProducer");
+                }
+                //primitives.drawCircle(graphics, point, (int) (Math.floor(v.getWidthMeters() * model.getViewport().getPixelsInMeter())), Color.YELLOW, true);
             }
 
             if (v.equals(model.getSelectedMapObject())) {
                 int radius = (int) (model.getViewport().getPixelsInMeter()
                         * ((Vehicle) model.getSelectedMapObject()).getDistanceToKeepToNextObject());
-                primitives.drawCircle(graphics,
+                try {
+                    cars.drawSmallCar(x, y, radius, graphics);
+                } catch (IOException e) {
+                    log.log_Fatal(e.getMessage(), "SimulationImageProducer");
+                }
+                /*primitives.drawCircle(graphics,
                         point,
                         radius,
-                        v.getColor());
+                        v.getColor());*/
                 primitives.drawText(graphics, point, v.getNameAndRoad(), v.getColor());
                 primitives.drawAngleVector(graphics, point, v.getBearing(), radius, 1, v.getColor(), true, false);
             }
