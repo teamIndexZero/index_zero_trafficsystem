@@ -810,39 +810,26 @@ Whole Greater London & 31101 road and 24314 junction, 120672 mapFeatures, 547 ma
 
 As the core design of the project offers a strong basis for further development there are many avenues of improvement opened that could be taken up.
 
-\underline{GUI}
+Firstly the GUI could be improved:
 
 \begin{itemize}
-	\item There might, as the program skirts into a hybrid model, be added visual detailing, i.e. car sprites, road graphics. Some features, while the zoom factor is changed, could have been dynamically removed or added, for instance: when the zoom factor increases beyond a threshold the dots representing the vehicles are changed to sprites matching their descriptions.
-	\item There might have been a point/click interface for adding static map objects to the graph via the GUI, for instance: road block, construction work or broken down cars.
-	\item The GUI map editor could have shown easy OSM error corrections or even synthetic map creation.
+	\item As the program skirts into a hybrid model, the visual detailing, i.e. car sprites, road graphics may be dynamically removed or added. For instance: when the zoom factor increases beyond a threshold the dots representing the vehicles are changed to actual sprites matching their descriptions.
+	\item Map editorial functinoality may be added, e.g. a point/click interface for adding static map objects to the graph via the GUI such as road block, construction work or broken down cars.
+	\item The GUI map editor could enable easy OSM error corrections or even synthetic map creation.
 \end{itemize}
 
-The second group of possible improvements are those related to the simulator.
+The second group of possible improvements are those related to the simulator:
 
-\underline{Simulator}
 \begin{itemize}
-	\item Complex traffic lights with not only green and red but also early/late yellow states could have been added to the program. We thought also about intelligent traffic lights depended on the amounts of the cars that are waiting at a junction.
-	\item There is a set  number of cars that are produced for the simulation purpose (currently 500), but in general we could have improved it by creating a vehicle generator that depends on the map size.
+	\item Complex traffic lights with not only green and red but also early/late yellow states could have been added to the program. This could have been further expanded to intelligent traffic lights devising on their mode basing on throughput data.
+	\item There is a maximum number of cars that are allowed on map (currently 500), but in general that could have been improved by creating a vehicle generator that depends on the map size.
 	\item There is also a possibility of vehicles specification based on real-life data.
-	\item Another project enlargement could have contained capability for adding third party development of behaviour and metric recorders. Components in that case would be added easily.
-	\item If we had had more time we would have even created a pollution profiler with a visualised heat map. Such a map would be based on the vehicle specifications and numbers.
-\end{itemize}
-
-We could have also developed additional options.
-
-\underline{Miscellaneous}
-\begin{itemize}
-	\item The maps could be read from other sources, for example Google or Bing maps.
-	\item The Simulation recorder, on the simulator side, might have saved large simulations to external files and a have played them on the GUI side.
-\end{itemize}
-
-There could have been improvement in the logger.
-
-\underline{Logger}
-\begin{itemize}
-	\item Logger might have coloured the output callable from the GUI.
-	\item Logger's messages might have been filtered, basing on the message's origin or granular individual log level control.
+	\item APIs could have been provided to enable plug-in behaviours for vehicle driving strategy and metrics. Components in that case would be added easily.
+	\item Pollution profiler with a visualized heat map would be a nice addition.
+    \item The maps could be read from other sources, for example Google or Bing maps.
+    \item Using intermediate format for simuilation state persistence would allow to record and later re-play the simulation sessions, enabling communication.
+	\item Logger coloured terminal output accessible from the GUI.
+	\item Custom log message filters (based on origin, granular individual log level control)
 \end{itemize}
 
 \section{Peer Assessment}
