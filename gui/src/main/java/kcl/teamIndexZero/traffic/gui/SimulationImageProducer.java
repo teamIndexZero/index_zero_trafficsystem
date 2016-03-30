@@ -131,7 +131,6 @@ public class SimulationImageProducer {
         if (imageConsumer == null) {
             LOG.log_Fatal("Image consumer not present. Can not draw.");
         } else {
-            model.setImage(image);
             imageConsumer.accept(image);
         }
     }
