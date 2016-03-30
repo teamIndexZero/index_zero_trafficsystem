@@ -107,18 +107,12 @@ Actual implemented features are listed in Table \ref{table:functionalities} in S
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Technology and libraries}
-Java Standard Edition version 1.8 has been chosen as an implementation platform, since Java is a language more or less familiar to all team members. At the same time it provides Graphical User Interface framework and an excellent tooling support. Gradle\footnote{Gradle is a modern build system for Java in tight integration with Groovy http://gradle.org} was used as build system to automate builds on Travis continuous integration server and also to produce various artifacts.
-
-There were no external libraries used for the actual application code, except for Java standard runtime library rt.jar.
-
-In order to enable more convinient testing, following libraries were used:
-\begin{enumerate}
-    \item Junit 4 as an actual test runner
-    \item Mockito\footnote{https://code.google.com/archive/p/mockito/} - easy mocks in java. Enables nicer separation of concepts and fluent invocation verification patterns
-    \item Fest assertions\footnote{https://github.com/alexruiz/fest-assert-2.x/wiki/One-minute-starting-guide} - library enabling writing comprehensive and convenient assertions.
-\end{enumerate}
-
-Build system using gradle was plugged in to automate builds and variuos artifact production. In order to work with OpenStreetMap files, appropriate standard OSM tools were used (namely, JOSM and osmosis), as detailed below in the report.
+\begin{itemize}
+    \item Java SE 1.8
+    \item most of the actual simulation and drawing code is written manually
+    \item libraries used: main code: Java standard library \(rt.jar\), testing code: jUnit, Mockito, Fest-assert. Own logger used.
+    \item OSM for the import map data
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Alex part
@@ -726,36 +720,46 @@ Unfortunately this methodology lost track over the course of the project's lifet
 
 In the end, the combination of these issues lead to an asymmetric distribution of work input on the project.
 
-Following are some numerical properties about project implementation course:
-\begin{itemize}
-    \item 110 Java source files created
-    \item 11111 lines of Java code written
-    \item 420+ commits
-    \item 13 pull requests
-    \item 50+ cards created in Trello
-\end{itemize}
-
 \section{Project Evaluation}
 \label{sec:projectEvaluation}
 %Critically evaluate your project: what worked well, and what didn’t? How did you do relative to your plan? what changes were the result of improved thinking and what changes were forced upon you? how did your team work together? etc. Note that you need to show that you understand the weaknesses in your work as well as its strengths. You may wish to identify relevant future work that could be done on your project.
 
 Originally the project was to take up the cellular automata model for the simulation. As it became obvious this would cause a problem for vehicles especially at stop point where it would leave gaps between the objects due to the nature of static sized cells the project evolved towards an agent based model with coordinates for movement placement for a more granular and realistic simulation.
 
-The code, whilst based on a simple set of designs, was a driving force towards changes as flaws in the original ideas and design were discovered as development went. One example of this is the change from linking roads bidirectionally as whole features to creating lanes and moving the graph linkage to those.
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!! One line example here
->>>Alex: would be good to mention something about architecture life: we started with a nice clean idea which had to evolve (i.e. I know at least of 2 places which beg for refactoring: especially the awkward movement-along-the-lane bit where for reverse lanes car moves backwards from the end of the lane, and all need to remember about that)
+The code, whilst based on a simple set of designs, was a driving force towards changes as flaws in the original ideas and design were discovered as development went. One example of this is the change from linking roads bidirectionally as whole features to creating lanes and moving the graph linkage to those in a directed fashion.
 
 Because of these changes whole sections of the code-base would become either redundant and deleted or modified to such extent that the original clean implementation had morphed into something less so. Given time those would need some refactoring to avoid the possibility of code-rot if this software was going to be further developed.
 
-\begin{itemize}
-	\item what worked well
-	\item what didn't
-	\item comparison of now and original plan (maybe use the table from first report to compare?)
-	\item Pros/cons of model and work done generally
-\end{itemize}
+One particular point of interest would be the movement along the lanes. Currently, as the offset construction of the individual lanes within a road is made based on the polyline, a vehicle when travelling on the backward lane requires a calculation that subtract from the total length whereas, on the forward direction, the calculation adds from 0. The latter being more natural.
 
+Certain planned functionalities were not achieved in the end as the work input capacity was not as originally anticipated and the creation of the graph from OSM data was more involved than previously thought. In the end most of the basic and advanced items planned were completed in addition of some extra ones (see Table~\ref{table:functionalities}).
 
+\begin{table}[!h]
+\centering
+\caption{Functionalities implemented before/after comparison}
+\label{table:functionalities}
+\resizebox{0.75\linewidth}{!}{%
+\begin{tabular}{|l|c|c|c|}
+\rowcolor[HTML]{656565}
+\hline
+{\color[HTML]{FFFFFF} \textbf{Functionalities}} & {\color[HTML]{FFFFFF} \textbf{Original}} & {\color[HTML]{FFFFFF} \textbf{Final}} & {\color[HTML]{FFFFFF} \textbf{Done}} \\ \hline
+\multicolumn{4}{l}{\textbf{Basic functionalities}}                                        \\ \hline
+Gradle deployment harness                       & \checkmark  & \checkmark  & \checkmark  \\ \hline
+Logger: basic functionality                     & \checkmark  & \checkmark  & \checkmark  \\ \hline
+Logger: Multi-output support                    & \checkmark  & \checkmark  & \checkmark  \\ \hline
+Tooling                                         & \checkmark  & \checkmark  & \checkmark  \\ \hline
+Simulation                                      & \checkmark  & \checkmark  & \checkmark  \\ \hline
+Basic GUI                                       & \checkmark  & \checkmark  & \checkmark  \\ \hline
+Basic measurement (throughput)                  & \checkmark  & \checkmark  & \checkmark  \\ \hline
+Simulation saving/loading                       & \checkmark  &             &             \\ \hline
+\multicolumn{4}{l}{\textbf{Advanced functionalities}}                                     \\ \hline
+Larger model: Graph with many connections       & \checkmark  & \checkmark  & \checkmark  \\ \hline
+Loading map data from OSM                       & \checkmark  & \checkmark  & \checkmark  \\ \hline
+Traffic Lights and model parameter optimisation & \checkmark  &             &             \\ \hline
+Advanced GUI (inspection, graph debug...)       &             & \checkmark  & \checkmark  \\ \hline
+Traffic behaviour: Lane changes                 &             & \checkmark  & \checkmark  \\ \hline
+\end{tabular}}
+\end{table}
 
 \subsection{Application performance}
 After the implementation of main application, performance measurements were taken. The parts of the functionality carrying most of the computational load were wrapped in time marker code and their performance was measured. Single sample was taken each time, since performing subsequent measurements yielded exactly the same results. Following are some details on the time measurement procedures undertaken:
@@ -850,4 +854,4 @@ Oleksandr Cherednychenko &  32\\
 \end{table}
 
 % Apply paragraph spacing only for the main report body %
-\setlength{\parskip}{0em}r
+\setlength{\parskip}{0em}
