@@ -10,13 +10,13 @@
 \section{Introduction}
 %Describe the context for the work and the problem you are addressing. Briefly summarise what you achieved in the project.
 
-The goal of the project was to create an urban traffic simulation over the connected road network resembling ones found in real world. Such simulation would allow for inspecting different traffic properties such as vehicle throughput in key points and possible effect of changes in rules or road network topology on these properties. In addition to providing basic inspection functionality, system would be easily extendable with extra, more complex observable properties such as pollution factors.
+The goal of the project was to create an urban traffic simulation over the connected road network resembling ones found in real world. Such simulation would allow inspection of different traffic properties such as vehicle throughput in strategic points and possible effects of altering rules or road network topology. In addition to providing basic inspection functionality, the system would be easily extendable with extra, more complex observable properties such as pollution factors.
 
-Approach to traffic modelling originated as one following cellular automata model, with the map represented as grid consisting of cells maybe occupied by a car. Shortly after initial prototype implementation the requirement for real map data was raised. The cellular automata model was found to be too rough and inflexible inflexible due to fixed cell size. Such model did not pair well with the multitude of forms and combinations found in real maps, so it had to be abandoned in favour of, or rather morphed into, more physical metric model. In this physical model vehicle bears real-life properties such as speed, acceleration, angle and position on the lane, and moves according to laws of mechanics, which uncovers a potential for further detailisation of the physical model. Junctions had inspection properties attached to them, namely vehicle counters, making the software a tool for inspection. Data import from Open Street Map format was added, which allows for interoperability with a vast tooling and data ecosystem already available, as well as convenience in creating a synthetic test examples.
+The project's original approach followed the cellular automata model, with the map represented as grid consisting of cells maybe occupied by a car. Shortly after initial prototype implementation the requirement for real map data was raised. The cellular automata model was found to be lacking flexibility due to fixed cell size. Such model did not pair well with the multitude of forms and combinations found in real maps, so it had to be abandoned in favour of, or rather morphed into, a more physical metric model. In this physical model vehicles bear real-life properties such as speed, acceleration, angle and position on the lane, and move according to laws of physics. The latter uncovers a potential for further model refinement. Certain key map features have inspection properties attached to them, namely vehicle counters, enabling live inspection. Data import from Open Street Map format was added, which allows for interoperability with a vast tooling and data ecosystem already available, as well as the convenience in creating synthetic test examples.
 
-Vehicle behaviour side - driving and reasoning about - received less attention than originally anticipated. At the same time some interesting driving behaviour, such as acceleration and breaking taking road situation into account, turn decisions,  as well as lane changing, was implemented.
+Vehicle behaviour, namely driving and reasoning about the routes, received less attention than originally anticipated. At the same time some interesting driving behaviour, such as acceleration, braking, turning and lane changing, was implemented. Though, vehicles can not be classified as agents, since interface between environment and vehicle is not that well defined, and really cars are only capable of basic reactive behaviour.
 
-A sophisticated user interface has been created, partly to facilitate need for visual inspection of various map data, but also useful for actual simulation runs. Example of main application window is shown in Figure \ref{fig:screenshot}
+A sophisticated user interface has been created, partly to facilitate the need for visual inspection of various data available on the map, but also useful for display of the actual simulation runs (see Figure~\ref{fig:screenshot}).
 
 \begin{figure}[H]
     \vspace{1.5em}
@@ -27,33 +27,18 @@ A sophisticated user interface has been created, partly to facilitate need for v
     \vspace{1.5em}
 \end{figure}
 
-During the course of implementation, accent was shifted from creating complex behavioural models for vehicles such as routing and implementing them as intelligent agents, to a different area of complexity: understanding, representing and displaying real world map data in a format required for traffic simulation. Still, vehicles operate in a rather autonomous ways, but they can not be classified as agents, since interface between environment and vehicle is not that well defined, and really cars are only capable of basic reactive behaviour.
-
 \section{Review}
 %Describe related work.
 
-\subsection{Research scope}
+A wide array of traffic modelling systems have been developed, either using classical software modelling (micro and macro), or with innovative and hybrid approaches (MESO and agent-based) \cite{Hawick2009}. Both categories have their own advantages and disadvantages. In this chapter their strengths and weaknesses will be summarised.
 
-Many different software traffic modelling systems were developed.
-Some of them are using classical software modelling approaches, some of them are based on innovative and hybrid approaches \cite{Hawick2009}.
-Both have advantages and disadvantages.
-In this chapter we will briefly highlight strong and weak sides of that software  and a theory  aspects which they are implementing.
+\subsection{SUMO}
 
+Simulation of Urban Mobility (SUMO) is a popular open-source road traffic simulation software which was implemented using the aspects of microscopic flow behaviour model. The main idea is to simulate complex road networks. Any road network can be modelled in the system through import from various sources\cite{Ismail2012}. SUMO supports simulation of ways, junctions, traffic lights, routes. Options available in SUMO include physical and logical properties of vehicles and traffic distribution based on them. SUMO is an open and well studied software in addition to being implemented in different national projects such as DRIVE C2X, COLOMBO and AMITRAN\cite{TransportResearchattheGermanAerospaceCentre2016}.
 
-\subsubsection{SUMO}
+Although used widely, SUMO is a complex piece of software with a steep learning curve\cite{Ismail2012}.
 
-Simulation of Urban Mobility (SUMO) is a popular open-source road traffic simulation software which was implemented using the aspects of microscopic flow behaviour model.
-The main idea is to simulate complex road networks. Any road network can be represented by importing or creating various sources \cite{Ismail2012}.
-Being a classical microscopic based simulator SUMO supports a simulation of such traffic's parts as ways, junctions, traffic lights, routes.
-Also appropriate demands can be created. Like physical properties of vehicle, logical parameters and vehicle type distribution.
-There are many different options supported by SUMO.
-SUMO is open and well studied software. Also it was implemented in different national projects like DRIVE C2X, COLOMBO and AMITRAN \cite[TransportResearchattheGermanAerospaceCentre2016].
-
-Despite being widely used one of the most significant disadvantages of SUMO is its complexity.
-This requires users to spend more time in order accurately set
-all parameters and understand aspects of micro-simulation more comprehensively \cite{Ismail2012}.
-
-\subsubsection{AIMSUN}
+\subsection{AIMSUN}
 
 AIMSUN is another popular and well studied, but in the same time commercial
 transport simulation software made by Transport Simulation Systems in Spain.
@@ -69,7 +54,7 @@ On of the significant disadvantages of AIMSUN is the longer coding phases which
 requires users to spend more time for coding rather than working with the settings.
 Also, as it was found the usage of 3d modes dramatically affects the performance \cite{Hawick2009}.
 
-\subsubsection{SATURN}
+\subsection{SATURN}
 
 SATURN (Simulation and Assignment of Traffic to Urban Road Networks)- is a macroscopic based traffic simulator created by
 Institute for Transport Studies in University of Leeds. Being popular in Europe and UK the main idea behind SATURN is to simulate public traffic transport in urban areas.
@@ -668,6 +653,7 @@ The idea of Traffic light module contained the following issues.
 \begin{itemize}
 	\item serialization/de-serialization
 \end{itemize}
+
 \subsection{GUI Primitives}
 Initially when we went for a micro  model we dealt with each car individually. Thus to reduce the overhead at the simulator, we planed to make a class with various functions that could be called to make the cars, and the roads, based on the location and other details of the same. This function was initially thought for drawing roads, cars, and trucks. It has an initial problem due to miscommunication, which led to a wrong design start. Upon rectifying out mistakes, we were again met with another problem of design, and implementation. The basic formula of the design was based around the coordinates of the placement of the car, thus it lead to cars being produced of different sizes based on the location on the map. Thus to remove the drawing issue it was decided to go with a picture of the car rather than a drawing, as it was an easier option. The image made a few things easier such as placement and sizing, but added new problems like initial direction of the image, and its background transparency. We had already spent a lot of time in this, and it was not getting to some concrete work. Even then we didn't loose hope and tried to get it working. As time progressed there were other problems with the code that had to be dealt with. The initial coding was very basic, and had to be streamlined and improved upon. This was added to the already existing list of problems to be dealt with. Once the code was streamlined, the next step initially was to make it log all the faliours it occurred while running. Upon this, just to check the performance of the code we ran a small test. The results were not what one would expect. The execution time for each iteration was very high. At this moment of time, the most important thing to be done was reduce the execution time, because with such long execution time the code couldn't be considered. It took us long to improve the execution time, and till then it was too late. While applying this whole concept we lost our way, and recovery was slow, may it be the initial misunderstanding or the latter neglect of the image while trying to reformat the code.
 
