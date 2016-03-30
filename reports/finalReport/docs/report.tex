@@ -644,16 +644,25 @@ In the event that no configuration file is found a default one is created that i
 
 \section{Pending Implementations - to sort out}
 
+We could have improved our program by adding Traffic lights module. The figure below shows the prepared class diagram. All management should have been in traffic light controller class. The rules for changing traffic lifht's states were suppose to be in TrafficLightRule and TrafficLightsSetRule classes.
+
+\begin{figure}[!h]
+	\vspace{1.5em}
+  	\caption{Traffic lights class diagram}
+  	\label{fig:tf_diagram}
+  	\centering
+	\includegraphics[width=0.75\textwidth]{figs/junction/tf_diagram.png}
+  	\vspace{1.5em}
+\end{figure}
+
+The idea of Traffic light module contained the following issues.
+
 \subsection{Traffic Lights}
 \begin{itemize}
-    \item two types of traffic lights: singles and those in one junction set
-    \item all traffic lights work autonomously
-	\item traffic light state: discussion whether traffic light State should be boolean or enum \(everyone wrote his version of boolean traffic lights, different ideas so we have taken Enum\)
-\end{itemize}
-
-\begin{itemize}
-        \item traffic lights rules are basic, they do not change states according to the traffic (not intelligent traffic lights)
-        \item only two states in traffic lights: red and green, we do not have early/late yellow etc.
+    \item Two types of traffic lights: singles and those in one junction set.
+    \item All traffic lights work autonomously.
+    \item Traffic lights in one junction set would have the same ID as Juntion.
+    \item The first idea was to create basic traffic lights rules, that do not change states according to the traffic (not intelligent traffic lights)
 \end{itemize}
      
 \begin{itemize}
@@ -830,12 +839,12 @@ Whole Greater London & 31101 road and 24314 junction, 120672 mapFeatures, 547 ma
 
 As the core design of the project offers a strong basis for further development there are many avenues of improvement opened that could be taken up.
 
-Firstly we could have improved the graphical interface of our program.
+Firstly there was a possibility to improve the graphical interface of our program.
 
 \underline{GUI}
 
 \begin{itemize}
-	\item We might, as our program skirts into a hybrid model, have added visual detailing, i.e. car sprites, road graphics. Some features, while the zoom factor is changed, could have been dynamically removed or added, for instance: when the zoom factor increases beyond a threshold the dots representing the vehicles are changed to sprites matching their descriptions.
+	\item There might, as the program skirts into a hybrid model, be added visual detailing, i.e. car sprites, road graphics. Some features, while the zoom factor is changed, could have been dynamically removed or added, for instance: when the zoom factor increases beyond a threshold the dots representing the vehicles are changed to sprites matching their descriptions.
 	\item There might have been a point/click interface for adding static map objects to the graph via the GUI, for instance: road block, construction work or broken down cars.
 	\item The GUI map editor could have shown easy OSM error corrections or even synthetic map creation.
 \end{itemize}
@@ -845,11 +854,13 @@ The second group of possible improvements are those related to the simulator.
 \underline{Simulator}
 \begin{itemize}
 	\item Complex traffic lights with not only green and red but also early/late yellow states could have been added to the program. We thought also about intelligent traffic lights depended on the amounts of the cars that are waiting at a junction.
-	\item We set a number of cars that are produced for the simulation purpose (currently 500), but in general we could have improved it by creating a vehicle generator that depends on the map size.
+	\item There is a set  number of cars that are produced for the simulation purpose (currently 500), but in general we could have improved it by creating a vehicle generator that depends on the map size.
 	\item There is also a possibility of vehicles specification based on real-life data.
 	\item Another project enlargement could have contained capability for adding third party development of behaviour and metric recorders. Components in that case would be added easily.
 	\item If we had had more time we would have even created a pollution profiler with a visualised heat map. Such a map would be based on the vehicle specifications and numbers.
 \end{itemize}
+
+We could have also developed additional options.
 
 \underline{Miscellaneous}
 \begin{itemize}
@@ -857,10 +868,12 @@ The second group of possible improvements are those related to the simulator.
 	\item The Simulation recorder, on the simulator side, might have saved large simulations to external files and a have played them on the GUI side.
 \end{itemize}
 
+There could have been improvement in the logger.
+
 \underline{Logger}
 \begin{itemize}
-	\item Coloured terminal output callable from the GUI
-	\item Custom log message filters (based on origin, granular individual log level control)
+	\item Logger might have coloured the output callable from the GUI.
+	\item Logger's messages might have been filtered, basing on the message's origin or granular individual log level control.
 \end{itemize}
 
 \section{Peer Assessment}
