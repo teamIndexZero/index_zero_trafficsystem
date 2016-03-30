@@ -107,12 +107,19 @@ Actual implemented features are listed in Table \ref{table:functionalities} in S
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Technology and libraries}
-\begin{itemize}
-    \item Java SE 1.8
-    \item most of the actual simulation and drawing code is written manually
-    \item libraries used: main code: Java standard library \(rt.jar\), testing code: jUnit, Mockito, Fest-assert. Own logger used.
-    \item OSM for the import map data
-\end{itemize}
+
+Java Standard Edition version 1.8 has been chosen as an implementation platform, since Java is a language more or less familiar to all team members. At the same time it provides Graphical User Interface framework and an excellent tooling support. Gradle\footnote{Gradle is a modern build system for Java in tight integration with Groovy http://gradle.org} was used as build system to automate builds on Travis continuous integration server and also to produce various artefacts.
+
+There were no external libraries used for the actual application code, except for Java standard runtime library rt.jar.
+
+In order to enable more convenient testing, following libraries were used:
+\begin{enumerate}
+    \item Junit 4 as an actual test runner
+    \item Mockito\footnote{https://code.google.com/archive/p/mockito/} - easy mocks in java. Enables nicer separation of concepts and fluent invocation verification patterns
+    \item Fest assertions\footnote{https://github.com/alexruiz/fest-assert-2.x/wiki/One-minute-starting-guide} - library enabling writing comprehensive and convenient assertions.
+\end{enumerate}
+
+Build system using Gradle was plugged in to automate builds and various artefact production. In order to work with OpenStreetMap files, appropriate standard OSM tools were used (namely, JOSM and osmosis), as detailed below in the report.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Alex part
