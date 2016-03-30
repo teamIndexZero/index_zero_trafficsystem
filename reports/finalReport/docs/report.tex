@@ -396,7 +396,7 @@ Since the data set may be quite big, some optimizations were introduced to impro
             // Actual drawing code.
     \end{lstlisting}
 
-    \item Caching the static objects image (roads, lanes, junctions etc.) into another in-memory image and only re-drawing it when the viewport parameters such as zoom or scale, or visualisation parametrs change. The invalidation check is performed with the custom hash function taking model and viewport model as arguments. Listing below provides a pseudo-code for lazy static objects draw optimization:
+    \item Caching the static objects image (roads, lanes, junctions etc.) into another in-memory image and only re-drawing it when the viewport parameters such as zoom or scale, or visualisation parameters change. The invalidation check is performed with the custom hash function taking model and viewport model as arguments. Listing below provides a pseudo-code for lazy static objects draw optimization:
     \begin{lstlisting}[language=java]
         // ... checking if the viewport has changed somehow:
         if (lastViewportHashcode != model.getViewHashCode()) {
@@ -410,7 +410,7 @@ Since the data set may be quite big, some optimizations were introduced to impro
         // regardless of change, stamp over the cached image of roads onto resulting image
         graphics.drawImage(roadsImage, 0, 0, null);
     \end{lstlisting}
-    \item Extensive caching of smaller helper object (java.awt.Stroke, java.awt.Color). Since most of the drawing is using line widhts dependent on the zoom level, it is beneficial to store static objects such as colors and stroke styles in caching maps for future re-use.
+    \item Extensive caching of smaller helper object (java.awt.Stroke, java.awt.Color). Since most of the drawing is using line widths dependent on the zoom level, it is beneficial to store static objects such as colors and stroke styles in caching maps for future re-use.
     \begin{lstlisting}[language=java]
         private Stroke getStrokeByWidthPixels(int width) {
             if (!strokeCache.containsKey(width)) {
@@ -452,7 +452,7 @@ There are two types of vehicles introduced to the system: passenger cars and tru
 
 Vehicles move within and along the lane. Since lane is represented with the polyline, having certain width, vehicle can easily place itself within the one-dimensional coordinate space, the only coordinate being the distance along the polyline from its start. In such a coordinate system, movement looks like a movement along the straight line, and the polyline determines actual change in bearing and meters offset coordinate system.
 
-There might be cases when the vehicle may want to change lane. For example, consider slower truck moving ahead of faster passenger car. As soon as car reaches certain distance to the truck, it might want to change the lane to adjacent one in order to continue moving with higher speed. Vehicles maintain a certain distance to next object which is dependant on speed. All three stages of lane changing are displayed in Figure \ref{fig:carKeepingDistance}. Vehicle color hue depends on the speed, and circle with the bearing vector in it represents the car movement direction and distance to keep to next one.
+There might be cases when the vehicle may want to change lane. For example, consider slower truck moving ahead of faster passenger car. As soon as car reaches certain distance to the truck, it might want to change the lane to adjacent one in order to continue moving with higher speed. Vehicles maintain a certain distance to next object which is dependent on speed. All three stages of lane changing are displayed in Figure \ref{fig:carKeepingDistance}. Vehicle color hue depends on the speed, and circle with the bearing vector in it represents the car movement direction and distance to keep to next one.
 \begin{figure}[!h]
     \caption{Car changing lane}
     \label{fig:carKeepingDistance}
@@ -490,7 +490,7 @@ Figure \ref{fig:forwardOrTurnOption} displays the forward and turn sectors for t
     \includegraphics[width=0.4\textwidth]{figs/junction/junction_car_incoming_angle_with_turn_sectors.png}
 \end{figure}
 
-In real mapping data junctions can take various forms. Figure \ref{fig:junctionTypes} displays two commonly found types of junctions: a simple connection of two roads, which is quite possible one road split by a traffic light and pedestrian crossing, and more complex jucntion having 5 streets connected to it. Using the method specified above, car can conveniently move across this junction, either moving forward or attempting a turn in any of the allowed directions.
+In real mapping data junctions can take various forms. Figure \ref{fig:junctionTypes} displays two commonly found types of junctions: a simple connection of two roads, which is quite possible one road split by a traffic light and pedestrian crossing, and more complex junction having 5 streets connected to it. Using the method specified above, car can conveniently move across this junction, either moving forward or attempting a turn in any of the allowed directions.
 
 Within this model, roundabout is established as a set of short one-way connected roads forming a circular structure. Right image in Figure \ref{fig:junctionTypes} shows a typical roundabout, with the road debug display setting enabled, where each individual lane is painted with new color in round-robin manner. One can clearly see where and how the roads connect.
 
