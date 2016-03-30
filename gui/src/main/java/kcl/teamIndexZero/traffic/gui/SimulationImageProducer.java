@@ -131,6 +131,7 @@ public class SimulationImageProducer {
         if (imageConsumer == null) {
             LOG.log_Fatal("Image consumer not present. Can not draw.");
         } else {
+            model.setImage(image);
             imageConsumer.accept(image);
         }
     }
@@ -536,7 +537,7 @@ public class SimulationImageProducer {
             int startX = model.getViewport().convertXMetersToPixels(point.xMeters);
             int startY = model.getViewport().convertYMetersToPixels(point.yMeters);
 
-            String angleDetails = String.format("%.1f˚", Math.toDegrees(bearing));
+            String angleDetails = String.format("%.1f\u0176", Math.toDegrees(bearing));
             graphics.setStroke(getStrokeByWidthPixels(strokeWidth));
             graphics.setColor(color);
 
