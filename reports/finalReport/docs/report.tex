@@ -354,14 +354,15 @@ The most obvious way to deal with this would be to detect roundabouts at the pos
 % Alex part
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Map visualisation}
-As soon as map is constructed, a representation of the road network graph which acts as a base for simulation is placed in memory. Roads, consisting of lanes, connect up to junctions, roads and lanes have polylines. All the coordinates in simulation space are provided in meters offset Cartesian coordinates - that is, horizontal and vertical meters offset from (0,0) bottom left point, as outlined in Figure \ref{fig:coordinateConversions}.
+\subsection{Map Visualisation}
+As soon as the map is constructed, a representation of the road network graph which acts as a base for the simulation is placed in memory. Roads, consisting of lanes, connect up to junctions. Roads and lanes have polylines. All the coordinates in the simulation space are provided in meters offset Cartesian coordinates - that is, horizontal and vertical meters offset from (0,0) bottom left point, as outlined in Figure \ref{fig:coordinateConversions}.
 
 In order for these objects to be visualized, their coordinates in simulation space need to be transformed to the on-screen coordinates. Java graphics API uses pixel coordinates, with origin point being top-left, and vertical axis pointing down.
 
-In addition to that, user is provided with comprehensive tools to control the view-port: zoom in and out with mouse scroll and pan with mouse drag gestures. These gestures control offset point and scale factor of the meters to screen coordinate conversion function. In addition to being natural, such coordinate system separation (meters offset in simulation and pixels in view), allow to inspect the details of the simulation even when it is paused, while also providing an ability to see overall picture.
+In addition to that, user is provided with comprehensive tools to control the view-port: zoom in and out with mouse scroll and pan with mouse drag gestures. These gestures control offset point and scale factor of the meters to screen coordinate conversion function. In addition to being natural, such coordinate system separation (meters offset in simulation and pixels in view), allow to inspect the details of the simulation even when it is paused, while also providing an ability to see the overall picture.
 
-Whilst being useful to a user, such conversion poses not only technical, but also design challenges. Since the primary interest is on vehicles and UI supports different scale, there was a need to come up with design decision to allow car inspection on different zoom levels. When the zoom level allows for rather detailed drawing of vehicles, they are representing in their bounding rectangles. When user zooms out too far, cars collapse to dots to make the overall road network visually readable. Figure \ref{fig:mapZoomOptions} has both options on display.
+Whilst being useful to a user, such conversion poses not only technical, but also, design challenges. Since the primary interest is on vehicles and UI supports different scale, there was a need to come up with design decision to allow car inspection on different zoom levels. When the zoom level allows for detailed drawing of vehicles, they are representing in their bounding rectangles. When user zooms out too far, cars collapse to dots to make the overall road network visually readable. Figure \ref{fig:mapZoomOptions} shows both options.
+
 \begin{figure}[!h]
     \vspace{1.5em}
     \caption{Map zoom options}
@@ -373,8 +374,7 @@ Whilst being useful to a user, such conversion poses not only technical, but als
     \vspace{1.5em}
 \end{figure}
 
-
-In addition to display functionality, the map provides interactive feedback. When the vehicles are visible, clicking it would select the vehicle both in inspection pane and on-map. When junctions are visible, clicking on a particular junction would reveal its incoming and outgoing road angles. While helpful for an inspection of map particularities, this feature was extremely useful for debugging vehicle movement code. Such interlinked functionality between multiple representations (vehicle list and the map panel, map feature list and map panel and vice versa) is possible due to implementation of Model-View-Controller design pattern in the UI section. Figure \ref{fig:guiMVC} displays class diagram for GUI module of the traffic simulation system.
+In addition to display functionality, the map provides interactive feedback. When the vehicles are visible, clicking one would select the vehicle both in inspection pane and on-map. When junctions are visible, clicking on a particular junction reveals its incoming and outgoing road angles. Whilst helpful for an inspection of map particularities, this feature was far more useful for debugging vehicle movement code. Such interlinked functionality between multiple representations (vehicle list and the map panel, map feature list and map panel and vice versa) is possible due to the implementation of the Model-View-Controller design pattern in the UI section. Figure \ref{fig:guiMVC} displays the class diagram for the GUI module of the traffic simulation system.
 
 \begin{figure}[h]
     \vspace{1.5em}
@@ -385,16 +385,16 @@ In addition to display functionality, the map provides interactive feedback. Whe
     \vspace{1.5em}
 \end{figure}
 
-\subsubsection{Optimizations}
+\subsubsection{Optimisations}
 For the simulation to run smoothly from the visual standpoint, it needs to update frames often. The overall user experience is affected by two bulky processes:
 \begin{itemize}
-    \item Simulation. Happens in meters offset coordinate space, this is the where the logic of the simulation happens - vehicles move along the lanes, make and implement decisions of changing lanes, accelerating and decelerating. Simulation happens in a separate background thread, as soon as one time-step of simulation is completed, simulator invokes GuiModel's callback method, which leads to the model change event to be sent to all subscribed listeners. The event is posted on the UI thread.
-    \item Visualisation. When the change event is received in MapPanel, it does the job of drawing the actual simulation objects on screen, applying the coordinate conversion throughout. Visualisation happens on UI thread. Actual drawing is performed not on a panel, but on an in-memory image, which allows for future extraction of visualisation code to another thread as well.
+    \item Simulation: happens in meters offset coordinate space where the logic of the simulation executes - vehicles move along the lanes, make and implement decisions of changing lanes, accelerating and decelerating. The simulation happens in a separate background thread; as soon as one time-step of simulation is completed, the simulator invokes the GuiModel's callback method, which leads to the model change event to be sent to all subscribed listeners. The event is posted on the UI thread.
+    \item Visualisation: When the change event is received in MapPanel, it does the job of drawing the actual simulation objects on screen, applying the coordinate conversion throughout. Visualisation happens on UI thread. Actual drawing is performed not on a panel, but on an in-memory image, which allows for future extraction of visualisation code to another thread as well.
 \end{itemize}
 
-Since the data set may be quite big, some optimizations were introduced to improve overall experience:
+Since the data set may be quite big, some optimisations were introduced to improve overall experience:
 \begin{itemize}
-    \item Limiting frame rate. There is no practical point drawing the image more often than user can normally understand, so the extra unneeded requests for draw are simply omitted:
+    \item Limiting frame rate: there is no practical point drawing the image more often than user can normally understand, so the extra unneeded requests for draw are simply omitted:
     \begin{lstlisting}[language=java]
         public void redraw() {
             if (System.currentTimeMillis() - lastDrawnTimestamp < 1000 / MAX_FRAME_RATE) {
@@ -429,8 +429,6 @@ Since the data set may be quite big, some optimizations were introduced to impro
             return strokeCache.get(width);
         }
     \end{lstlisting}
-
-
 \end{itemize}
 
 
@@ -438,11 +436,11 @@ Since the data set may be quite big, some optimizations were introduced to impro
 % Alex part
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Traffic simulation}
+\subsection{Traffic Simulation}
 Actual traffic simulation requires an already completed and linked simulation map: an in-memory data graph data structure consisting of different map features, such as roads, junctions or traffic generators. Simulation has certain parameters, such as duration of single simulation step (tick), total number of ticks to run and simulation time start. Notion of simulated time is maintained - in addition to discrete tick number, each moment of time contains a simulated time stamp. This may be required in future for more complex behaviour, such as changing environment perception parameters according to the time of the day, or profiling the traffic load to the real-like commute patterns.
 
-\subsubsection{Simulation loop and time}
-Simulation is performed in discrete steps. On each simulation steps a simulation timestamp (tick) object is created and passed down to all the interested listeners, which need to implement ISimulationAware interface. Each of them does what is needed on that level. For example, traffic lights might change their state basing on a tick, cars may change their speed, position and acceleration, traffic generators may insert the new cars onto connected outflow lanes.
+\subsubsection{Simulation Loop and Time}
+Simulation is performed in discrete steps. On each simulation steps a simulation timestamp (tick) object is created and passed down to all the interested listeners, which need to implement the <ISimulationAware> interface. Each of them does what is needed on that level. For example, traffic lights might change their state basing on a tick, cars may change their speed, position and acceleration and traffic generators may insert the new cars onto connected outflow lanes.
 
 \begin{figure}[h]
     \vspace{1.5em}
@@ -453,17 +451,18 @@ Simulation is performed in discrete steps. On each simulation steps a simulation
     \vspace{1.5em}
 \end{figure}
 
-Since the Simulator has control over what are the parameters ticks are created with, it is possible to control time granularity or speed. At the same time such approach causes some limitations: as such, if the tick duration is too long, for example, traffic lights might be able to update.
+Since the Simulator has control over what are the parameters ticks are created with, it is possible to control time granularity or speed. At the same time such approach causes some limitations: for example, if the tick duration is too long, traffic lights might not be able to update.
 Diagram in Figure \ref{fig:simulationClassDiagram} details main classes forming structure for the actual movement simulation.
 
-\subsubsection{Movement within the single road}
+\subsubsection{Movement within the Single Road}
 Vehicles are modelled using different physical parameters. At each simulation time moment, vehicle can have certain speed and acceleration values. Using the speed and tick duration, vehicle can determine its next position along the lane, and move there. Using the acceleration, same process is applied to the speed value. Vehicle determines what to do, depending on current road conditions it is in. For example, if it approaches a crossing, it needs to slow down.
 
-There are two types of vehicles introduced to the system: passenger cars and trucks. They share different initialization parameters: trucks are bigger in metric sizes, slower, having way lower maximum acceleration and lower maximum speed than passenger cars.
+There are two types of vehicles introduced to the system: passenger cars and trucks. They share different initialization parameters: trucks are bigger in metric dimensions, slower, having way lower maximum acceleration and lower maximum speed than passenger cars.
 
-Vehicles move within and along the lane. Since lane is represented with the polyline, having certain width, vehicle can easily place itself within the one-dimensional coordinate space, the only coordinate being the distance along the polyline from its start. In such a coordinate system, movement looks like a movement along the straight line, and the polyline determines actual change in bearing and meters offset coordinate system.
+Vehicles move within and along the lane. Since lanes are represented with polylines having width, vehicle can easily place itself within the one-dimensional coordinate space, the only coordinate being the distance along the polyline from its start. In such a coordinate system, movement looks like a movement along the straight line, and the polyline determines actual change in bearing and meters offset coordinate system.
 
-There might be cases when the vehicle may want to change lane. For example, consider slower truck moving ahead of faster passenger car. As soon as car reaches certain distance to the truck, it might want to change the lane to adjacent one in order to continue moving with higher speed. Vehicles maintain a certain distance to next object which is dependent on speed. All three stages of lane changing are displayed in Figure \ref{fig:carKeepingDistance}. Vehicle color hue depends on the speed, and circle with the bearing vector in it represents the car movement direction and distance to keep to next one.
+There might be cases when the vehicle may want to change lane. For example; consider slower truck moving ahead of faster passenger car. As soon as car reaches certain distance to the truck, it might want to change the lane to adjacent one in order to continue moving with higher speed. Vehicles maintain a certain distance to next object which is dependent on speed. All three stages of lane changing are displayed in Figure \ref{fig:carKeepingDistance}. Vehicle color hue depends on the speed and circle with the bearing vector in it represents the car movement direction and distance to keep to next one.
+
 \begin{figure}[!h]
     \vspace{1.5em}
     \caption{Car changing lane}
@@ -477,7 +476,7 @@ There might be cases when the vehicle may want to change lane. For example, cons
     \vspace{1.5em}
 \end{figure}
 
-Definitely, it is not always the case that changing lane is possible. For example, there may be no adjacent lane, or both the adjacent lanes are buys. Following is the process of lane changing represented as decision flow:
+It is not always the case that changing lane is possible. For example, there may be no adjacent lane, or both the adjacent lanes are busy. Following is the process of lane changing represented as decision flow:
 \begin{enumerate}
     \item If there is vehicle (any part of it) in current lane within distance to keep,
     \item Check if there is a lane to the inner side of the road. If it exists, and it is free for distance to keep in front and back, change there.
@@ -485,12 +484,12 @@ Definitely, it is not always the case that changing lane is possible. For exampl
     \item If that did not succeed, decelerate.
 \end{enumerate}
 
-Depending on the data obtained from the OSM file, roads can be one-way roads or bi-directional roads. As a pleasant bonus the software is mostly capable of working with both the right hand side movement and left hand side. The direction of the road is established by sequence of the nodes in polyline. One way roads then become a collection of lanes running in that way. For the two-way roads, the opposite set of lanes is created.
+Depending on the data obtained from the OSM file, roads can be one-way roads or bi-directional roads. As a pleasant bonus the software is mostly capable of working with both right hand and left hand drive (UK/EU...). The direction of the road is established by the sequence of the nodes in the polyline. One way roads then become a collection of lanes running in that way. For the two-way roads, the opposite set of lanes is created too.
 
-\subsubsection{Movement in junction}
-In the current implementation of traffic simulator, junction is purely logical: it is a point where multiple roads having some lanes connect. When a car reaches this point, it can take a decision (within certain limits) what next lane to switch to. All possible paths are pre-computed using the graph tool in the graph construction phase. At the same time, vehicle can, and should have certain specifics and limitations as to what are the possible actions. Consider a kerb to kerb turn radius: a minimal U-turn possible for a Mini Cooper is hard to imagine for 6-axis truck.
+\subsubsection{Movement in Junction}
+In the current implementation of traffic simulator, junction is purely logical: it is a point where multiple roads having some lanes connect. When a car reaches this point, it can take a decision (within certain limits) what next lane to switch to. All possible paths are pre-computed using the graph tool in the graph construction phase. At the same time, vehicles can, and should have certain specifics and limitations as to what are the possible actions. Consider a kerb to kerb turn radius: a minimal U-turn possible for a Mini Cooper is hard to imagine for 6-axis truck.
 
-When reaching a junction, vehicle needs to decide first what is the plan\footnote{Actual decision process is implemented with weighted random selection, with some preference given to 'move straight' mode. This is the good place to introduce route planning and traffic profiling}. There are two options possible: vehicle wants to carry on in roughly the same direction, or it wants to turn. In real life data, the 'same direction' does not necessarily mean same bearing of the adjacent road segments, sometimes these may be considerably different. In order to attack this problem, an empirical rule was established, which classifies all available junction proceedings whose angle between incoming and outgoing vector is less than 30\degspc  as 'moving straight', and ones with angle between 100\degspc  and 30\degspc as turns. Everything requiring turn with an angle larger than 110\degspc is considered a prohibited turn. As a result, U-turns are not allowed in simulation.
+When reaching a junction, vehicle needs to decide first what is the plan\footnote{Actual decision process is implemented with weighted random selection, with some preference given to 'move straight' mode. This is the good place to introduce route planning and traffic profiling}. There are two options possible: the vehicle wants to carry on in roughly the same direction, or it wants to turn. In real life data, the 'same direction' does not necessarily mean same bearing of the adjacent road segments, sometimes these may be considerably different. In order to attack this problem, an empirical rule was established which classifies all available junction proceedings whose angle between incoming and outgoing vector is less than 30\degspc  as 'moving straight', and ones with angle between 100\degspc  and 30\degspc as turns. Everything requiring turn with an angle larger than 110\degspc is considered a prohibited turn. As a result, U-turns are not allowed in simulation.
 
 Upon switching to the new lane, car continues to move along it in the same mode as described in previous section.
 
