@@ -1,0 +1,13 @@
+This is the distribution of Team_Index_Zero Traffic Simulation system.
+
+Java SE v. 1.8+ is required to run this software. No explicit installation procedure is required. Just unpack the gui.tar.gz
+ file and run one of the wrapper shell scripts from bin folder.
+ You can download Oracle Java from http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+
+Directory structure:
+
+  * bin contains shell scripts to run the simulation software. Please run either ./gui on Linux/Mac or gui.bat from
+    within bin folder to start main application.
+  * lib contains actual compiled and packaged java files.
+
+You can obtain full source code and history of the project on https://github.com/teamIndexZero/index_zero_trafficsystem

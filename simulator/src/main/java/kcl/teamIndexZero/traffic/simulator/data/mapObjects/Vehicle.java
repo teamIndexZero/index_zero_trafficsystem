@@ -136,7 +136,7 @@ public class Vehicle extends MapObject {
 
     @Override
     public String getNameAndRoad() {
-        return super.getNameAndRoad() + String.format(" %.1f˚", Math.toDegrees(getBearing()));
+        return super.getNameAndRoad() + String.format(" %.1f\u00b0", Math.toDegrees(getBearing()));
     }
 
     /**

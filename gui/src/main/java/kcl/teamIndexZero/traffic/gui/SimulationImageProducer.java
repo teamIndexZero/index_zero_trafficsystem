@@ -536,7 +536,7 @@ public class SimulationImageProducer {
             int startX = model.getViewport().convertXMetersToPixels(point.xMeters);
             int startY = model.getViewport().convertYMetersToPixels(point.yMeters);
 
-            String angleDetails = String.format("%.1f˚", Math.toDegrees(bearing));
+            String angleDetails = String.format("%.1f\u00b0", Math.toDegrees(bearing));
             graphics.setStroke(getStrokeByWidthPixels(strokeWidth));
             graphics.setColor(color);
 

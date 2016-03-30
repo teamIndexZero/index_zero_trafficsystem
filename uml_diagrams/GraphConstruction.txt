@@ -1,0 +1,29 @@
+@startuml
+start
+if( Are there roadDescription(s)? ) then (yes)
+	:Start graph creation;
+	while( unprocessed Road descriptions? )
+		:Create a '__Road__' feature based on description;
+		:Add created __Road__ and its Lanes in the list of features;
+	endwhile
+	if( Are there junctionDescription(s)? ) then (yes)
+		while( unprocessed Junction descriptions? )
+			:Create a '__Junction__' feature;
+			:Connect the __Road__(s) from the description to the __Junction__;
+			if( only Inbound lanes to the Junction OR all inbound lanes except from one road ) then (yes)
+				:Create a '__TrafficGenerator__' feature;
+				:Link the __Junction__ to the __TrafficGenerator__;
+			else (no)
+			endif
+			:Compute all the possible paths for each of the lanes through the __Junction__;
+			:Add the created __Junction__ to the list of features;
+		endwhile
+	else ( no )
+	endif
+	:Add __TrafficGenerator__(s) to dangling links on the map;
+	:Add all __TrafficGenerator__(s) to the list of features;
+	end
+else (no)
+	:throw exception;
+	end
+@enduml

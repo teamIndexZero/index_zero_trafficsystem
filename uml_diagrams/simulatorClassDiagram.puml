@@ -26,8 +26,7 @@ class SimulationTick {
 SimulationTick <-- Simulator:creates and sends to \nall 'Tick Aware' objects
 
 
-note right of Map: 'see' is the vision \n of the moving objects (vehicles)
-class Map {
+class SimulationMap {
 +tick(time:Time)
 +addObject(MapObject, Position)
 +removeObject(MapObject)
@@ -35,7 +34,12 @@ class Map {
 -mapObjectCollection:Collection<MapObject>
 }
 
-Map --|> ISimulationAware
+SimulationMap --|> ISimulationAware
+
+
+MapObject --|> ISimulationAware
+SimulationMap "1" o--> "*" Feature
+SimulationMap "1" o--> "*" MapObject
 
 interface MapObject {
 +tick(time:Time)
@@ -43,51 +47,36 @@ interface MapObject {
 +setMap(Map)
 }
 
-MapObject --|> ISimulationAware
-Map "1" o--> "*" MapObject
-
 class Vehicle {
 +tick(time:Time)
-+getPosition():Position
-+setMap(Map)
--weightKilos: float
--position: Position
--map
 -speed
 -acceleration
--direction
--driverSpec:DriverStrategy
--route:MapRoute
+-lane
 }
 
-MapObject <|-- Vehicle
-
-class Obstacle {
-+tick(time:Time) //noop for now!
-+getPosition():Position
-+setMap(Map)
--map:Map
--position:Position
+class Feature {
++tick(time:Time)
 }
 
-MapObject <|-- Obstacle
-
-class CarAdder {
+class Road {
+    -lanes[]
+    +tick()
 }
 
-class CarRemover {
+class TrafficGenerator {
+    +tick()
 }
 
-class ImageProducer {
-}
+Vehicle --|> MapObject
+Feature <|-- Road
+Feature <|-left- TrafficGenerator
+
 
 class SimulationDelay {
- }
++tick()
+}
 
-ISimulationAware <|-left-CarAdder
-ISimulationAware <|--CarRemover
 ISimulationAware <|--SimulationDelay
-ISimulationAware <|--ImageProducer
-
+Feature --|> ISimulationAware
 
 @enduml

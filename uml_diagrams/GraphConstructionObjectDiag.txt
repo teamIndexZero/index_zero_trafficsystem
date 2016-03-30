@@ -1,0 +1,48 @@
+@startuml
+package "kcl.teamIndexZero.traffic.simulator.data" #FFFFFF {
+	object GraphConstructor
+	object GraphTools
+	object SimulationMap
+	
+	package "kcl.teamIndexZero.traffic.simulator.data.descriptors" #DDDDDD {
+		object JunctionDescription
+		object RoadDescription
+	}
+	package "kcl.teamIndexZero.traffic.simulator.data.features" #DDDDDD {
+		object Feature
+		object Road
+		object DirectedLanes
+		object Lane
+		object TrafficGenerator
+	}
+	package "kcl.teamIndexZero.traffic.simulator.data.links" #DDDDDD {
+		object Link
+		object JunctionLink
+	}
+	package "kcl.teamIndexZero.traffic.simulator.data.trafficBehaviour" #DDDDDD {
+		object TrafficBehaviour
+	}
+	GraphConstructor *-- GraphTools
+	GraphConstructor --> JunctionDescription
+	GraphConstructor --> RoadDescription
+	GraphConstructor *-- Feature
+	GraphConstructor *-- Road
+	GraphConstructor *-- DirectedLanes
+	GraphConstructor *-- Lane
+	GraphConstructor *-- TrafficGenerator
+	GraphConstructor *-- Link
+	GraphConstructor *-- JunctionLink
+	GraphConstructor *-- TrafficBehaviour
+	
+	SimulationMap o-- GraphConstructor
+	SimulationMap o-- Feature
+	SimulationMap o-- Road
+	SimulationMap o-- DirectedLanes
+	SimulationMap o-- Lane
+	SimulationMap o-- TrafficGenerator
+	SimulationMap o-- Link
+	SimulationMap o-- JunctionLink
+	SimulationMap o-- TrafficBehaviour
+	
+}
+@enduml

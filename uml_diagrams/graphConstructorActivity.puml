@@ -1,0 +1,15 @@
+@startuml
+partition "Graph Construction" {
+(*) --> [Result is passed to Graph Constructor]Roads are created
+-> Lanes are created
+--> Junctions are created
+-left-> Lanes are linked to junctions
+--> Junctions calculate possible inflow/outflow paths for all lanes
+-> Traffic Generators are linked in terminus areas (ends). \nSame traffic generators are acting as traffic receivers, \ncollecting cars going out of screen.
+--> Graph integrity check is performed.
+-left-> Graph is ready - we can traverse via nodes (features) \nand edges (links). Road is a feature, jucntion is a feature, \nTrafficGenerator is a feature.\nBeyond this point there is no *Description objects, only \nreal graph objects which are used for simulation.
+}
+--> (*)
+
+
+@enduml

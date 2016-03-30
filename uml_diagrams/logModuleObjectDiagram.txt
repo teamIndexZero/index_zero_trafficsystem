@@ -1,0 +1,52 @@
+@startuml
+package "kcl.teamIndexZero.traffic.log" #FFFFFF {
+	object Logger_Interface
+	object Logger
+	object Log_Engine
+	object Log_Config
+	object Log_TimeStamp
+	
+	Logger --|> Logger_Interface
+	Log_TimeStamp --o Logger
+	Log_Engine --o Logger
+	Log_Config --* Log_Engine
+	
+	package "kcl.teamIndexZero.traffic.log.outputs" #DDDDDD {
+		object Formatter_Interface
+		object Formatter_TERM
+		object Formatter_TXT
+		object Formatter_CSV
+		object Output
+		object Output_TERM
+		object Output_TXT
+		object Output_CSV
+
+		Formatter_TERM --|> Formatter_Interface
+		Formatter_TXT --|> Formatter_Interface
+		Formatter_CSV --|> Formatter_Interface
+		Log_TimeStamp --o Formatter_TERM
+		Log_TimeStamp --o Formatter_TXT
+		Log_TimeStamp --o Formatter_CSV
+		Output --* Log_Engine
+		Output <|-- Output_TERM
+		Output <|-- Output_TXT
+		Output <|-- Output_CSV
+		Output_TERM *-- Formatter_TERM
+		Output_TXT *-- Formatter_TXT
+		Output_CSV *-- Formatter_CSV
+	}
+	
+	package "kcl.teamIndexZero.traffic.log.fileIO" #DDDDDD {
+		object FileIO
+		object FileInput
+		object FileOutput
+		
+		FileIO <|-- FileOutput
+		FileIO <|-- FileInput
+	}
+	
+	FileOutput --* Output
+	FileInput --* Log_Config
+}
+
+@enduml

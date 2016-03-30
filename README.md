@@ -3,6 +3,10 @@
 Traffic management system group project by Team Index Zero
 Created by KCL students as a part of group project 2016
 
+## Packaging delivery artifact as .tar.gz
+
+Execute `./gradlew clean javadoc assemble`. You can get the build artifact in `gui/build/distributions` as .zip and .tar.gz file
+
 ## Building and running
 
 **Prerequisites and Building** you need to have JDK >= 1.8 prior to running and building, and `JAVA_HOME` environment variable set.

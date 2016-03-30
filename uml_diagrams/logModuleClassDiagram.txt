@@ -1,0 +1,238 @@
+@startuml
+
+package "kcl.teamIndexZero.traffic.log" #FFFFFF {
+	Logger --|> Logger_Interface
+	Log_Levels <-- Logger
+	Log_TimeStamp --o Logger
+	Log_Engine --o Logger
+	Log_Config --* Log_Engine
+	
+	interface Logger_Interface <<interface>> {
+		{abstract} log( objects : Object... )
+		{abstract} log_Fatal( objects : Object... )
+		{abstract} log_Error( objects : Object... )
+		{abstract} log_Warning( objects : Object... )
+		{abstract} log_Debug( objects : Object... )
+		{abstract} log_Trace( objects : Object... )
+		{abstract} log_Exception( e : Exception )
+	}
+
+	class Logger {
+		-String calling_instance_name
+		-Log_Engine log_engine
+		-{static} Map<String, Logger> loggers
+		-Logger( instance_name : String )
+		+{static} getLoggerInstance( instance_name : String ) : Logger
+		+log( objects : Object... )
+		+log_Fatal( objects : Object... )
+		+log_Error( objects : Object... )
+		+log_Warning( objects : Object... )
+		+log_Debug( objects : Object... )
+		+log_Trace( objects : Object... )
+		+log_Exception( e : Exception )
+	}
+
+	class Log_Engine <<singleton>> {
+		-{static} Log_Engine instance
+		-Log_Config global_config
+		-Long session_msg_number
+		+Log_Engine( config : Log_Config )
+		+{static} getInstance() : Log_Engine
+		+{static} load( locator : Log_Engine )
+		#processLogMsg( time_stamp : Log_TimeStamp, level : int, class_origin : String, objects : Object... )
+		#processException( time_stamp : Log_TimeStamp, class_origin : String, e : Exception )
+	}
+
+	class Log_Config {
+		-String global_file_name
+		-int global_log_level
+		-boolean log_exception_flag
+		-Vector<Output> outputs
+		-String config_file_name
+		-Log_TimeStamp ts
+		+Log_Config()
+		+getGlobalLogLevel : int
+		+getLogExceptionFlag() : boolean
+		#getOutputs() : Vector<Output>
+		-setGlobalLogLevel( level : int )
+		-loadConfiguration( file_name : String ) : boolean
+		-applyConfigurationLine( line : String ) : boolean
+		-applyDefaultConfiguration()
+		-writeDefaultsToFile() : boolean
+	}
+
+	class Log_Levels <<static>> {
+		-Log_Levels()
+		+{static} int OFF = 0
+		+{static} int FATAL = 1
+		+{static} int ERROR = 2
+		+{static} int WARNING = 3
+		+{static} int MSG = 4
+		+{static} int DEBUG = 5
+		+{static} int TRACE = 6
+		+{static} String[] txtLevels
+		+{static} String[] csvLevels
+	}
+
+	class Log_TimeStamp {
+		-LocalDateTime now
+		+Log_TimeStamp()
+		+Log_TimeStamp( now : LocalDateTime )
+		+getDate() : String
+		+getTime() : String
+		+getCustomStamp( formatter : String ) : String
+		+toString() : String
+	}
+
+	package "kcl.teamIndexZero.traffic.log.outputs" #DDDDDD {
+		interface Formatter_Interface <<interface>> {
+			format( origin_name : String, log_level : int, log_number : Long, time_stamp : Log_TimeStamp, objects : Object... ) : String
+			format( origin_name : String, time_stamp : Log_TimeStamp, log_number : Long, e : Exception ) : String
+		}
+
+		class Formatter_TERM {
+			#Formatter_TERM()
+			+format( origin_name String, log_level : int, log_number : Long, time_stamp : Log_TimeStamp, objects : Object... ) : String
+			+format( origin_name : String, time_stamp : Log_TimeStamp, log_number : Long, e : Exception ) : String
+		}
+
+		class Formatter_TXT {
+			#Formatter_TXT()
+			+format( origin_name String, log_level : int, log_number : Long, time_stamp : Log_TimeStamp, objects : Object... ) : String
+			+format( origin_name : String, time_stamp : Log_TimeStamp, log_number : Long, e : Exception ) : String
+		}
+
+		class Formatter_CSV {
+			#Formatter_CSV()
+			+format( origin_name String, log_level : int, log_number : Long, time_stamp : Log_TimeStamp, objects : Object... ) : String
+			+format( origin_name : String, time_stamp : Log_TimeStamp, log_number : Long, e : Exception ) : String
+		}
+
+		class Output {
+			-String output_name
+			-GlobalOutputTypes output_type
+			#Ouput( output_name : String, output_type : GlobalOutputTypes )
+			+setName( output_name : String )
+			+getOutputName() : String
+			+getOutputType() : GlobalOutputTypes
+			+output( origin_name : String, log_level : int, log_number : Long, time_stamp Log_TimeStamp, objects : Object... )
+			+output( origin_name : String, time_stamp : Log_TimeStamp, log_number : Long, e : Exception )
+		}
+
+		class Output_TERM {
+			-Formatter_TERM formatter
+			+Output_TERM( name : String )
+			+setName( output_name : String )
+			+getOutputName() : String
+			+getOutputType() : GlobalOutputTypes
+			+output( origin_name : String, log_level : int, log_number : Long, time_stamp Log_TimeStamp, objects : Object... )
+			+output( origin_name : String, time_stamp : Log_TimeStamp, log_number : Long, e : Exception )
+		}
+
+		class Output_TXT {
+			-Formatter_TXT formatter
+			-FileOutput out
+			+Output_TXT( name : String )
+			+Output_TXT( out : FileOutput )
+			+setName( output_name : String )
+			+getOutputName() : String
+			+getOutputType() : GlobalOutputTypes
+			+output( origin_name : String, log_level : int, log_number : Long, time_stamp Log_TimeStamp, objects : Object... )
+			+output( origin_name : String, time_stamp : Log_TimeStamp, log_number : Long, e : Exception )
+		}
+
+		class Output_CSV {
+			-Formatter_CSV formatter
+			-FileOutput out
+			+Output_CSV( name : String )
+			+Output_CSV( out : FileOutput )
+			+setName( output_name : String )
+			+getOutputName() : String
+			+getOutputType() : GlobalOutputTypes
+			+output( origin_name : String, log_level : int, log_number : Long, time_stamp Log_TimeStamp, objects : Object... )
+			+output( origin_name : String, time_stamp : Log_TimeStamp, log_number : Long, e : Exception )
+		}
+		
+		enum GlobalOutputTypes <<enum>> {
+			TERMINAL
+			TXT
+			CSV
+		}
+
+		Formatter_TERM --|> Formatter_Interface
+		Formatter_TXT --|> Formatter_Interface
+		Formatter_CSV --|> Formatter_Interface
+		Log_TimeStamp --o Formatter_TERM
+		Log_TimeStamp --o Formatter_TXT
+		Log_TimeStamp --o Formatter_CSV
+		GlobalOutputTypes <-- Output
+		Output --* Log_Engine
+		Output <|-- Output_TERM
+		Output <|-- Output_TXT
+		Output <|-- Output_CSV
+		Output_TERM *-- Formatter_TERM
+		Output_TXT *-- Formatter_TXT
+		Output_CSV *-- Formatter_CSV
+	}
+	
+	package "kcl.teamIndexZero.traffic.log.fileIO" #DDDDDD {
+		class FileIO {
+			-{static} Charset charset
+			-String directory
+			-String file_name
+			+FileIO( directory : String, file_name : String )
+			+createFile() : bool
+			+deleteFile() : bool
+			#getDirectoryPath() : Path
+			#getFilePath() : Path
+			#getCharset() : Charset
+			#getFileName() : String
+			#getDirectory() : String
+		}
+		
+		class FileInput {
+			-BufferedReader reader
+			+FileInput( folder_path : String, file_name : String )
+			+read() : List<String>
+			+closeReader()
+			+deleteFile() : bool
+			+isOpen() : bool
+		}
+		
+		class FileOutput {
+			-BufferedWriter writer
+			+FileOutput( folder_path : String, file_name : String )
+			+reOpenBufferedWriter() : bool
+			+closeWriter() : bool
+			+appendString( s : String )
+			+clearFileContent() : boolean
+			+deleteFile() : bool
+			+getFileName() : String
+			+getDirectory() : String
+			+isOpen() : bool
+		}
+		
+		FileIO <|-- FileOutput
+		FileIO <|-- FileInput
+	}
+	
+	FileOutput --* Output
+	FileInput --* Log_Config
+	
+	class MicroLogger { 
+		-MicroLogger()
+		+setFileName( file_name : String )
+		+log_Fatal( objects : Object... )
+		+log_Error( objects : Object... )
+		+log_Warning( objects : Object... )
+		+log( objects : Object... )
+		+log_Debug( objects : Object... )
+		+log_Exception( e : Exception )
+		-writeToFile( msg : String )
+		+{static} INSTANCE : MicroLogger
+		-file_name : String
+	}
+	note right: Used by classes in the log module for their errors.
+}
+
+@enduml

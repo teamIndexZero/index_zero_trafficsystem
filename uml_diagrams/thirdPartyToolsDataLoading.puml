@@ -1,0 +1,9 @@
+@startuml
+partition "Third Party Tools" {
+(*) -->[Data preparation time] Raw OpenStreetMap file (area, such as London Full),containing all needed and unneeded features of the \nOSM (needed: roads, traffic lights, nodes, not needed: building shapes, trees, kebab kiosks, etc.
+--> [Osmosis: bounding box] File limited by a physical bounding box provided in lat/long coordinates. On this step, file still contains\nboth needed and not-needed features, however now it is of much smaller size.
+--> [Osmosis: filter by way type] File containing map area which is limited by bounding box but at the same time contains only needed features\nsuch as highways, trunk ways, bridges, traffic lights.
+--> [JOSM: Manual fixes] Sometimes, extra polishing by visual tool such as JOSM is needed. Data coming from OSM is extremely non-uniform,\n it contains errors and different authors express same concepts in different ways (Example: not all junctions\n are marked as junctions in the file,\nbut some are).
+}
+
+@enduml

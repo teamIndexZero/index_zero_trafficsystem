@@ -1,0 +1,5 @@
+@startuml
+(*) -->[Data from OpenStreetMap'\n (OSM) XML file] Geographical coordinates\nOpenStreetMap coordinate system\n (WGS-84 Datum, Lat/Long)\nBounding box for the map \nsubset as well as nodes (lat,lon)\n and ways (node*)
+-> [Convert to metric. Discard datum,\n use sphere approximation and get \n offset in meters from bottom left \n of the bounding box.] Metric coordinates: \n offset in meters from \n(bottom, left) of \nbounding box
+--> [Convert to on-screen coordinates\nin pixels, by applying scale, offset\nand rotation (on-screen Y-axis is\nopposite of traditional upwards\nfacing.] On-screen coordinates:\noffset in pixels from left-top \ncorner of the drawing panel.\nControllable by user (scale, \npan) and set by map.
+@enduml

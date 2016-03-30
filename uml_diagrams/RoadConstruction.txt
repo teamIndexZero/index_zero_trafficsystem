@@ -1,0 +1,25 @@
+@startuml
+start
+partition Road {
+	:Create a '__DirectedLanes__' for the forward direction;
+		partition "DirectedLanes: Forward" {
+			if( forwardSide count > 0 ) then (true)
+				repeat
+					:Create a new '__Lane__' feature;
+					:Add '__Lane__' to list of lanes;
+				repeat while( '__Lane__'(s) created < forwardSide count )
+			else (false)
+			endif
+		}
+	:Create a '__DirectedLanes__' for the backward direction;
+		partition "DirectedLanes: Backward" {
+			if( backwardSide count > 0 ) then (true)
+				repeat
+					:Create a new '__Lane__' feature;
+					:Add '__Lane__' to list of lanes;
+				repeat while( '__Lane__'(s) created < forwardSide count )
+			else (false)
+			endif	
+		}
+}
+@enduml
