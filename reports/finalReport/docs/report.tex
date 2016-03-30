@@ -143,10 +143,12 @@ $ osmosis --read-xml file=INPUT_LARGE_FILE.osm enableDateParsing=no
 
 Figure \ref{fig:thirdPartyToolsOSMPreparation} summarizes steps performed during preliminary file preparation process.
 \begin{figure}[h]
+    \vspace{1.5em}
     \caption{OpenStreetMap file preparation}
     \label{fig:thirdPartyToolsOSMPreparation}
     \centering
     \includegraphics[width=0.8\textwidth]{../../uml_diagrams/thirdPartyToolsDataLoading.png}
+    \vspace{1.5em}
 \end{figure}
 
 
@@ -162,21 +164,25 @@ Actual parsing of the XML file has been implemented using standard java SAX\foot
 First, the bounding box representing the actual geographical rectangle containing all the places of interest is read. Whilst OSM operates in geo-coordinates, the actual simulation happens on a flat positive Cartesian coordinate system. All objects have coordinates as offset from zero point by the x and y axis. Figure \ref{fig:coordinateConversions} provides an overview of what coordinate systems are used across the traffic simulation system. At this stage of parsing, the conversion operator is initialized by the offset to translate geographical coordinates to meters offset.
 
 \begin{figure}[h]
+    \vspace{1.5em}
     \caption{Coordinate systems used in the traffic simulation system}
     \label{fig:coordinateConversions}
     \centering
     \includegraphics[width=0.8\textwidth]{../../uml_diagrams/coordinateSystems.png}
+    \vspace{1.5em}
 \end{figure}
 
  Since OSM has a small set of basic objects to express mapping data, roads are expressed as <way> elements, containing a sequence of references to nodes which, effectively, forms a polyline. There is no notion of road width as such in the original data. Only the number of lanes and whether the road is one way or not is recorded in it. The design decision has been made to have the default lane width set to the standard 3.2 meters\cite{Council2016}. Using lane width, one-way flags and number of lanes in road, the physical representation of the road is created.
 
 \begin{figure}[h]
+    \vspace{1.5em}
     \caption{Polyline creation and visualisation stages}
     \label{fig:roadAndLanesPolylines}
     \centering
     \includegraphics[width=0.4\textwidth]{figs/road/road_polyline.png}
     \hspace{0.2em}
     \includegraphics[width=0.4\textwidth]{figs/road/road_lanes.png}
+    \vspace{1.5em}
 \end{figure}
 
 At the same time, XML data file provides enough information to construct a road central axis polyline. After this polyline is available, the individual lanes' own polylines are constructed using positive or negative shifts along the normal vector to the current segment. This depends on the position of the lane in the road. Figure \ref{fig:roadAndLanesPolylines} shows an overview of the process: on the left the road's central axis polyline is visible (thin black hairline), on the right the more complex junction with multiple lanes, constructed using the method mentioned before is visible.
@@ -200,10 +206,12 @@ The following problems were encountered and solved during the implementation of 
 \end{itemize}
 
 \begin{figure}[h]
+    \vspace{1.5em}
 	\caption{Example of road being split at junction}
 	\label{fig:roadSplitting}
 	\centering
 	\includegraphics[width=0.4\textwidth]{figs/junction/road_splitting.png}
+    \vspace{1.5em}
 \end{figure}
 
 
@@ -362,6 +370,7 @@ Whilst being useful to a user, such conversion poses not only technical, but als
     \includegraphics[width=0.4\textwidth]{figs/road/zoom_dots.png}
     \hspace{0.2em}
     \includegraphics[width=0.4\textwidth]{figs/road/zoom_cars.png}
+    \vspace{1.5em}
 \end{figure}
 
 
@@ -373,6 +382,7 @@ In addition to display functionality, the map provides interactive feedback. Whe
     \label{fig:guiMVC}
     \centering
     \includegraphics[width=0.75\textwidth]{../../uml_diagrams/GUI.png}
+    \vspace{1.5em}
 \end{figure}
 
 \subsubsection{Optimizations}
@@ -440,6 +450,7 @@ Simulation is performed in discrete steps. On each simulation steps a simulation
     \label{fig:simulationClassDiagram}
     \centering
     \includegraphics[width=0.75\textwidth]{../../uml_diagrams/simulatorClassDiagram.png}
+    \vspace{1.5em}
 \end{figure}
 
 Since the Simulator has control over what are the parameters ticks are created with, it is possible to control time granularity or speed. At the same time such approach causes some limitations: as such, if the tick duration is too long, for example, traffic lights might be able to update.
@@ -454,6 +465,7 @@ Vehicles move within and along the lane. Since lane is represented with the poly
 
 There might be cases when the vehicle may want to change lane. For example, consider slower truck moving ahead of faster passenger car. As soon as car reaches certain distance to the truck, it might want to change the lane to adjacent one in order to continue moving with higher speed. Vehicles maintain a certain distance to next object which is dependent on speed. All three stages of lane changing are displayed in Figure \ref{fig:carKeepingDistance}. Vehicle color hue depends on the speed, and circle with the bearing vector in it represents the car movement direction and distance to keep to next one.
 \begin{figure}[!h]
+    \vspace{1.5em}
     \caption{Car changing lane}
     \label{fig:carKeepingDistance}
     \centering
@@ -462,6 +474,7 @@ There might be cases when the vehicle may want to change lane. For example, cons
     \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_before.png}
     \hspace{0.2em}
     \includegraphics[width=0.3\textwidth]{figs/carMovement/car_lane_change_after.png}
+    \vspace{1.5em}
 \end{figure}
 
 Definitely, it is not always the case that changing lane is possible. For example, there may be no adjacent lane, or both the adjacent lanes are buys. Following is the process of lane changing represented as decision flow:
@@ -484,10 +497,12 @@ Upon switching to the new lane, car continues to move along it in the same mode 
 Figure \ref{fig:forwardOrTurnOption} displays the forward and turn sectors for the car approaching crossing. The crossing itself is displayed as a white circle in the center. Small car is approaching the crossing from the east. The car is following an inbound lane with the bearing at the junction of 15.9\degspc. The junction itself, in addition to two incoming lanes at 15.9\degspc and 158.7\degspc, has two outgoing lanes: one at 19.7\degspc, and one at 107.4\degspc. For the Car 46 approaching the junction, possible forward and turn outcomes are displayed on the overlay disc: red segments represent prohibited proceedings, yellow ones represent turns, and green ones represent forward movement. For this very scenario, Car 46 has an option to go forward with the 19.7\degspc exit, and an option to turn left with 107.4\degspc exit.
 
 \begin{figure}[H]
+    \vspace{1.5em}
     \caption{Junction forward or turn options depending on angle }
     \label{fig:forwardOrTurnOption}
     \centering
     \includegraphics[width=0.4\textwidth]{figs/junction/junction_car_incoming_angle_with_turn_sectors.png}
+    \vspace{1.5em}
 \end{figure}
 
 In real mapping data junctions can take various forms. Figure \ref{fig:junctionTypes} displays two commonly found types of junctions: a simple connection of two roads, which is quite possible one road split by a traffic light and pedestrian crossing, and more complex junction having 5 streets connected to it. Using the method specified above, car can conveniently move across this junction, either moving forward or attempting a turn in any of the allowed directions.
@@ -495,6 +510,7 @@ In real mapping data junctions can take various forms. Figure \ref{fig:junctionT
 Within this model, roundabout is established as a set of short one-way connected roads forming a circular structure. Right image in Figure \ref{fig:junctionTypes} shows a typical roundabout, with the road debug display setting enabled, where each individual lane is painted with new color in round-robin manner. One can clearly see where and how the roads connect.
 
 \begin{figure}[h]
+    \vspace{1.5em}
     \caption{Junctions found in real mapping data}
     \label{fig:junctionTypes}
     \centering
@@ -503,17 +519,20 @@ Within this model, roundabout is established as a set of short one-way connected
     \includegraphics[width=0.3\textwidth]{figs/junction/junction_two_roads.png}
     \hspace{0.2em}
     \includegraphics[width=0.3\textwidth]{figs/junction/roundabout.png}
+    \vspace{1.5em}
 \end{figure}
 
 A more subtle subtype of junctions is a fork, commonly found in proximity to roundabouts. Fork usually consist of multiple inflow or outflow features connected to a junction with a slight difference in degree with single outflow or inflow feature, respectively. Figure \ref{fig:forkTypes}, left, depicts a collecting fork joining two 2-lane one-way roads into the bridge road. The right image displays an actual two-lane two-way road splitting each lane into the two-lane one-way road.
 
 \begin{figure}[h]
+    \vspace{1.5em}
     \caption{Forks found in real mapping data}
     \label{fig:forkTypes}
     \centering
     \includegraphics[width=0.4\textwidth]{figs/junction/junction_oneway_to_fork.png}
     \hspace{0.2em}
     \includegraphics[width=0.4\textwidth]{figs/junction/junction_two_way_to_fork.png}
+    \vspace{1.5em}
 \end{figure}
 
 \subsection{Logger}
