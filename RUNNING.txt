@@ -1,0 +1,7 @@
+You need to have Java Runtime Environment (JRE) of version at least 1.8 to run the sofware.
+In order to run the software, from within this folder, please execute the following commands:
+
+ * Windows: $> gradlew :gui:run
+ * Linux, Mac: $> ./gradlew :gui:run
+
+Please check out README.md file for additional details.
