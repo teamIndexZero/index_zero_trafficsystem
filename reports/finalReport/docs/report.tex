@@ -9,7 +9,7 @@
 
 \section{Introduction}
 %Describe the context for the work and the problem you are addressing. Briefly summarise what you achieved in the project.
-
+The aim of this project was to simulate traffic in urban environment, enabeling us to gather some data with respect to the same. The data gainned would enable us to apply different situations to the test in the environment. We had orignally planned to go for a micro model, in this model we deal with each vehicle as a seperate entity, along with it's various charecteristics, like acceleration, direction of movement. We initially thought about implimenting a cell automata, which devided the roads into cells. To link roads we wanted to use graphs, thus getting a road with cells coneected to another by graphs. The main issues with our initial thought model was it's flexibility. The model was not scaleable to bigger regions.
 \begin{itemize}
 	\item Context
 	\begin{itemize}
@@ -654,10 +654,12 @@ In the event that no configuration file is found a default one is created that i
 \begin{itemize}
 	\item serialization/de-serialization
 \end{itemize}
+\subsection{GUI Primitives}
+Initially when we went for a micro  model we dealt with each car individually. Thus to reduce the overhead at the simulator, we planed to make a class with various functions that could be called to make the cars, and the roads, based on the location and other details of the same. This function was initially thought for drawing roads, cars, and trucks. It has an initial problem due to miscommunication, which led to a wrong design start. Upon rectifying out mistakes, we were again met with another problem of design, and implementation. The basic formula of the design was based around the coordinates of the placement of the car, thus it lead to cars being produced of different sizes based on the location on the map. Thus to remove the drawing issue it was decided to go with a picture of the car rather than a drawing, as it was an easier option. The image made a few things easier such as placement and sizing, but added new problems like initial direction of the image, and its background transparency. We had already spent a lot of time in this, and it was not getting to some concrete work. Even then we didn't loose hope and tried to get it working. As time progressed there were other problems with the code that had to be dealt with. The initial coding was very basic, and had to be streamlined and improved upon. This was added to the already existing list of problems to be dealt with. Once the code was streamlined, the next step initially was to make it log all the faliours it occurred while running. Upon this, just to check the performance of the code we ran a small test. The results were not what one would expect. The execution time for each iteration was very high. At this moment of time, the most important thing to be done was reduce the execution time, because with such long execution time the code couldn't be considered. It took us long to improve the execution time, and till then it was too late. While applying this whole concept we lost our way, and recovery was slow, may it be the initial misunderstanding or the latter neglect of the image while trying to reformat the code.
 
 \section{Team Work}
 %Describe how you worked together, including the tools and processes you used to facilitate group work.
-
+The initial start was really great for us, as we were following all the guidelines as the team. Our attendance to the weekly meetings was almost one hundred percent. The booking of rooms, and other miscellaneous works were never a problem, as one of us would always make sure it was done well in advance. The Interpretation of the meetings was taken differently by our team members, this was a bit of a concern.
 \subsection{Tools and processes}
 
 The team unanimously used IntelliJ IDEA\footnote{https://www.jetbrains.com/idea/} for coding and version control access. The IDE offers a wide array of development tools that automates a lot of "boiler-plate" things for Java enabling the user to focus on the more important aspects of development. It also has an integrated VCS module.
