@@ -48,70 +48,63 @@ One of the significant disadvantages of AIMSUN is that users are required to wri
 
 \subsection{SATURN}
 
-SATURN (Simulation and Assignment of Traffic to Urban Road Networks) is a macroscopic-based traffic simulator created by the Institute for Transport Studies in the University of Leeds. It is  popular in Europe and the UK. SATURN aims to simulate public transport traffic in urban areas. Since SATURN employs a macro-model, it allows observation of the large scale impact public transport can have. Possible parameters can be cost and duration of journey, vehicle price and configuration of fare zones. Also, there is an ad on  (PT-SATURN) which provides special simulation for the passengers behaviour in the public transport. Problems like which transport to choose, where to travel, how to travel (routes)
-can be also simulated \cite{Shires2006}.
+SATURN (Simulation and Assignment of Traffic to Urban Road Networks) is a macroscopic-based traffic simulator created by the Institute for Transport Studies in the University of Leeds. It is  popular in Europe and the UK. SATURN aims to simulate public transport traffic in urban areas. Since SATURN employs a macro-model, it allows observation of the large scale impact public transport can have. Possible parameters can be cost and duration of journey, vehicle price and configuration of fare zones. PT-SATURN, an addon, is available which provides simulation of the passenger behaviour within public transport. Problems like which transport to choose, where to travel, what route to take can also be incorporated in the simulation\cite{Shires2006}.
 
-\subsubsection{Conclusion}
+\subsection{Summary}
 
-During our research different problems of existed models and softwares were found. The advantage of each model dramatically depends on
-the final purpose. Surely, in case of the more detailed simulation a software based on microscopic model can achieve better results, on the contrary
-the intend to observe traffic paradigms and patterns will lead to the macroscopic models. In the same time, limit our software in the scopes of
-any of those model would not give expected result.
+Research highlighted different issues that exist within the models. The advantage of each model dramatically depends on their intended purpose, therefore these must be selected based on the required granularity.
 
 \section{Requirements and Design}
 %Describe the requirements you set for your project at the beginning and the design you have taken for your project. Focus on why you decided to tackle the problem in the way you did, and what effects that had on the design. You may also wish to mention the impact of team-working on your requirements and design.
 
-There were no formal requirements specified at any stage. Instead, the team followed the agile requirements process with no dedicated product manager. In essence, requirements were created by piling possible improvements and things nice to have into the backlog task section, which were evaluated and taken for implementation basing on their priority. At the same time, there were basic minimal requirements of creating a working product with GUI displaying vehicles moving in first simplistic and then more adverse road conditions.
+There were no formal requirements specified at any stage. Instead, the team followed the agile requirements process with no dedicated product manager. In essence, requirements were created by piling possible improvements and things of possible interest into the backlog task section, which were evaluated and taken for implementation based on their priority. At the same time, there were basic minimal requirements of creating a working product with a GUI displaying vehicles moving in map setting.
 
-The requirement evolution followed that one of the model. Original cellular automata model was rather limiting, so with the introduction of enhanced model more things became possible (i.e. cars display in an angle following the road angle).
+The requirements drove the evolution of the model and vice versa. The original cellular automata model was rather limiting, so with the introduction of enhanced model more things became possible (i.e. cars display in an angle following the road angle).
 
-Naturally, implementation of some features took place earlier, defining ongoing possibilities for other features to be implemented. As such, basic feature of crossing being free-form demanded some test definitions of different types of crossings, which in turn led to requirement for loading external data files. At the same time, GUI started to serve as a sort of visual inspector and debugger to understand data encounters, which led to a more sophisticated GUI design.
+Naturally, implementation of some features took place earlier, defining ongoing possibilities for other features to be implemented. As such,  free-form junctions demanded some test fixtures, which in turn led to requirement for loading external data files. At the same time, the GUI started to serve as a sort of visual inspector and debugger leading to an ever evolving design.
 
-Team capacitly played not the last role in requirement adaptation as well. Defined features were distributed among team members and due to different level of efficiency some of them were implemented to a higher level than others.
+With such an evolutionary approach to requirements the specific attention has been paid to internal structure and architecture enabling easier new features implementation. Design methodologies such as separation of concerns, modularization and design patterns were used to make software more robust and maintainable in the course of unforseen changes.
 
-With such an evolutionary approach to requirements the specific attention has been paid to internal structure and architecture enabling easier new feature implementation. Such methods as separation of concepts, modularization, some usage of design patterns were put in place to make software more robust and maintainable in the course of unforseen changes.
-
-Actual implemented features are listed in Table \ref{table:functionalities} in Section \ref{sec:projectEvaluation} below.
+Actual implemented features are listed in Table \ref{table:functionalities} in Section \ref{sec:projectEvaluation}.
 
 \section{Implementation}
 %Describe the most significant implementation details, focussing on those where unusual or detailed solutions were required. Quote code fragments where necessary, but remember that the full source code will be included as an appendix. Explain how you tested your software (e.g. unit testing) and the extent to which you tested it. If relevant to your project, explain performance issues and how you tackled them.
 
-While the test driven development process was selected by team initially, usage of proper unit testing has declined over time due to approaching deadlines. Still, tests were written as a regular practice for some parts of the system, especially illustrating more complex concepts or acting as early clients for the code to be integrated later.
+Whilst test driven development process was selected by the team initially, usage of proper unit testing declined over time due to looming  deadlines. Still, regular practice of writing tests for some parts of the system, especially core and complex ones, persisted.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Alex part
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Technology and libraries}
+\subsection{Technology and Libraries}
 
-Java Standard Edition version 1.8 has been chosen as an implementation platform, since Java is a language more or less familiar to all team members. At the same time it provides Graphical User Interface framework and an excellent tooling support. Gradle\footnote{Gradle is a modern build system for Java in tight integration with Groovy http://gradle.org} was used as build system to automate builds on Travis continuous integration server and also to produce various artefacts.
+Java Standard Edition version 1.8 was chosen as an implementation platform, since Java is a language familiar to all team members. At the same time it provides a Graphical User Interface framework and an excellent tooling support. Gradle\footnote{Gradle is a modern build system for Java in tight integration with Groovy http://gradle.org} was used as a build system to automate builds on Travis continuous integration server and also to produce various artefacts.
 
-There were no external libraries used for the actual application code, except for Java standard runtime library rt.jar.
+There were no external libraries used for the actual application code, except for the Java standard runtime library (rt.jar).
 
-In order to enable more convenient testing, following libraries were used:
+In order to enable more convenient unit-testing, following libraries were used:
 \begin{enumerate}
     \item Junit 4 as an actual test runner
-    \item Mockito\footnote{https://code.google.com/archive/p/mockito/} - easy mocks in java. Enables nicer separation of concepts and fluent invocation verification patterns
-    \item Fest assertions\footnote{https://github.com/alexruiz/fest-assert-2.x/wiki/One-minute-starting-guide} - library enabling writing comprehensive and convenient assertions.
+    \item Mockito\footnote{https://code.google.com/archive/p/mockito/} - easy mocks in java. Enables better separation of concerns and fluent invocation verification patterns
+    \item Fest assertions\footnote{https://github.com/alexruiz/fest-assert-2.x/wiki/One-minute-starting-guide} - library enabling writing comprehensive and convenient assertions
 \end{enumerate}
 
-Build system using Gradle was plugged in to automate builds and various artefact production. In order to work with OpenStreetMap files, appropriate standard OSM tools were used (namely, JOSM and osmosis), as detailed below in the report.
+In order to work with OpenStreetMap files, appropriate standard OSM tools were used (namely, JOSM and osmosis), as detailed further in the report.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Alex part
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Map data import (OSM)}
-According to the requirements, the software would need to be able to model traffic behaviour in real-like road networks. In addition to the organic requirements needs, there were synthetic type of requirements demanding for various test fixtures for all application components from actual vehicle behaviour to individual lane visualisation.
+\subsection{Map Data Import}
+According to the requirements, the software would need to be able to model traffic behaviour in real-like road networks. In addition to the organic requirements, there were synthetic ones, demanded by various test fixtures for all application components from actual vehicle behaviour to individual lane visualisation.
 
-Decision was made to use already-available public-domain ordnance data from OpenStreetMap\footnote{OSM data is available under ODbL license, see http://www.openstreetmap.org/copyright} (OSM)  worldwide project. It was a natural decision since data is available for all the world, and is collaboratively created by multitude of users, OSM has a strong technical community and ample documentation, and, finally, it contains all the data which may be required for traffic simulation. In addition to that, data files are available in well-known XML format\footnote{Having said that, there is no official XML type specification due to main software pieces in ecosystem vaguely interpreting different cases: http://wiki.openstreetmap.org/wiki/OSM\_XML}. As an extremely useful side-effect, using such widely available data allows a user to obtain a map of the area of particular interest for simulation following simple steps, so it greatly adds to the practical value. At the same time, the implementation of such loading turned out to be not straightforward due to data originating from many human contributors bearing all the inconsistencies and errors possible for vaguely defined data.
+Decision was made to use already-available public-domain ordnance data from OpenStreetMap\footnote{OSM data is available under ODbL license, see http://www.openstreetmap.org/copyright} (OSM)  worldwide project. It was a natural decision since data is available for all the world, and is collaboratively created by a multitude of users. OSM has a strong technical community and ample documentation. Finally, it contains all the most important data which may be required for traffic simulation. Data files are available in well-known XML format\footnote{Having said that, there is no official XML type specification due to main software pieces in ecosystem vaguely interpreting different cases: http://wiki.openstreetmap.org/wiki/OSM\_XML}. As an extremely useful side-effect, using such widely available data allows a user to obtain a map of the area of particular interest for simulation following simple steps, so it greatly adds to the practical value. At the same time, the implementation of such loading turned out to not be straightforward due to data originating from many human contributors bearing all the inconsistencies and errors possible for vaguely defined data.
 
-OSM format defines three main types of objects: nodes (points having coordinates), ways (polylines, sequences of nodes) and relations (types of relationships between other objects), which are extensively tagged, to represent all the complex setting of the real-world mapping. For example, a way (sequence of node references) with tag type equal to primary and lanes equal to 4, would mean a two-way primary road. A way with type building represents a building on the map, and should be a closed polygon. All the objects have the ID attached to them.
+OSM format defines three main types of objects: nodes (points having coordinates), ways (polylines, sequences of nodes) and relations (types of relationships between other objects). These are extensively tagged to represent all the complex settings of the real-world mapping. For example: a way (sequence of node references) with tag type equal to primary and lanes equal to 4 would mean a two-way primary road. However a way with type building represents a building on the map, and should be a closed polygon. All the objects have their ID attached to them via tags.
 
-Following is a compact overview of the pipeline data follows from the OpenStreetMap file downloadable from the internet to the actual simulation process:
+Following is a compact overview of the pipeline the data follows from the OpenStreetMap file downloadable from the internet to the actual simulation process:
 \begin{itemize}
-    \item Stage 1. Using standard OSM software tools (Osmosis, JOSM), prepare the excerpt from large data set suitable, which is suitable for simulation.
-
+    \item Stage 1. Using standard OSM software tools (Osmosis, JOSM), prepare the excerpt from large data set, which is suitable for simulation.
     \item Stage 2. Using obtained OSM XML file, load a set of Descriptor objects:
     \begin{itemize}
         \item Collection of road descriptors: objects describing roads, with number of lanes in each direction
@@ -124,7 +117,7 @@ Following is a compact overview of the pipeline data follows from the OpenStreet
         \item Create roads from descriptions. Create individual lanes within the roads. Offset lanes accordingly.
         \item Create junctions from descriptors.
         \item Link roads and junctions using junction descriptors. Link on individual lanes. Compute possible inflow and outflow paths for junctions to save time in simulation run.
-        \item Walk the graph and attach traffic generators and receivers to not yet connected edges.
+        \item Walk the graph and attach traffic generators and receivers to the edges not yet connected.
     \end{itemize}
 
     \item Stage 4. Run the traffic simulation on the created map.
@@ -134,8 +127,8 @@ Following is a compact overview of the pipeline data follows from the OpenStreet
 % Alex part
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Preparing data file}
-First of all, user needs to decide on the actual geographical area they want to perform simulation in. The area is uniquely defined by 2 pairs geographical of coordinates in latitude, longitude coordinate system: (south-west lat, long) - (north-east lat,long). After that, user needs to either download the full planet.osm file (containing whole OSM data set), or an area excerpt containing area of interest\footnote{Geofabrik is a reliable source for OSM excerpts with fresh data http://www.geofabrik.de}.
+\subsubsection{Preparing Data File}
+First of all, a user needs to decide on the actual geographical area they want to perform the simulation of. The area is uniquely defined by 2 pairs of geographical coordinates: (south-west lat, long) - (north-east lat,long). After that, user needs to either download the full planet.osm file (containing whole OSM data set), or an area excerpt containing the area of interest\footnote{Geofabrik is a reliable source for OSM excerpts with fresh data http://www.geofabrik.de}.
 
 Following is the osmosis tool command line, which combines both cut and filter steps into single run:
 \begin{lstlisting}
@@ -146,7 +139,7 @@ $ osmosis --read-xml file=INPUT_LARGE_FILE.osm enableDateParsing=no
         --used-node
         --write-xml OUTPUT_FILE.osm
 \end{lstlisting}
-'completeWays=yes' key is of specific interest. When osmosis attempts bounding box reduction, and finds a way which is located both inside and outside the bounding box, its default behaviour is to terminate the way at the last node within the box. When applied to real life data, this yielded ugly results, sometimes terminating road network segment where it should not terminate. As a counter action, this key is used to include all the ways which are within, or intersect with, bounding box rectangle.  As a result, we obtain an OSM XML file with some ways spanning outside of the box, which may be opened directly from within the user interface of the Traffic Simulator system, or edited in any standard OSM file editor, such as JOSM.
+'completeWays=yes' key is of specific interest. When osmosis attempts bounding box reduction, and finds a way which is located both inside and outside the bounding box, its default behaviour is to terminate the way at the last node within the box. When applied to real life data, this yielded ugly results, sometimes terminating road network segment where it should not terminate. As a counter action, this key is used to include all the ways which are within, or intersect with, the bounding box rectangle.  As a result, the OSM XML file with some ways spanning outside of the box is obtained which may be opened directly from within the user interface of the Traffic Simulator system, or edited in any standard OSM file editor such as JOSM.
 
 Figure \ref{fig:thirdPartyToolsOSMPreparation} summarizes steps performed during preliminary file preparation process.
 \begin{figure}[h]
@@ -161,10 +154,10 @@ Figure \ref{fig:thirdPartyToolsOSMPreparation} summarizes steps performed during
 % Alex part
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Descriptors creation from the OSM file}
-After the actual simulation map OSM file is created, it may be opened directly from traffic simulation. In order for the data contained in an XML file to be used, it first needs to be read, parsed and adopted into the internal format, and also linked into the in-memory graph.
+\subsubsection{Descriptors Creation from the OSM File}
+After the actual simulation map OSM file is created, it may be opened directly from the traffic simulator. In order for the data contained in an XML file to be used, it first needs to be read, parsed and adopted into the internal format on top of being linked into the in-memory graph.
 
-Actual parsing of the XML file has been implemented using standard java SAX\footnote{Simple API for XML, https://docs.oracle.com/javase/7/docs/api/javax/xml/parsers/SAXParser.html} parser. When choosing between the DOM and SAX parsing, the latter was selected with no doubt, since the DOM has significantly larger memory requirement as soon as it establishes the whole document as tree in memory, and exposes many complex APIs and methods for manipulation which are not needed for the loading data case. SAX employs event-driven XML parsing model: when parser encounters new element, closing element, an attribute or text blocks, it invokes appropriate methods on handler object. In order to listen to these events, class OsmSaxHandler has been created.
+Actual parsing of the XML file has been implemented using standard java SAX\footnote{Simple API for XML, https://docs.oracle.com/javase/7/docs/api/javax/xml/parsers/SAXParser.html} parser. When choosing between the DOM and SAX parsing, the latter was selected as the DOM has significantly larger memory requirement\footnote{DOM establishes the whole document as a tree in memory and exposes many complex APIs and methods for manipulating that tree which are not needed for the loading data case}. SAX employs event-driven XML parsing model: when the parser encounters a new element, closing element, an attribute or text blocks, it invokes appropriate methods on handler object. In order to listen to these events, class OsmSaxHandler has been created.
 
 From the XML file, first the bounding box is read, the actual geographical rectangle containing all the places of interest. Whilst OSM operates in geo-coordinates, actual simulation happens on a flat Cartesian coordinate system first quadrant map. All objects have coordinates as offset from zero point by x and by y axis. Figure \ref{fig:coordinateConversions} provides an overview of what are the coordinate systems used across the traffic simulation system. On this stage of parsing, conversion operator is initialized for geographical to meters offset coordinate system conversion.
 
@@ -732,6 +725,7 @@ Following are some numerical properties about project implementation course:
 \end{itemize}
 
 \section{Project Evaluation}
+\label{sec:projectEvaluation}
 %Critically evaluate your project: what worked well, and what didn’t? How did you do relative to your plan? what changes were the result of improved thinking and what changes were forced upon you? how did your team work together? etc. Note that you need to show that you understand the weaknesses in your work as well as its strengths. You may wish to identify relevant future work that could be done on your project.
 
 Originally the project was to take up the cellular automata model for the simulation. As it became obvious this would cause a problem for vehicles especially at stop point where it would leave gaps between the objects due to the nature of static sized cells the project evolved towards a more precise model with coordinates for movement placement allowing for a more granular and realistic simulation.
